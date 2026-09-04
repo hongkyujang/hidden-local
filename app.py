@@ -2,44 +2,40 @@ import streamlit as st
 import pandas as pd
 import folium
 from streamlit_folium import st_folium
-import urllib.parse
 
 # =========================================================
 # 1. 페이지 설정
 # =========================================================
 st.set_page_config(
-    page_title=" SGIS(통계지리정보서비스)를 활용한 숨은 로컬 발견 (Dark Mode)",
+    page_title="숨은 로컬 발견",
     page_icon="📍",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
 # =========================================================
-# 2. 다크 모드 전용 커스텀 CSS
+# 2. 커스텀 CSS (제목 짤림 방지 & 디자인 복원)
 # =========================================================
 st.markdown("""
 <style>
-/* 다크 모드 글로벌 배경 및 폰트 설정 */
+/* 글로벌 배경 및 폰트 설정 */
 html, body, [data-testid="stApp"], [data-testid="stAppViewContainer"], [data-testid="stMain"] {
-    background-color: #121212 !important;
+    background-color: #f8f9fa !important;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    color: #e0e0e0 !important;
+    color: #212529;
 }
 
-/* 상단 여백 및 맥스 너비 */
+/* 제목 짤림 방지: 상단 패딩 확보 */
 .main .block-container {
     padding-top: 3.5rem !important;
     padding-bottom: 3rem !important;
     max-width: 1280px !important;
 }
 
-/* 사이드바 다크 스타일 */
+/* 사이드바 스타일링 */
 section[data-testid="stSidebar"] {
-    background-color: #1e1e1e !important;
-    border-right: 1px solid #2d2d2d !important;
-}
-section[data-testid="stSidebar"] * {
-    color: #e0e0e0 !important;
+    background-color: #ffffff !important;
+    border-right: 1px solid #e9ecef !important;
 }
 
 /* 메인 타이틀 헤더 */
@@ -56,39 +52,41 @@ section[data-testid="stSidebar"] * {
 }
 .header-icon {
     font-size: 28px;
-    color: #ff6b6b;
+    color: #e63946;
 }
 .header-title {
     font-size: 28px;
     font-weight: 800;
-    color: #ffffff !important;
-    line-height: 1.3 !important;
+    color: #111111;
+    line-height: 1.3 !important; /* 글자 상단 짤림 방지 */
     margin: 0;
 }
 .header-subtitle {
     font-size: 14px;
-    color: #a0a0a0;
+    color: #6c757d;
     margin-top: 4px;
 }
 .fav-btn {
-    background-color: #2b2b2b;
-    border: 1px solid #3d3d3d;
+    background-color: #ffffff;
+    border: 1px solid #e9ecef;
     border-radius: 20px;
     padding: 6px 14px;
     font-size: 13px;
-    color: #ff6b6b;
+    color: #e63946;
     font-weight: 600;
     display: inline-flex;
     align-items: center;
     gap: 5px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
 }
 
 /* 대시보드 지표 카드 (4열) */
 .metric-card {
-    background: #1e1e1e;
+    background: #ffffff;
     border-radius: 12px;
     padding: 16px 20px;
-    border: 1px solid #2d2d2d;
+    border: 1px solid #f1f3f5;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.03);
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -109,17 +107,17 @@ section[data-testid="stSidebar"] * {
 }
 .metric-label {
     font-size: 12px;
-    color: #a0a0a0;
+    color: #868e96;
     font-weight: 600;
 }
 .metric-value {
     font-size: 20px;
     font-weight: 800;
-    color: #ffffff;
+    color: #212529;
 }
 .metric-sub {
     font-size: 11px;
-    color: #707070;
+    color: #adb5bd;
     margin-top: 2px;
 }
 
@@ -131,7 +129,7 @@ section[data-testid="stSidebar"] * {
     margin-top: 10px;
     margin-bottom: 25px;
     font-size: 12px;
-    color: #a0a0a0;
+    color: #495057;
 }
 .legend-item {
     display: flex;
@@ -145,10 +143,17 @@ section[data-testid="stSidebar"] * {
 }
 
 /* 상세 정보 섹션 */
+.section-title-box {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 30px;
+    margin-bottom: 15px;
+}
 .section-title {
     font-size: 20px;
     font-weight: 700;
-    color: #ffffff;
+    color: #212529;
     display: flex;
     align-items: center;
     gap: 8px;
@@ -156,10 +161,11 @@ section[data-testid="stSidebar"] * {
 
 /* 메인 지역 정보 카드 */
 .main-region-card {
-    background: #1e1e1e;
+    background: #ffffff;
     border-radius: 12px;
-    border: 1px solid #2d2d2d;
+    border: 1px solid #f1f3f5;
     overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.03);
     height: 100%;
     position: relative;
 }
@@ -172,7 +178,7 @@ section[data-testid="stSidebar"] * {
     position: absolute;
     top: 12px;
     right: 12px;
-    background: #ff6b6b;
+    background: #e63946;
     color: white;
     font-weight: 700;
     font-size: 12px;
@@ -184,7 +190,7 @@ section[data-testid="stSidebar"] * {
 }
 .main-region-desc {
     font-size: 13px;
-    color: #cccccc;
+    color: #495057;
     line-height: 1.5;
     margin-bottom: 15px;
 }
@@ -192,32 +198,33 @@ section[data-testid="stSidebar"] * {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 8px;
-    border-top: 1px solid #2d2d2d;
+    border-top: 1px solid #f1f3f5;
     padding-top: 12px;
     text-align: center;
 }
 .stat-item-label {
     font-size: 11px;
-    color: #a0a0a0;
+    color: #868e96;
 }
 .stat-item-val {
     font-size: 12px;
     font-weight: 700;
-    color: #ffffff;
+    color: #212529;
 }
 
-/* 서브 아이템 카드 */
+/* 서브 아이템 카드 (대표음식, 특산품, 축제) */
 .sub-info-card {
-    background: #1e1e1e;
+    background: #ffffff;
     border-radius: 12px;
-    border: 1px solid #2d2d2d;
+    border: 1px solid #f1f3f5;
     padding: 14px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.03);
     height: 100%;
 }
 .sub-info-title {
     font-size: 14px;
     font-weight: 700;
-    color: #ffffff;
+    color: #212529;
     margin-bottom: 10px;
 }
 .sub-info-img {
@@ -230,11 +237,11 @@ section[data-testid="stSidebar"] * {
 .sub-info-name {
     font-size: 15px;
     font-weight: 700;
-    color: #ffffff;
+    color: #212529;
 }
 .sub-info-desc {
     font-size: 12px;
-    color: #a0a0a0;
+    color: #6c757d;
     line-height: 1.4;
     margin-top: 4px;
     margin-bottom: 12px;
@@ -244,20 +251,20 @@ section[data-testid="stSidebar"] * {
     width: 100%;
     text-align: center;
     padding: 6px 0;
-    background: #2b2b2b;
-    border: 1px solid #3d3d3d;
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
     border-radius: 6px;
     font-size: 12px;
-    color: #e0e0e0;
+    color: #495057;
     font-weight: 600;
     text-decoration: none;
 }
 
-/* 맛집 카드 */
+/* 추천 맛집 카드 */
 .place-card {
-    background: #1e1e1e;
+    background: #ffffff;
     border-radius: 10px;
-    border: 1px solid #2d2d2d;
+    border: 1px solid #f1f3f5;
     padding: 12px;
     display: flex;
     gap: 12px;
@@ -272,50 +279,26 @@ section[data-testid="stSidebar"] * {
 .place-name {
     font-size: 14px;
     font-weight: 700;
-    color: #ffffff;
+    color: #212529;
 }
 .place-star {
     font-size: 12px;
-    color: #ffd43b;
+    color: #fcc419;
     font-weight: 700;
     margin: 2px 0;
 }
 .place-addr {
     font-size: 11px;
-    color: #a0a0a0;
+    color: #868e96;
 }
 
-/* 길찾기 카드 다크 스타일 */
-.route-card {
-    background: #1e1e1e;
-    border-radius: 12px;
-    border: 1px solid #2d2d2d;
-    padding: 18px;
-    margin-bottom: 15px;
-}
-.map-link-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    padding: 10px 16px;
-    border-radius: 8px;
-    font-size: 13px;
-    font-weight: 700;
-    text-decoration: none;
-    color: white !important;
-    width: 100%;
-    margin-top: 8px;
-}
-.btn-kakao { background-color: #fee500; color: #000000 !important; }
-.btn-naver { background-color: #03c75a; }
-
-/* 리뷰 카드 다크 스타일 */
+/* 리뷰 카드 */
 .review-card {
-    background: #1e1e1e;
+    background: #ffffff;
     border-radius: 12px;
-    border: 1px solid #2d2d2d;
+    border: 1px solid #f1f3f5;
     padding: 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.03);
 }
 .review-header {
     display: flex;
@@ -332,7 +315,7 @@ section[data-testid="stSidebar"] * {
     width: 36px;
     height: 36px;
     border-radius: 50%;
-    background: #2b2b2b;
+    background: #e9ecef;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -341,17 +324,21 @@ section[data-testid="stSidebar"] * {
 .review-username {
     font-size: 13px;
     font-weight: 700;
-    color: #ffffff;
+    color: #212529;
 }
 .review-date {
     font-size: 11px;
-    color: #707070;
+    color: #adb5bd;
 }
 .review-text {
     font-size: 12px;
-    color: #cccccc;
+    color: #495057;
     line-height: 1.5;
     margin-bottom: 12px;
+}
+.review-imgs {
+    display: flex;
+    gap: 6px;
 }
 .review-img {
     width: 48%;
@@ -362,9 +349,9 @@ section[data-testid="stSidebar"] * {
 
 /* TOP 5 카러셀 아이템 */
 .top-card {
-    background: #1e1e1e;
+    background: #ffffff;
     border-radius: 10px;
-    border: 1px solid #2d2d2d;
+    border: 1px solid #f1f3f5;
     overflow: hidden;
     position: relative;
 }
@@ -374,7 +361,7 @@ section[data-testid="stSidebar"] * {
     left: 8px;
     width: 22px;
     height: 22px;
-    background: #ff6b6b;
+    background: #212529;
     color: white;
     border-radius: 50%;
     display: flex;
@@ -394,24 +381,12 @@ section[data-testid="stSidebar"] * {
 .top-title {
     font-size: 13px;
     font-weight: 700;
-    color: #ffffff;
+    color: #212529;
 }
 .top-score {
     font-size: 11px;
-    color: #ff6b6b;
+    color: #e63946;
     font-weight: 700;
-}
-
-/* Streamlit Tab 다크 스타일 개선 */
-.stTabs [data-baseweb="tab-list"] {
-    background-color: #121212;
-    border-bottom: 1px solid #2d2d2d;
-}
-.stTabs [data-baseweb="tab"] {
-    color: #a0a0a0;
-}
-.stTabs [aria-selected="true"] {
-    color: #ff6b6b !important;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -424,7 +399,7 @@ def load_data():
     return [
         {
             "id": 1, "지역": "강원도 정선군", "위도": 37.3806, "경도": 128.6608, "점수": 88.7,
-            "인구": "34,419명", "면적": "1,444.00㎢", "음식점수": "46개", "관광지수": "91개",
+            "인구": "34,419명", "면적": "1,444.00㎢", "음식점수": 46개, "관광지수": 91개,
             "소개": "아리랑의 고향 정선은 아름다운 자연경관과 전통문화, 그리고 건강한 먹거리가 가득한 보석 같은 지역입니다.",
             "대표음식": "곤드레밥", "대표음식_설명": "정선의 대표 향토 음식으로, 건강에 좋은 곤드레나물을 넣어 지은 밥.",
             "대표음식_img": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600&q=80",
@@ -435,12 +410,13 @@ def load_data():
             "메인이미지": "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1000&q=80",
             "맛집목록": [
                 {"이름": "정선곤드레본가", "평점": "★ 4.6 (126)", "주소": "정선읍 5일장길 31", "img": "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=300&q=80"},
-                {"이름": "함백산식당", "평점": "★ 4.4 (98)", "주소": "고한읍 고한로 123", "img": "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=300&q=80"}
+                {"이름": "함백산식당", "평점": "★ 4.4 (98)", "주소": "고한읍 고한로 123", "img": "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=300&q=80"},
+                {"이름": "정선아리랑시장 맛집", "평점": "★ 4.3 (87)", "주소": "정선읍 봉양3길 322", "img": "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=300&q=80"}
             ]
         },
         {
             "id": 2, "지역": "전라남도 구례군", "위도": 35.2025, "경도": 127.4628, "점수": 87.3,
-            "인구": "24,800명", "면적": "429.80㎢", "음식점수": "38개", "관광지수": "75개",
+            "인구": "24,800명", "면적": "429.80㎢", "음식점수": 38개, "관광지수": 75개,
             "소개": "지리산 자락 청정 자연 속에서 산수유와 산채 요리를 만나볼 수 있는 구례입니다.",
             "대표음식": "산채정식", "대표음식_설명": "지리산에서 채취한 다양한 나물과 정갈한 반찬으로 차려낸 한상.",
             "대표음식_img": "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=600&q=80",
@@ -449,11 +425,13 @@ def load_data():
             "축제": "구례 산수유꽃축제", "축제_설명": "노란 산수유 꽃물결을 감상하는 대표 봄축제.",
             "축제_img": "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&w=600&q=80",
             "메인이미지": "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1000&q=80",
-            "맛집목록": [{"이름": "지리산산채식당", "평점": "★ 4.8 (210)", "주소": "구례군 마산면 88", "img": "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=300&q=80"}]
+            "맛집목록": [
+                {"이름": "지리산산채식당", "평점": "★ 4.8 (210)", "주소": "구례군 마산면 88", "img": "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=300&q=80"}
+            ]
         },
         {
             "id": 3, "지역": "경상남도 의령군", "위도": 35.3222, "경도": 128.2617, "점수": 86.1,
-            "인구": "26,100명", "면적": "482.90㎢", "음식점수": "32개", "관광지수": "58개",
+            "인구": "26,100명", "면적": "482.90㎢", "음식점수": 32개, "관광지수": 58개,
             "소개": "소바와 의령망개떡이 유명하며 맑은 남강이 흐르는 정겨운 로컬 도시입니다.",
             "대표음식": "의령소바", "대표음식_설명": "진한 메밀향과 메밀면의 쫄깃함이 일품인 대표 별미.",
             "대표음식_img": "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&w=600&q=80",
@@ -462,11 +440,13 @@ def load_data():
             "축제": "의령 의병제전", "축제_설명": "임진왜란 의병들의 숭고한 호국정신을 기리는 축제.",
             "축제_img": "https://images.unsplash.com/photo-1533105079780-92b9be482077?auto=format&fit=crop&w=600&q=80",
             "메인이미지": "https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=1000&q=80",
-            "맛집목록": [{"이름": "의령소바 본점", "평점": "★ 4.5 (320)", "주소": "의령읍 의병로 18", "img": "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&w=300&q=80"}]
+            "맛집목록": [
+                {"이름": "의령소바 본점", "평점": "★ 4.5 (320)", "주소": "의령읍 의병로 18", "img": "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&w=300&q=80"}
+            ]
         },
         {
             "id": 4, "지역": "전라북도 무주군", "위도": 35.9861, "경도": 127.6606, "점수": 84.9,
-            "인구": "23,500명", "면적": "631.80㎢", "음식점수": "41개", "관광지수": "82개",
+            "인구": "23,500명", "면적": "631.80㎢", "음식점수": 41개, "관광지수": 82개,
             "소개": "덕유산의 웅장함과 청정 반딧불이가 숨쉬는 힐링 여행지입니다.",
             "대표음식": "어죽", "대표음식_설명": "금강 상류의 민물고기로 푹 끓여낸 얼큰하고 담백한 별미.",
             "대표음식_img": "https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=600&q=80",
@@ -475,11 +455,13 @@ def load_data():
             "축제": "무주 반딧불축제", "축제_설명": "천연기념물 반딧불이와 함께하는 생태 환경 축제.",
             "축제_img": "https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=600&q=80",
             "메인이미지": "https://images.unsplash.com/photo-1472214103451-9374bd1c798e?auto=format&fit=crop&w=1000&q=80",
-            "맛집목록": [{"이름": "금강식당 어죽", "평점": "★ 4.7 (180)", "주소": "무주읍 단산리 12", "img": "https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=300&q=80"}]
+            "맛집목록": [
+                {"이름": "금강식당 어죽", "평점": "★ 4.7 (180)", "주소": "무주읍 단산리 12", "img": "https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=300&q=80"}
+            ]
         },
         {
             "id": 5, "지역": "충청북도 단양군", "위도": 36.9845, "경도": 128.3657, "점수": 84.2,
-            "인구": "28,105명", "면적": "780.10㎢", "음식점수": "52개", "관광지수": "88개",
+            "인구": "28,105명", "면적": "780.10㎢", "음식점수": 52개, "관광지수": 88개,
             "소개": "단양팔경의 수려한 자연경관과 마늘 특산 요리가 어우러진 휴양 도시입니다.",
             "대표음식": "마늘떡갈비", "대표음식_설명": "단양 특산물인 육쪽마늘을 더해 깊은 풍미를 자랑하는 떡갈비.",
             "대표음식_img": "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=600&q=80",
@@ -488,11 +470,13 @@ def load_data():
             "축제": "단양 마늘축제", "축제_설명": "단양 마늘과 로컬 먹거리를 만끽하는 여름 축제.",
             "축제_img": "https://images.unsplash.com/photo-1533105079780-92b9be482077?auto=format&fit=crop&w=600&q=80",
             "메인이미지": "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1000&q=80",
-            "맛집목록": [{"이름": "단양마늘원조집", "평점": "★ 4.7 (150)", "주소": "단양읍 중앙로 15", "img": "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=300&q=80"}]
+            "맛집목록": [
+                {"이름": "단양마늘원조집", "평점": "★ 4.7 (150)", "주소": "단양읍 중앙로 15", "img": "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=300&q=80"}
+            ]
         },
         {
             "id": 6, "지역": "경상북도 영양군", "위도": 36.6667, "경도": 129.1118, "점수": 83.5,
-            "인구": "16,000명", "면적": "815.10㎢", "음식점수": "25개", "관광지수": "45개",
+            "인구": "16,000명", "면적": "815.10㎢", "음식점수": 25개, "관광지수": 45개,
             "소개": "아시아 최초 밤하늘 보호공원이 위치한 별빛 가득한 오지 로컬 명소.",
             "대표음식": "산나물비빔밥", "대표음식_설명": "영양의 깨끗한 고산지대에서 채취한 산나물 뷔페식 비빔밥.",
             "대표음식_img": "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=600&q=80",
@@ -505,10 +489,10 @@ def load_data():
         },
         {
             "id": 7, "지역": "경상북도 청송군", "위도": 36.4356, "경도": 129.0572, "점수": 82.8,
-            "인구": "24,000명", "면적": "842.60㎢", "음식점수": "35개", "관광지수": "65개",
+            "인구": "24,000명", "면적": "842.60㎢", "음식점수": 35개, "관광지수": 65개,
             "소개": "주왕산 국립공원의 절경과 달기약수탕, 꿀사과가 유명한 힐링 명소.",
             "대표음식": "달기약수백숙", "대표음식_설명": "탄산 약수로 끓여 닭고기가 부드럽고 국물이 깊은 약선 요리.",
-            "대표음식_img": "https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=600&q=80",
+            "대표음式_img": "https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=600&q=80",
             "특산품": "청송 사과", "특산품_설명": "해발이 높고 일교차가 크며 즙이 많은 명품 꿀사과.",
             "특산품_img": "https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?auto=format&fit=crop&w=600&q=80",
             "축제": "청송 사과축제", "축제_설명": "가을철 사과 수확 기쁨을 나누는 경북 대표 축제.",
@@ -518,7 +502,7 @@ def load_data():
         },
         {
             "id": 8, "지역": "충청남도 태안군", "위도": 36.7456, "경도": 126.2981, "점수": 81.9,
-            "인구": "62,000명", "면적": "500.80㎢", "음식점수": "78개", "관광지수": "110개",
+            "인구": "62,000명", "면적": "500.80㎢", "음식점수": 78개, "관광지수": 110개,
             "소개": "서해안 해안선과 안면도 소나무 숲, 풍부한 해산물이 어우러진 해양 도시.",
             "대표음식": "게국지", "대표음식_설명": "꽃게와 겉절이 김치를 넣고 시원하게 끓여낸 충남 향토 음식.",
             "대표음식_img": "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=600&q=80",
@@ -531,7 +515,7 @@ def load_data():
         },
         {
             "id": 9, "지역": "전라남도 고흥군", "위도": 34.6114, "경도": 127.2842, "점수": 80.4,
-            "인구": "62,500명", "면적": "807.30㎢", "음식점수": "55개", "관광지수": "70개",
+            "인구": "62,500명", "면적": "807.30㎢", "음식점수": 55개, "관광지수": 70개,
             "소개": "우주항공의 중심지이자 따뜻한 해양성 기후로 유자와 삼치가 유명한 곳.",
             "대표음식": "삼치회", "대표음식_설명": "입안에서 부드럽게 녹아내리는 신선한 삼치회.",
             "대표음식_img": "https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?auto=format&fit=crop&w=600&q=80",
@@ -544,7 +528,7 @@ def load_data():
         },
         {
             "id": 10, "지역": "경상북도 울릉군", "위도": 37.4844, "경도": 130.9057, "점수": 79.8,
-            "인구": "8,900명", "면적": "72.90㎢", "음식점수": "40개", "관광지수": "60개",
+            "인구": "8,900명", "면적": "72.90㎢", "음식점수": 40개, "관광지수": 60개,
             "소개": "동해의 에메랄드빛 보석, 천혜의 화산섬 지형과 독도를 품은 신비로운 섬.",
             "대표음식": "오징어내장탕", "대표음식_설명": "울릉도 신선한 오징어로 끓여 시원하고 칼칼한 국물 요리.",
             "대표음식_img": "https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=600&q=80",
@@ -565,23 +549,25 @@ if "selected_region_id" not in st.session_state:
     st.session_state.selected_region_id = 1
 
 # =========================================================
-# 4. 사이드바 (필터)
+# 4. 사이드바 (필터 컨트롤)
 # =========================================================
 with st.sidebar:
-    st.markdown("<h4 style='font-weight:700; color:#ffffff;'>🔍 지역 탐색 필터</h4>", unsafe_allow_html=True)
+    st.markdown("<h4 style='font-weight:700; color:#212529;'>🔍 지역 탐색 필터</h4>", unsafe_allow_html=True)
     
     score_slider = st.slider("최소 숨은 지역 점수", 0, 100, 60)
     food_type = st.selectbox("선호 음식 타입", ["전체", "향토음식", "해산물", "산채요리", "육류"])
     
-    st.markdown("<p style='font-size:13px; font-weight:700; color:#a0a0a0; margin-top:15px; margin-bottom:5px;'>지도 표시 옵션</p>", unsafe_allow_html=True)
+    st.markdown("<p style='font-size:13px; font-weight:700; color:#495057; margin-top:15px; margin-bottom:5px;'>지도 표시 옵션</p>", unsafe_allow_html=True)
     chk_pin = st.checkbox("추천 지역 핀", value=True)
     chk_food = st.checkbox("음식점", value=True)
     chk_tour = st.checkbox("관광지", value=True)
+    chk_fest = st.checkbox("축제/행사", value=True)
+    chk_prod = st.checkbox("특산품", value=True)
     
-    st.markdown("<p style='font-size:13px; font-weight:700; color:#a0a0a0; margin-top:15px; margin-bottom:5px;'>정렬 기준</p>", unsafe_allow_html=True)
+    st.markdown("<p style='font-size:13px; font-weight:700; color:#495057; margin-top:15px; margin-bottom:5px;'>정렬 기준</p>", unsafe_allow_html=True)
     sort_order = st.selectbox("", ["숨은 지역 점수 순", "인구 적은 순", "관광지 많은 순"], label_visibility="collapsed")
     
-    st.markdown("<p style='font-size:13px; font-weight:700; color:#a0a0a0; margin-top:15px; margin-bottom:5px;'>키워드 검색</p>", unsafe_allow_html=True)
+    st.markdown("<p style='font-size:13px; font-weight:700; color:#495057; margin-top:15px; margin-bottom:5px;'>키워드 검색</p>", unsafe_allow_html=True)
     keyword = st.text_input("", placeholder="지역명 또는 키워드 입력", label_visibility="collapsed")
     
     st.button("검색", use_container_width=True, type="primary")
@@ -591,7 +577,7 @@ with st.sidebar:
         st.rerun()
 
 # =========================================================
-# 5. 헤더 타이틀 & 상단 대시보드
+# 5. 헤더 타이틀 및 상단 카드
 # =========================================================
 st.markdown("""
 <div class="main-header">
@@ -606,7 +592,7 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# 지표 데이터 필터링
+# 지표 계산
 filtered_df = df[df["점수"] >= score_slider]
 if keyword:
     filtered_df = filtered_df[filtered_df["지역"].str.contains(keyword) | filtered_df["소개"].str.contains(keyword)]
@@ -619,7 +605,7 @@ with c1:
     st.markdown(f"""
     <div class="metric-card">
         <div class="metric-left">
-            <div class="metric-icon" style="background:#1b382b; color:#20c997;">★</div>
+            <div class="metric-icon" style="background:#e6fcf5; color:#0ca678;">★</div>
             <div>
                 <div class="metric-label">추천 지역 수</div>
                 <div class="metric-value">{len(filtered_df)}곳</div>
@@ -633,7 +619,7 @@ with c2:
     st.markdown(f"""
     <div class="metric-card">
         <div class="metric-left">
-            <div class="metric-icon" style="background:#182c4d; color:#339af0;">📈</div>
+            <div class="metric-icon" style="background:#e7f5ff; color:#1c7ed6;">📈</div>
             <div>
                 <div class="metric-label">평균 숨은 점수</div>
                 <div class="metric-value">{avg_score:.1f}점</div>
@@ -647,7 +633,7 @@ with c3:
     st.markdown("""
     <div class="metric-card">
         <div class="metric-left">
-            <div class="metric-icon" style="background:#2b1d48; color:#a55eea;">💬</div>
+            <div class="metric-icon" style="background:#f3f0ff; color:#748ffc;">💬</div>
             <div>
                 <div class="metric-label">리뷰 수</div>
                 <div class="metric-value">237개</div>
@@ -661,7 +647,7 @@ with c4:
     st.markdown("""
     <div class="metric-card">
         <div class="metric-left">
-            <div class="metric-icon" style="background:#423011; color:#fcc419;">🎁</div>
+            <div class="metric-icon" style="background:#fff9db; color:#f59f00;">🎁</div>
             <div>
                 <div class="metric-label">특산품</div>
                 <div class="metric-value">32개</div>
@@ -672,25 +658,28 @@ with c4:
     """, unsafe_allow_html=True)
 
 # =========================================================
-# 6. 다크 스타일 지도 및 범례
+# 6. 지도 및 범례
 # =========================================================
-st.markdown("<h3 style='font-size:18px; font-weight:700; margin-top:25px; margin-bottom:10px; color:#ffffff;'>🗺️ 추천 지역 지도 (다크 뷰)</h3>", unsafe_allow_html=True)
+st.markdown("<h3 style='font-size:18px; font-weight:700; margin-top:25px; margin-bottom:10px;'>🗺️ 추천 지역 지도</h3>", unsafe_allow_html=True)
 
+# 현재 선택된 데이터
 curr_data = df[df["id"] == st.session_state.selected_region_id].iloc[0]
 
-# CartoDB dark_matter 다크 타일 적용
+# 지도 생성
 m = folium.Map(
     location=[curr_data["위도"], curr_data["경도"]],
     zoom_start=7,
-    tiles="CartoDB dark_matter"
+    tiles="https://xdworld.vworld.kr/2d/Base/service/{z}/{x}/{y}.png",
+    attr="VWorld Base Map"
 )
 
+# 마커 추가
 for _, row in filtered_df.iterrows():
     is_sel = (row["id"] == st.session_state.selected_region_id)
     color = "red" if row["점수"] >= 85 else ("orange" if row["점수"] >= 80 else "blue")
     
     popup_html = f"""
-    <div style='width:160px; font-family:sans-serif; color:#000;'>
+    <div style='width:160px; font-family:sans-serif;'>
         <b>{row['지역']}</b><br>
         <span style='color:#e63946; font-size:12px;'>★ 숨은 지역 점수 {row['점수']}점</span><br>
         <span style='font-size:11px; color:#555;'>대표 음식: {row['대표음식']}</span>
@@ -706,9 +695,10 @@ for _, row in filtered_df.iterrows():
 
 st_folium(m, use_container_width=True, height=450, returned_objects=[])
 
+# 범례 표시
 st.markdown("""
 <div class="legend-container">
-    <div class="legend-item"><div class="legend-dot" style="background:#ff6b6b;"></div> 숨은 점수 90점 이상</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#e63946;"></div> 숨은 점수 90점 이상</div>
     <div class="legend-item"><div class="legend-dot" style="background:#f76707;"></div> 80~90점</div>
     <div class="legend-item"><div class="legend-dot" style="background:#2f9e44;"></div> 70~80점</div>
     <div class="legend-item"><div class="legend-dot" style="background:#1c7ed6;"></div> 60~70점</div>
@@ -729,6 +719,7 @@ with sec_col2:
         index=df["지역"].tolist().index(curr_data["지역"]),
         label_visibility="collapsed"
     )
+    # 변경 시 업데이트
     new_id = df[df["지역"] == selected_name].iloc[0]["id"]
     if new_id != st.session_state.selected_region_id:
         st.session_state.selected_region_id = new_id
@@ -736,6 +727,7 @@ with sec_col2:
 
 dc1, dc2, dc3, dc4 = st.columns([1.3, 1, 1, 1])
 
+# 메인 카드가 포함된 4열 구조
 with dc1:
     st.markdown(f"""
     <div class="main-region-card">
@@ -799,69 +791,12 @@ with dc4:
     """, unsafe_allow_html=True)
 
 # =========================================================
-# 8. 상세 하단 탭 (길찾기 / 맛집 / 관광 / 축제 / 리뷰)
+# 8. 상세 하단 탭
 # =========================================================
 st.markdown("<div style='height:20px;'></div>", unsafe_allow_html=True)
 
-tab_route, tab1, tab2, tab3, tab4, tab5 = st.tabs(["🚀 길찾기 & 소요시간", "🍚 음식&맛집", "🏞️ 관광지", "🎉 축제&행사", "🎁 특산품", "💬 리뷰 (32)"])
+tab1, tab2, tab3, tab4, tab5 = st.tabs(["🍚 음식&맛집", "🏞️ 관광지", "🎉 축제&행사", "🎁 특산품", "💬 리뷰 (32)"])
 
-# ---------------------------------------------------------
-# [새 기능] 길찾기 & 소요시간 탭
-# ---------------------------------------------------------
-with tab_route:
-    st.markdown("<h4 style='font-weight:700; color:#ffffff; margin-bottom:15px;'>🚗 출발지에서 도착지까지 길찾기</h4>", unsafe_allow_html=True)
-    
-    r_col1, r_col2 = st.columns([1, 1.8])
-    
-    with r_col1:
-        st.markdown("<div class='route-card'>", unsafe_allow_html=True)
-        start_location = st.text_input("📍 출발지 입력", value="서울역", help="예: 서울역, 강남역, 대전역, 부산역 등")
-        destination = curr_data["지역"]
-        
-        st.markdown(f"""
-        <div style="margin-top:10px; margin-bottom:15px;">
-            <p style="font-size:12px; color:#a0a0a0; margin:0;">도착지 지정</p>
-            <p style="font-size:16px; font-weight:700; color:#ff6b6b; margin:0;">🎯 {destination}</p>
-        </div>
-        """, unsafe_allow_html=True)
-        
-        # URL 인코딩
-        encoded_start = urllib.parse.quote(start_location)
-        encoded_dest = urllib.parse.quote(destination)
-        
-        # 네이버 지도 & 카카오맵 길찾기 바로가기 URL
-        naver_url = f"https://map.naver.com/v5/directions/{encoded_start}/{encoded_dest}/-/car"
-        kakao_url = f"https://map.kakao.com/?sName={encoded_start}&eName={encoded_dest}"
-        
-        st.markdown(f"""
-        <p style="font-size:12px; color:#a0a0a0; margin-bottom:6px;">원하는 지도 앱으로 실시간 소요시간 확인:</p>
-        <a href="{kakao_url}" target="_blank" class="map-link-btn btn-kakao">🟡 카카오맵 실시간 길찾기 실행</a>
-        <a href="{naver_url}" target="_blank" class="map-link-btn btn-naver">🟢 네이버 지도 실시간 길찾기 실행</a>
-        """, unsafe_allow_html=True)
-        
-        st.markdown("</div>", unsafe_allow_html=True)
-        
-        st.info("💡 카카오맵 또는 네이버 지도 버튼을 누르시면 실시간 대중교통/자차 소요시간과 최적 경로를 바로 확인할 수 있습니다.")
-
-    with r_col2:
-        st.markdown("<p style='font-size:13px; font-weight:700; color:#a0a0a0; margin-bottom:8px;'>🗺️ 구글 지도 경로 미리보기</p>", unsafe_allow_html=True)
-        
-        # 구글 임베드 지도 길찾기
-        google_map_embed = f"https://maps.google.com/maps?q={curr_data['위도']},{curr_data['경도']}&z=10&output=embed"
-        
-        st.markdown(f"""
-        <iframe 
-            width="100%" 
-            height="320" 
-            style="border:0; border-radius:12px; filter: invert(90%) hue-rotate(180deg);" 
-            src="{google_map_embed}" 
-            allowfullscreen>
-        </iframe>
-        """, unsafe_allow_html=True)
-
-# ---------------------------------------------------------
-# 기타 기존 탭
-# ---------------------------------------------------------
 with tab1:
     tc1, tc2 = st.columns([1, 2.5])
     with tc1:
@@ -877,10 +812,10 @@ with tab1:
     
     with tc2:
         st.markdown("<div class='sub-info-title' style='margin-bottom:10px;'>추천 맛집</div>", unsafe_allow_html=True)
-        rc1, rc2 = st.columns(2)
+        rc1, rc2, rc3 = st.columns(3)
         
         for idx, res in enumerate(curr_data["맛집목록"]):
-            target_col = [rc1, rc2][idx % 2]
+            target_col = [rc1, rc2, rc3][idx % 3]
             with target_col:
                 st.markdown(f"""
                 <div class="place-card">
@@ -894,7 +829,7 @@ with tab1:
                 """, unsafe_allow_html=True)
 
 with tab5:
-    st.markdown("<div style='display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;'><span style='font-size:14px; font-weight:700; color:#ffffff;'>실제 방문객 리뷰</span><a href='#' style='font-size:12px; color:#ff6b6b;'>전체 리뷰 보기 ></a></div>", unsafe_allow_html=True)
+    st.markdown("<div style='display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;'><span style='font-size:14px; font-weight:700;'>실제 방문객 리뷰</span><a href='#' style='font-size:12px; color:#1c7ed6;'>전체 리뷰 보기 ></a></div>", unsafe_allow_html=True)
     
     rev_c1, rev_c2, rev_c3, rev_c4 = st.columns(4)
     
@@ -914,19 +849,23 @@ with tab5:
                         <div class="review-avatar">👤</div>
                         <div>
                             <div class="review-username">{rev['user']}</div>
-                            <div style="font-size:10px; color:#ffd43b;">{rev['star']}</div>
+                            <div style="font-size:10px; color:#fcc419;">{rev['star']}</div>
                         </div>
                     </div>
                     <div class="review-date">{rev['date']}</div>
                 </div>
                 <div class="review-text">{rev['text']}</div>
+                <div class="review-imgs">
+                    <img src="{curr_data['메인이미지']}" class="review-img">
+                    <img src="{curr_data['대표음식_img']}" class="review-img">
+                </div>
             </div>
             """, unsafe_allow_html=True)
 
 # =========================================================
 # 9. 추천 지역 TOP 5 카러셀
 # =========================================================
-st.markdown("<h3 style='font-size:16px; font-weight:700; margin-top:35px; margin-bottom:12px; color:#ffffff;'>🏆 추천 지역 TOP 5</h3>", unsafe_allow_html=True)
+st.markdown("<h3 style='font-size:16px; font-weight:700; margin-top:35px; margin-bottom:12px;'>🏆 추천 지역 TOP 5</h3>", unsafe_allow_html=True)
 
 top5 = df.sort_values(by="점수", ascending=False).head(5)
 top_cols = st.columns(5)
