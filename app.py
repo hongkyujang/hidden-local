@@ -1,5 +1,7 @@
+```python
 import os
 import html
+import textwrap
 
 import streamlit as st
 import pandas as pd
@@ -20,11 +22,24 @@ st.set_page_config(
 
 
 # =========================================================
+# HTML 렌더링 helper
+# =========================================================
+# HTML 앞쪽의 불필요한 들여쓰기를 자동 제거
+# → Streamlit에서 HTML이 코드 블록으로 표시되는 문제 방지
+# =========================================================
+
+def render_html(content):
+    st.markdown(
+        textwrap.dedent(content),
+        unsafe_allow_html=True
+    )
+
+
+# =========================================================
 # CSS
 # =========================================================
 
-st.markdown(
-    """
+render_html("""
 <style>
 
 /* =====================================================
@@ -277,9 +292,7 @@ button {
 }
 
 </style>
-""",
-    unsafe_allow_html=True
-)
+""")
 
 
 # =========================================================
@@ -291,21 +304,19 @@ ASSET_DIR = os.path.join(BASE_DIR, "assets")
 
 
 def get_image_path(filename):
-    """
-    assets 폴더에서 이미지의 실제 경로를 반환
-    """
+    """assets 폴더에서 이미지의 실제 경로 반환"""
     return os.path.join(ASSET_DIR, filename)
 
 
 def show_local_image(filename, caption=None):
     """
-    로컬 이미지가 존재하면 표시.
-    이미지가 없어도 앱이 죽지 않도록 처리.
+    로컬 이미지 표시
+    이미지가 없으면 대체 화면 표시
     """
 
     path = get_image_path(filename)
 
-    if os.path.exists(path):
+    if os.path.isfile(path):
 
         st.image(
             path,
@@ -315,49 +326,46 @@ def show_local_image(filename, caption=None):
 
     else:
 
-        st.markdown(
-            f"""
-            <div style="
-                width:100%;
-                height:250px;
-                background:linear-gradient(
-                    135deg,
-                    #e9f1ed,
-                    #f7faf8
-                );
-                border:1px solid #dce8e1;
-                border-radius:16px;
-                display:flex;
-                align-items:center;
-                justify-content:center;
-                text-align:center;
-                color:#718078;
-                font-weight:700;
-            ">
+        render_html(f"""
+        <div style="
+            width:100%;
+            height:300px;
+            background:linear-gradient(
+                135deg,
+                #e9f1ed,
+                #f7faf8
+            );
+            border:1px solid #dce8e1;
+            border-radius:16px;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            text-align:center;
+            color:#718078;
+            font-weight:700;
+        ">
+            <div>
+                <div style="
+                    font-size:42px;
+                    margin-bottom:10px;
+                ">
+                    📷
+                </div>
+
                 <div>
-                    <div style="
-                        font-size:42px;
-                        margin-bottom:10px;
-                    ">
-                        📷
-                    </div>
+                    이미지 준비 중
+                </div>
 
-                    <div>
-                        이미지 준비 중
-                    </div>
-
-                    <div style="
-                        font-size:11px;
-                        font-weight:400;
-                        margin-top:5px;
-                    ">
-                        assets/{html.escape(filename)}
-                    </div>
+                <div style="
+                    font-size:11px;
+                    font-weight:400;
+                    margin-top:5px;
+                ">
+                    assets/{html.escape(filename)}
                 </div>
             </div>
-            """,
-            unsafe_allow_html=True
-        )
+        </div>
+        """)
 
 
 # =========================================================
@@ -365,10 +373,6 @@ def show_local_image(filename, caption=None):
 # =========================================================
 
 region_data = [
-
-    # -----------------------------------------------------
-    # 정선
-    # -----------------------------------------------------
 
     {
         "지역": "강원도 정선군",
@@ -411,11 +415,6 @@ region_data = [
         ]
     },
 
-
-    # -----------------------------------------------------
-    # 단양
-    # -----------------------------------------------------
-
     {
         "지역": "충청북도 단양군",
         "위도": 36.9845,
@@ -456,11 +455,6 @@ region_data = [
             "조용하게 하루 여행하기 좋은 곳입니다."
         ]
     },
-
-
-    # -----------------------------------------------------
-    # 구례
-    # -----------------------------------------------------
 
     {
         "지역": "전라남도 구례군",
@@ -503,11 +497,6 @@ region_data = [
         ]
     },
 
-
-    # -----------------------------------------------------
-    # 영덕
-    # -----------------------------------------------------
-
     {
         "지역": "경상북도 영덕군",
         "위도": 36.4150,
@@ -548,11 +537,6 @@ region_data = [
             "해안도로 드라이브 코스로도 추천합니다."
         ]
     },
-
-
-    # -----------------------------------------------------
-    # 무주
-    # -----------------------------------------------------
 
     {
         "지역": "전라북도 무주군",
@@ -595,11 +579,6 @@ region_data = [
         ]
     },
 
-
-    # -----------------------------------------------------
-    # 서천
-    # -----------------------------------------------------
-
     {
         "지역": "충청남도 서천군",
         "위도": 36.0803,
@@ -641,11 +620,6 @@ region_data = [
         ]
     },
 
-
-    # -----------------------------------------------------
-    # 의령
-    # -----------------------------------------------------
-
     {
         "지역": "경상남도 의령군",
         "위도": 35.3222,
@@ -686,11 +660,6 @@ region_data = [
             "지역 음식 때문에 다시 방문하고 싶습니다."
         ]
     },
-
-
-    # -----------------------------------------------------
-    # 삼척
-    # -----------------------------------------------------
 
     {
         "지역": "강원도 삼척시",
@@ -766,13 +735,8 @@ df["숨은지역점수"] = df.apply(
 # =========================================================
 # 메인 제목
 # =========================================================
-# 주의:
-# HTML 시작 부분에 들여쓰기를 하지 않아
-# 코드 블록으로 표시되는 문제를 방지함.
-# =========================================================
 
-st.markdown(
-    """
+render_html("""
 <div class="main-title-card">
 
     <div class="main-title-small">
@@ -788,17 +752,14 @@ st.markdown(
     </div>
 
 </div>
-""",
-    unsafe_allow_html=True
-)
+""")
 
 
 # =========================================================
 # 사이드바
 # =========================================================
 
-st.sidebar.markdown(
-    """
+render_html("""
 <div style="
     font-size:25px;
     font-weight:850;
@@ -815,16 +776,12 @@ st.sidebar.markdown(
 ">
     지역을 데이터로 탐색해보세요
 </div>
-""",
-    unsafe_allow_html=True
-)
-
+""")
 
 selected_region = st.sidebar.selectbox(
     "지역 선택",
     ["전체"] + df["지역"].tolist()
 )
-
 
 min_score = st.sidebar.slider(
     "최소 숨은지역 점수",
@@ -832,7 +789,6 @@ min_score = st.sidebar.slider(
     max_value=100,
     value=70
 )
-
 
 food_min = st.sidebar.slider(
     "최소 음식 점수",
@@ -852,7 +808,6 @@ filtered_df = df[
     (df["음식점수"] >= food_min)
 ].copy()
 
-
 if selected_region != "전체":
 
     filtered_df = filtered_df[
@@ -866,29 +821,25 @@ if selected_region != "전체":
 
 col1, col2, col3, col4 = st.columns(4)
 
-
 with col1:
 
-    st.markdown(
-        f"""
-<div class="metric-card">
+    render_html(f"""
+    <div class="metric-card">
 
-    <div class="metric-title">
-        📍 발견 지역
+        <div class="metric-title">
+            📍 발견 지역
+        </div>
+
+        <div class="metric-value">
+            {len(filtered_df)}
+        </div>
+
+        <div class="metric-sub">
+            현재 조건에 맞는 지역
+        </div>
+
     </div>
-
-    <div class="metric-value">
-        {len(filtered_df)}
-    </div>
-
-    <div class="metric-sub">
-        현재 조건에 맞는 지역
-    </div>
-
-</div>
-""",
-        unsafe_allow_html=True
-    )
+    """)
 
 
 with col2:
@@ -899,26 +850,23 @@ with col2:
         else 0
     )
 
-    st.markdown(
-        f"""
-<div class="metric-card">
+    render_html(f"""
+    <div class="metric-card">
 
-    <div class="metric-title">
-        ✨ 평균 숨은지역 점수
+        <div class="metric-title">
+            ✨ 평균 숨은지역 점수
+        </div>
+
+        <div class="metric-value">
+            {avg_score:.1f}
+        </div>
+
+        <div class="metric-sub">
+            지역 발견 가능성
+        </div>
+
     </div>
-
-    <div class="metric-value">
-        {avg_score:.1f}
-    </div>
-
-    <div class="metric-sub">
-        지역 발견 가능성
-    </div>
-
-</div>
-""",
-        unsafe_allow_html=True
-    )
+    """)
 
 
 with col3:
@@ -929,26 +877,23 @@ with col3:
         else 0
     )
 
-    st.markdown(
-        f"""
-<div class="metric-card">
+    render_html(f"""
+    <div class="metric-card">
 
-    <div class="metric-title">
-        🍚 평균 음식 점수
+        <div class="metric-title">
+            🍚 평균 음식 점수
+        </div>
+
+        <div class="metric-value">
+            {avg_food:.1f}
+        </div>
+
+        <div class="metric-sub">
+            로컬 음식 매력도
+        </div>
+
     </div>
-
-    <div class="metric-value">
-        {avg_food:.1f}
-    </div>
-
-    <div class="metric-sub">
-        로컬 음식 매력도
-    </div>
-
-</div>
-""",
-        unsafe_allow_html=True
-    )
+    """)
 
 
 with col4:
@@ -959,37 +904,34 @@ with col4:
         else 0
     )
 
-    st.markdown(
-        f"""
-<div class="metric-card">
+    render_html(f"""
+    <div class="metric-card">
 
-    <div class="metric-title">
-        👀 평균 관광 인지도
+        <div class="metric-title">
+            👀 평균 관광 인지도
+        </div>
+
+        <div class="metric-value">
+            {avg_awareness:.1f}
+        </div>
+
+        <div class="metric-sub">
+            낮을수록 숨은 지역
+        </div>
+
     </div>
-
-    <div class="metric-value">
-        {avg_awareness:.1f}
-    </div>
-
-    <div class="metric-sub">
-        낮을수록 숨은 지역
-    </div>
-
-</div>
-""",
-        unsafe_allow_html=True
-    )
+    """)
 
 
 # =========================================================
 # 지도
 # =========================================================
 
-st.markdown(
-    '<div class="section-title">🗺️ 숨은 지역 지도</div>',
-    unsafe_allow_html=True
-)
-
+render_html("""
+<div class="section-title">
+    🗺️ 숨은 지역 지도
+</div>
+""")
 
 m = folium.Map(
     location=[36.2, 127.8],
@@ -1001,8 +943,6 @@ m = folium.Map(
     no_wrap=True
 )
 
-
-# 대한민국 주변 범위
 m.fit_bounds(
     [
         [33.0, 124.0],
@@ -1010,8 +950,6 @@ m.fit_bounds(
     ]
 )
 
-
-# 지도 이동 제한
 m.options["maxBounds"] = [
     [32.0, 123.0],
     [40.5, 134.0]
@@ -1027,42 +965,42 @@ m.options["maxBoundsViscosity"] = 1.0
 for _, row in filtered_df.iterrows():
 
     popup_html = f"""
-<div style="
-    width:230px;
-    font-family:Arial,sans-serif;
-">
-
-    <h4 style="
-        margin-bottom:8px;
-        color:#18352c;
+    <div style="
+        width:230px;
+        font-family:Arial,sans-serif;
     ">
-        📍 {html.escape(row["지역"])}
-    </h4>
 
-    <b>숨은지역 점수</b>
-    <br>
-    ⭐ {row["숨은지역점수"]}
+        <h4 style="
+            margin-bottom:8px;
+            color:#18352c;
+        ">
+            📍 {html.escape(row["지역"])}
+        </h4>
 
-    <hr>
+        <b>숨은지역 점수</b>
+        <br>
+        ⭐ {row["숨은지역점수"]}
 
-    <b>대표 음식</b>
-    <br>
-    🍚 {html.escape(row["대표음식"])}
+        <hr>
 
-    <br><br>
+        <b>대표 음식</b>
+        <br>
+        🍚 {html.escape(row["대표음식"])}
 
-    <b>대표 관광지</b>
-    <br>
-    🏔️ {html.escape(row["관광지"])}
+        <br><br>
 
-    <br><br>
+        <b>대표 관광지</b>
+        <br>
+        🏔️ {html.escape(row["관광지"])}
 
-    <b>특산품</b>
-    <br>
-    🎁 {html.escape(row["특산품"])}
+        <br><br>
 
-</div>
-"""
+        <b>특산품</b>
+        <br>
+        🎁 {html.escape(row["특산품"])}
+
+    </div>
+    """
 
     folium.Marker(
         location=[
@@ -1099,11 +1037,11 @@ st_folium(
 # 지역 탐색
 # =========================================================
 
-st.markdown(
-    '<div class="section-title">🔎 지역 탐색</div>',
-    unsafe_allow_html=True
-)
-
+render_html("""
+<div class="section-title">
+    🔎 지역 탐색
+</div>
+""")
 
 if len(filtered_df) == 0:
 
@@ -1121,98 +1059,88 @@ else:
 
     for _, row in sorted_regions.iterrows():
 
-        st.markdown(
-            f"""
-<div class="region-card">
+        render_html(f"""
+        <div class="region-card">
 
-    <div style="
-        display:flex;
-        justify-content:space-between;
-        align-items:center;
-    ">
+            <div style="
+                display:flex;
+                justify-content:space-between;
+                align-items:center;
+            ">
 
-        <div>
+                <div>
 
-            <div class="region-name">
-                📍 {html.escape(row["지역"])}
+                    <div class="region-name">
+                        📍 {html.escape(row["지역"])}
+                    </div>
+
+                    <div style="
+                        color:#718078;
+                        margin-top:6px;
+                    ">
+                        대표 음식 ·
+                        {html.escape(row["대표음식"])}
+                    </div>
+
+                </div>
+
+                <div style="
+                    text-align:right;
+                ">
+
+                    <div class="small-label">
+                        숨은지역 점수
+                    </div>
+
+                    <div class="region-score">
+                        {row["숨은지역점수"]}
+                    </div>
+
+                </div>
+
             </div>
 
             <div style="
-                color:#718078;
-                margin-top:6px;
+                margin-top:18px;
             ">
-                대표 음식 ·
-                {html.escape(row["대표음식"])}
+
+                <div class="small-label">
+                    지역 특색
+                </div>
+
+                <div class="score-bar">
+                    <div
+                        class="score-fill"
+                        style="width:{row["지역특색"]}%"
+                    ></div>
+                </div>
+
+                <div class="small-label">
+                    음식 매력도
+                </div>
+
+                <div class="score-bar">
+                    <div
+                        class="score-fill"
+                        style="width:{row["음식점수"]}%"
+                    ></div>
+                </div>
+
             </div>
 
         </div>
-
-
-        <div style="
-            text-align:right;
-        ">
-
-            <div class="small-label">
-                숨은지역 점수
-            </div>
-
-            <div class="region-score">
-                {row["숨은지역점수"]}
-            </div>
-
-        </div>
-
-    </div>
-
-
-    <div style="
-        margin-top:18px;
-    ">
-
-        <div class="small-label">
-            지역 특색
-        </div>
-
-        <div class="score-bar">
-
-            <div
-                class="score-fill"
-                style="width:{row["지역특색"]}%"
-            ></div>
-
-        </div>
-
-
-        <div class="small-label">
-            음식 매력도
-        </div>
-
-        <div class="score-bar">
-
-            <div
-                class="score-fill"
-                style="width:{row["음식점수"]}%"
-            ></div>
-
-        </div>
-
-    </div>
-
-</div>
-""",
-            unsafe_allow_html=True
-        )
+        """)
 
 
 # =========================================================
 # 상세 지역
 # =========================================================
 
-st.markdown(
-    '<div class="section-title">🍴 지역 상세 정보</div>',
-    unsafe_allow_html=True
-)
-
+render_html("""
+<div class="section-title">
+    🍴 지역 상세 정보
+</div>
+""")
 
 if len(filtered_df) > 0:
 
@@ -1220,7 +1148,6 @@ if len(filtered_df) > 0:
         "상세 정보를 볼 지역",
         filtered_df["지역"].tolist()
     )
-
 
     selected = filtered_df[
         filtered_df["지역"] == detail_region
@@ -1231,77 +1158,72 @@ if len(filtered_df) > 0:
     # 상세 지역 헤더
     # =====================================================
 
-    st.markdown(
-        f"""
-<div class="region-card">
+    render_html(f"""
+    <div class="region-card">
 
-    <div class="region-name">
-        📍 {html.escape(selected["지역"])}
-    </div>
-
-    <div style="
-        color:#718078;
-        margin-top:7px;
-    ">
-        데이터 기반 숨은 지역 탐색 결과
-    </div>
-
-    <div style="
-        display:flex;
-        gap:30px;
-        margin-top:18px;
-    ">
-
-        <div>
-            <div class="small-label">
-                숨은지역 점수
-            </div>
-
-            <div style="
-                font-size:27px;
-                font-weight:850;
-                color:#2d7657;
-            ">
-                {selected["숨은지역점수"]}
-            </div>
+        <div class="region-name">
+            📍 {html.escape(selected["지역"])}
         </div>
 
-
-        <div>
-            <div class="small-label">
-                음식 점수
-            </div>
-
-            <div style="
-                font-size:27px;
-                font-weight:850;
-                color:#a46b32;
-            ">
-                {selected["음식점수"]}
-            </div>
+        <div style="
+            color:#718078;
+            margin-top:7px;
+        ">
+            데이터 기반 숨은 지역 탐색 결과
         </div>
 
+        <div style="
+            display:flex;
+            gap:30px;
+            margin-top:18px;
+        ">
 
-        <div>
-            <div class="small-label">
-                지역 특색
+            <div>
+                <div class="small-label">
+                    숨은지역 점수
+                </div>
+
+                <div style="
+                    font-size:27px;
+                    font-weight:850;
+                    color:#2d7657;
+                ">
+                    {selected["숨은지역점수"]}
+                </div>
             </div>
 
-            <div style="
-                font-size:27px;
-                font-weight:850;
-                color:#6f5595;
-            ">
-                {selected["지역특색"]}
+            <div>
+                <div class="small-label">
+                    음식 점수
+                </div>
+
+                <div style="
+                    font-size:27px;
+                    font-weight:850;
+                    color:#a46b32;
+                ">
+                    {selected["음식점수"]}
+                </div>
             </div>
+
+            <div>
+                <div class="small-label">
+                    지역 특색
+                </div>
+
+                <div style="
+                    font-size:27px;
+                    font-weight:850;
+                    color:#6f5595;
+                ">
+                    {selected["지역특색"]}
+                </div>
+            </div>
+
         </div>
 
     </div>
-
-</div>
-""",
-        unsafe_allow_html=True
-    )
+    """)
 
 
     # =====================================================
@@ -1329,7 +1251,6 @@ if len(filtered_df) > 0:
             gap="large"
         )
 
-
         with col1:
 
             show_local_image(
@@ -1337,55 +1258,51 @@ if len(filtered_df) > 0:
                 selected["대표음식"]
             )
 
-
         with col2:
 
-            st.markdown(
-                f"""
-<div class="food-box">
+            render_html(f"""
+            <div class="food-box">
 
-    <div class="small-label">
-        대표 로컬 음식
-    </div>
+                <div class="small-label">
+                    대표 로컬 음식
+                </div>
 
-    <h2 style="
-        color:#18352c;
-        margin-top:6px;
-    ">
-        🍚 {html.escape(selected["대표음식"])}
-    </h2>
+                <h2 style="
+                    color:#18352c;
+                    margin-top:6px;
+                ">
+                    🍚 {html.escape(selected["대표음식"])}
+                </h2>
 
-    <p>
-        {html.escape(selected["음식설명"])}
-    </p>
+                <p>
+                    {html.escape(selected["음식설명"])}
+                </p>
 
-    <hr>
+                <hr>
 
-    <div class="small-label">
-        추천 음식점
-    </div>
+                <div class="small-label">
+                    추천 음식점
+                </div>
 
-    <h3>
-        {html.escape(selected["음식점"])}
-    </h3>
+                <h3>
+                    {html.escape(selected["음식점"])}
+                </h3>
 
-    <p>
-        {html.escape(selected["음식점설명"])}
-    </p>
+                <p>
+                    {html.escape(selected["음식점설명"])}
+                </p>
 
-    <div style="
-        margin-top:20px;
-        font-size:30px;
-        font-weight:850;
-        color:#a46b32;
-    ">
-        {selected["음식점수"]}점
-    </div>
+                <div style="
+                    margin-top:20px;
+                    font-size:30px;
+                    font-weight:850;
+                    color:#a46b32;
+                ">
+                    {selected["음식점수"]}점
+                </div>
 
-</div>
-""",
-                unsafe_allow_html=True
-            )
+            </div>
+            """)
 
 
     # =====================================================
@@ -1399,7 +1316,6 @@ if len(filtered_df) > 0:
             gap="large"
         )
 
-
         with col1:
 
             show_local_image(
@@ -1407,66 +1323,62 @@ if len(filtered_df) > 0:
                 selected["관광지"]
             )
 
-
         with col2:
 
-            st.markdown(
-                f"""
-<div class="tour-box">
+            render_html(f"""
+            <div class="tour-box">
 
-    <div class="small-label">
-        추천 관광지
-    </div>
+                <div class="small-label">
+                    추천 관광지
+                </div>
 
-    <h2 style="
-        color:#18352c;
-    ">
-        🏔️ {html.escape(selected["관광지"])}
-    </h2>
+                <h2 style="
+                    color:#18352c;
+                ">
+                    🏔️ {html.escape(selected["관광지"])}
+                </h2>
 
-    <p>
-        {html.escape(selected["관광지설명"])}
-    </p>
+                <p>
+                    {html.escape(selected["관광지설명"])}
+                </p>
 
-    <hr>
+                <hr>
 
-    <div class="small-label">
-        지역 행사
-    </div>
+                <div class="small-label">
+                    지역 행사
+                </div>
 
-    <h3>
-        🎉 {html.escape(selected["지역행사"])}
-    </h3>
+                <h3>
+                    🎉 {html.escape(selected["지역행사"])}
+                </h3>
 
-    <p>
-        {html.escape(selected["행사설명"])}
-    </p>
+                <p>
+                    {html.escape(selected["행사설명"])}
+                </p>
 
-    <div style="
-        margin-top:18px;
-        color:#718078;
-        font-size:13px;
-    ">
-        관광 인지도
-    </div>
+                <div style="
+                    margin-top:18px;
+                    color:#718078;
+                    font-size:13px;
+                ">
+                    관광 인지도
+                </div>
 
-    <div class="score-bar">
+                <div class="score-bar">
 
-        <div
-            class="score-fill"
-            style="width:{selected["관광인지도"]}%"
-        ></div>
+                    <div
+                        class="score-fill"
+                        style="width:{selected["관광인지도"]}%"
+                    ></div>
 
-    </div>
+                </div>
 
-    <b>
-        {selected["관광인지도"]} / 100
-    </b>
+                <b>
+                    {selected["관광인지도"]} / 100
+                </b>
 
-</div>
-""",
-                unsafe_allow_html=True
-            )
+            </div>
+            """)
 
 
     # =====================================================
@@ -1480,7 +1392,6 @@ if len(filtered_df) > 0:
             gap="large"
         )
 
-
         with col1:
 
             show_local_image(
@@ -1488,55 +1399,51 @@ if len(filtered_df) > 0:
                 selected["특산품"]
             )
 
-
         with col2:
 
-            st.markdown(
-                f"""
-<div class="special-box">
+            render_html(f"""
+            <div class="special-box">
 
-    <div class="small-label">
-        지역 특산품
-    </div>
+                <div class="small-label">
+                    지역 특산품
+                </div>
 
-    <h2 style="
-        color:#18352c;
-    ">
-        🎁 {html.escape(selected["특산품"])}
-    </h2>
+                <h2 style="
+                    color:#18352c;
+                ">
+                    🎁 {html.escape(selected["특산품"])}
+                </h2>
 
-    <p>
-        {html.escape(selected["특산품설명"])}
-    </p>
+                <p>
+                    {html.escape(selected["특산품설명"])}
+                </p>
 
-    <hr>
+                <hr>
 
-    <div class="small-label">
-        지역 특색 점수
-    </div>
+                <div class="small-label">
+                    지역 특색 점수
+                </div>
 
-    <div style="
-        font-size:34px;
-        font-weight:850;
-        color:#6f5595;
-        margin-top:5px;
-    ">
-        {selected["지역특색"]}점
-    </div>
+                <div style="
+                    font-size:34px;
+                    font-weight:850;
+                    color:#6f5595;
+                    margin-top:5px;
+                ">
+                    {selected["지역특색"]}점
+                </div>
 
-    <div class="score-bar">
+                <div class="score-bar">
 
-        <div
-            class="score-fill"
-            style="width:{selected["지역특색"]}%"
-        ></div>
+                    <div
+                        class="score-fill"
+                        style="width:{selected["지역특색"]}%"
+                    ></div>
 
-    </div>
+                </div>
 
-</div>
-""",
-                unsafe_allow_html=True
-            )
+            </div>
+            """)
 
 
     # =====================================================
@@ -1545,47 +1452,39 @@ if len(filtered_df) > 0:
 
     with tab4:
 
-        st.markdown(
-            f"""
-<div style="
-    margin-bottom:18px;
-    color:#718078;
-">
-    {html.escape(selected["지역"])}
-    에 대한 로컬 여행자들의 간단한 후기입니다.
-</div>
-""",
-            unsafe_allow_html=True
-        )
-
+        render_html(f"""
+        <div style="
+            margin-bottom:18px;
+            color:#718078;
+        ">
+            {html.escape(selected["지역"])}
+            에 대한 로컬 여행자들의 간단한 후기입니다.
+        </div>
+        """)
 
         for review in selected["리뷰"]:
 
-            st.markdown(
-                f"""
-<div class="review-box">
-    💬 {html.escape(review)}
-</div>
-""",
-                unsafe_allow_html=True
-            )
+            render_html(f"""
+            <div class="review-box">
+                💬 {html.escape(review)}
+            </div>
+            """)
 
 
 # =========================================================
 # TOP 5
 # =========================================================
 
-st.markdown(
-    '<div class="section-title">🏆 숨은 지역 TOP 5</div>',
-    unsafe_allow_html=True
-)
-
+render_html("""
+<div class="section-title">
+    🏆 숨은 지역 TOP 5
+</div>
+""")
 
 top5 = df.sort_values(
     "숨은지역점수",
     ascending=False
 ).head(5)
-
 
 for rank, (_, row) in enumerate(
     top5.iterrows(),
@@ -1596,98 +1495,85 @@ for rank, (_, row) in enumerate(
         [0.7, 3, 1]
     )
 
-
     with col1:
 
-        st.markdown(
-            f"""
-<div style="
-    font-size:28px;
-    font-weight:850;
-    color:#6d8f7c;
-    padding-top:10px;
-">
-    #{rank}
-</div>
-""",
-            unsafe_allow_html=True
-        )
-
+        render_html(f"""
+        <div style="
+            font-size:28px;
+            font-weight:850;
+            color:#6d8f7c;
+            padding-top:10px;
+        ">
+            #{rank}
+        </div>
+        """)
 
     with col2:
 
-        st.markdown(
-            f"""
-<div style="
-    background:#ffffff;
-    border:1px solid #e1ebe5;
-    border-radius:14px;
-    padding:15px 18px;
-">
+        render_html(f"""
+        <div style="
+            background:#ffffff;
+            border:1px solid #e1ebe5;
+            border-radius:14px;
+            padding:15px 18px;
+        ">
 
-    <div style="
-        font-size:20px;
-        font-weight:800;
-        color:#18352c;
-    ">
-        📍 {html.escape(row["지역"])}
-    </div>
+            <div style="
+                font-size:20px;
+                font-weight:800;
+                color:#18352c;
+            ">
+                📍 {html.escape(row["지역"])}
+            </div>
 
-    <div style="
-        color:#718078;
-        font-size:13px;
-        margin-top:4px;
-    ">
-        🍚 {html.escape(row["대표음식"])}
-        &nbsp; · &nbsp;
-        🏔️ {html.escape(row["관광지"])}
-    </div>
+            <div style="
+                color:#718078;
+                font-size:13px;
+                margin-top:4px;
+            ">
+                🍚 {html.escape(row["대표음식"])}
+                &nbsp; · &nbsp;
+                🏔️ {html.escape(row["관광지"])}
+            </div>
 
-</div>
-""",
-            unsafe_allow_html=True
-        )
-
+        </div>
+        """)
 
     with col3:
 
-        st.markdown(
-            f"""
-<div style="
-    background:#ffffff;
-    border:1px solid #e1ebe5;
-    border-radius:14px;
-    padding:15px;
-    text-align:center;
-">
+        render_html(f"""
+        <div style="
+            background:#ffffff;
+            border:1px solid #e1ebe5;
+            border-radius:14px;
+            padding:15px;
+            text-align:center;
+        ">
 
-    <div style="
-        font-size:12px;
-        color:#718078;
-    ">
-        숨은지역 점수
-    </div>
+            <div style="
+                font-size:12px;
+                color:#718078;
+            ">
+                숨은지역 점수
+            </div>
 
-    <div style="
-        font-size:25px;
-        font-weight:850;
-        color:#2d7657;
-    ">
-        {row["숨은지역점수"]}
-    </div>
+            <div style="
+                font-size:25px;
+                font-weight:850;
+                color:#2d7657;
+            ">
+                {row["숨은지역점수"]}
+            </div>
 
-</div>
-""",
-            unsafe_allow_html=True
-        )
+        </div>
+        """)
 
 
 # =========================================================
 # 하단
 # =========================================================
 
-st.markdown(
-    """
+render_html("""
 <div style="
     margin-top:45px;
     padding:25px;
@@ -1715,6 +1601,5 @@ st.markdown(
     </div>
 
 </div>
-""",
-    unsafe_allow_html=True
-)
+""")
+```
