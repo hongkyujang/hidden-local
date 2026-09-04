@@ -58,7 +58,7 @@ section[data-testid="stSidebar"] {
     font-size: 28px;
     font-weight: 800;
     color: #111111;
-    line-height: 1.3 !important; /* 글자 상단 짤림 방지 */
+    line-height: 1.3 !important;
     margin: 0;
 }
 .header-subtitle {
@@ -346,48 +346,6 @@ section[data-testid="stSidebar"] {
     border-radius: 6px;
     object-fit: cover;
 }
-
-/* TOP 5 카러셀 아이템 */
-.top-card {
-    background: #ffffff;
-    border-radius: 10px;
-    border: 1px solid #f1f3f5;
-    overflow: hidden;
-    position: relative;
-}
-.top-rank {
-    position: absolute;
-    top: 8px;
-    left: 8px;
-    width: 22px;
-    height: 22px;
-    background: #212529;
-    color: white;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 11px;
-    font-weight: 700;
-}
-.top-img {
-    width: 100%;
-    height: 90px;
-    object-fit: cover;
-}
-.top-body {
-    padding: 10px;
-}
-.top-title {
-    font-size: 13px;
-    font-weight: 700;
-    color: #212529;
-}
-.top-score {
-    font-size: 11px;
-    color: #e63946;
-    font-weight: 700;
-}
 </style>
 """, unsafe_allow_html=True)
 
@@ -399,7 +357,7 @@ def load_data():
     return [
         {
             "id": 1, "지역": "강원도 정선군", "위도": 37.3806, "경도": 128.6608, "점수": 88.7,
-            "인구": "34,419명", "면적": "1,444.00㎢", "음식점수": 46개, "관광지수": 91개,
+            "인구": "34,419명", "면적": "1,444.00㎢", "음식점수": "46개", "관광지수": "91개",
             "소개": "아리랑의 고향 정선은 아름다운 자연경관과 전통문화, 그리고 건강한 먹거리가 가득한 보석 같은 지역입니다.",
             "대표음식": "곤드레밥", "대표음식_설명": "정선의 대표 향토 음식으로, 건강에 좋은 곤드레나물을 넣어 지은 밥.",
             "대표음식_img": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600&q=80",
@@ -416,7 +374,7 @@ def load_data():
         },
         {
             "id": 2, "지역": "전라남도 구례군", "위도": 35.2025, "경도": 127.4628, "점수": 87.3,
-            "인구": "24,800명", "면적": "429.80㎢", "음식점수": 38개, "관광지수": 75개,
+            "인구": "24,800명", "면적": "429.80㎢", "음식점수": "38개", "관광지수": "75개",
             "소개": "지리산 자락 청정 자연 속에서 산수유와 산채 요리를 만나볼 수 있는 구례입니다.",
             "대표음식": "산채정식", "대표음식_설명": "지리산에서 채취한 다양한 나물과 정갈한 반찬으로 차려낸 한상.",
             "대표음식_img": "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=600&q=80",
@@ -431,7 +389,7 @@ def load_data():
         },
         {
             "id": 3, "지역": "경상남도 의령군", "위도": 35.3222, "경도": 128.2617, "점수": 86.1,
-            "인구": "26,100명", "면적": "482.90㎢", "음식점수": 32개, "관광지수": 58개,
+            "인구": "26,100명", "면적": "482.90㎢", "음식점수": "32개", "관광지수": "58개",
             "소개": "소바와 의령망개떡이 유명하며 맑은 남강이 흐르는 정겨운 로컬 도시입니다.",
             "대표음식": "의령소바", "대표음식_설명": "진한 메밀향과 메밀면의 쫄깃함이 일품인 대표 별미.",
             "대표음식_img": "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&w=600&q=80",
@@ -446,7 +404,7 @@ def load_data():
         },
         {
             "id": 4, "지역": "전라북도 무주군", "위도": 35.9861, "경도": 127.6606, "점수": 84.9,
-            "인구": "23,500명", "면적": "631.80㎢", "음식점수": 41개, "관광지수": 82개,
+            "인구": "23,500명", "면적": "631.80㎢", "음식점수": "41개", "관광지수": "82개",
             "소개": "덕유산의 웅장함과 청정 반딧불이가 숨쉬는 힐링 여행지입니다.",
             "대표음식": "어죽", "대표음식_설명": "금강 상류의 민물고기로 푹 끓여낸 얼큰하고 담백한 별미.",
             "대표음식_img": "https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=600&q=80",
@@ -461,7 +419,7 @@ def load_data():
         },
         {
             "id": 5, "지역": "충청북도 단양군", "위도": 36.9845, "경도": 128.3657, "점수": 84.2,
-            "인구": "28,105명", "면적": "780.10㎢", "음식점수": 52개, "관광지수": 88개,
+            "인구": "28,105명", "면적": "780.10㎢", "음식점수": "52개", "관광지수": "88개",
             "소개": "단양팔경의 수려한 자연경관과 마늘 특산 요리가 어우러진 휴양 도시입니다.",
             "대표음식": "마늘떡갈비", "대표음식_설명": "단양 특산물인 육쪽마늘을 더해 깊은 풍미를 자랑하는 떡갈비.",
             "대표음식_img": "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=600&q=80",
@@ -476,7 +434,7 @@ def load_data():
         },
         {
             "id": 6, "지역": "경상북도 영양군", "위도": 36.6667, "경도": 129.1118, "점수": 83.5,
-            "인구": "16,000명", "면적": "815.10㎢", "음식점수": 25개, "관광지수": 45개,
+            "인구": "16,000명", "면적": "815.10㎢", "음식점수": "25개", "관광지수": "45개",
             "소개": "아시아 최초 밤하늘 보호공원이 위치한 별빛 가득한 오지 로컬 명소.",
             "대표음식": "산나물비빔밥", "대표음식_설명": "영양의 깨끗한 고산지대에서 채취한 산나물 뷔페식 비빔밥.",
             "대표음식_img": "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=600&q=80",
@@ -489,10 +447,10 @@ def load_data():
         },
         {
             "id": 7, "지역": "경상북도 청송군", "위도": 36.4356, "경도": 129.0572, "점수": 82.8,
-            "인구": "24,000명", "면적": "842.60㎢", "음식점수": 35개, "관광지수": 65개,
+            "인구": "24,000명", "면적": "842.60㎢", "음식점수": "35개", "관광지수": "65개",
             "소개": "주왕산 국립공원의 절경과 달기약수탕, 꿀사과가 유명한 힐링 명소.",
             "대표음식": "달기약수백숙", "대표음식_설명": "탄산 약수로 끓여 닭고기가 부드럽고 국물이 깊은 약선 요리.",
-            "대표음式_img": "https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=600&q=80",
+            "대표음식_img": "https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=600&q=80",
             "특산품": "청송 사과", "특산품_설명": "해발이 높고 일교차가 크며 즙이 많은 명품 꿀사과.",
             "특산품_img": "https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?auto=format&fit=crop&w=600&q=80",
             "축제": "청송 사과축제", "축제_설명": "가을철 사과 수확 기쁨을 나누는 경북 대표 축제.",
@@ -502,7 +460,7 @@ def load_data():
         },
         {
             "id": 8, "지역": "충청남도 태안군", "위도": 36.7456, "경도": 126.2981, "점수": 81.9,
-            "인구": "62,000명", "면적": "500.80㎢", "음식점수": 78개, "관광지수": 110개,
+            "인구": "62,000명", "면적": "500.80㎢", "음식점수": "78개", "관광지수": "110개",
             "소개": "서해안 해안선과 안면도 소나무 숲, 풍부한 해산물이 어우러진 해양 도시.",
             "대표음식": "게국지", "대표음식_설명": "꽃게와 겉절이 김치를 넣고 시원하게 끓여낸 충남 향토 음식.",
             "대표음식_img": "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=600&q=80",
@@ -515,7 +473,7 @@ def load_data():
         },
         {
             "id": 9, "지역": "전라남도 고흥군", "위도": 34.6114, "경도": 127.2842, "점수": 80.4,
-            "인구": "62,500명", "면적": "807.30㎢", "음식점수": 55개, "관광지수": 70개,
+            "인구": "62,500명", "면적": "807.30㎢", "음식점수": "55개", "관광지수": "70개",
             "소개": "우주항공의 중심지이자 따뜻한 해양성 기후로 유자와 삼치가 유명한 곳.",
             "대표음식": "삼치회", "대표음식_설명": "입안에서 부드럽게 녹아내리는 신선한 삼치회.",
             "대표음식_img": "https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?auto=format&fit=crop&w=600&q=80",
@@ -528,7 +486,7 @@ def load_data():
         },
         {
             "id": 10, "지역": "경상북도 울릉군", "위도": 37.4844, "경도": 130.9057, "점수": 79.8,
-            "인구": "8,900명", "면적": "72.90㎢", "음식점수": 40개, "관광지수": 60개,
+            "인구": "8,900명", "면적": "72.90㎢", "음식점수": "40개", "관광지수": "60개",
             "소개": "동해의 에메랄드빛 보석, 천혜의 화산섬 지형과 독도를 품은 신비로운 섬.",
             "대표음식": "오징어내장탕", "대표음식_설명": "울릉도 신선한 오징어로 끓여 시원하고 칼칼한 국물 요리.",
             "대표음식_img": "https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=600&q=80",
@@ -828,6 +786,15 @@ with tab1:
                 </div>
                 """, unsafe_allow_html=True)
 
+with tab2:
+    st.info(f"{curr_data['지역']}의 주요 관광지 정보 페이지입니다.")
+
+with tab3:
+    st.info(f"{curr_data['지역']}의 주요 축제 및 행사 정보 페이지입니다.")
+
+with tab4:
+    st.info(f"{curr_data['지역']}의 주요 특산품 정보 페이지입니다.")
+
 with tab5:
     st.markdown("<div style='display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;'><span style='font-size:14px; font-weight:700;'>실제 방문객 리뷰</span><a href='#' style='font-size:12px; color:#1c7ed6;'>전체 리뷰 보기 ></a></div>", unsafe_allow_html=True)
     
@@ -861,24 +828,4 @@ with tab5:
                 </div>
             </div>
             """, unsafe_allow_html=True)
-
-# =========================================================
-# 9. 추천 지역 TOP 5 카러셀
-# =========================================================
-st.markdown("<h3 style='font-size:16px; font-weight:700; margin-top:35px; margin-bottom:12px;'>🏆 추천 지역 TOP 5</h3>", unsafe_allow_html=True)
-
-top5 = df.sort_values(by="점수", ascending=False).head(5)
-top_cols = st.columns(5)
-
-for idx, (_, row) in enumerate(top5.iterrows()):
-    with top_cols[idx]:
-        st.markdown(f"""
-        <div class="top-card">
-            <div class="top-rank">{idx+1}</div>
-            <img src="{row['메인이미지']}" class="top-img">
-            <div class="top-body">
-                <div class="top-title">{row['지역']}</div>
-                <div class="top-score">{row['점수']}점</div>
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
+        
