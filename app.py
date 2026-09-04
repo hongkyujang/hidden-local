@@ -1,7 +1,10 @@
+```python
 import streamlit as st
 import pandas as pd
 import folium
 from streamlit_folium import st_folium
+import requests
+import json
 
 # =========================================================
 # 기본 설정
@@ -12,6 +15,42 @@ st.set_page_config(
     page_icon="📍",
     layout="wide"
 )
+
+# =========================================================
+# 전체 UI 스타일
+# =========================================================
+
+st.markdown("""
+<style>
+
+.main {
+    background-color: #f5f7fa;
+}
+
+.block-container {
+    max-width: 1450px;
+    padding-top: 2rem;
+    padding-bottom: 3rem;
+}
+
+h1 {
+    font-weight: 800;
+}
+
+[data-testid="stMetric"] {
+    background-color: white;
+    border-radius: 15px;
+    padding: 15px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+}
+
+[data-testid="stSidebar"] {
+    background-color: #f8fafc;
+}
+
+</style>
+""", unsafe_allow_html=True)
+
 
 st.title("📍 숨은 로컬 발견")
 st.caption("데이터로 발견하는 대한민국의 숨은 지역과 로컬 경험")
@@ -569,6 +608,7 @@ with col1:
     )
 
 with col2:
+
     st.metric(
         "⭐ 평균 숨은 지역 점수",
         f"{filtered_df['숨은지역점수'].mean():.1f}"
@@ -577,6 +617,7 @@ with col2:
     )
 
 with col3:
+
     total_reviews = sum(
         len(row["리뷰"])
         for _, row in filtered_df.iterrows()
@@ -588,6 +629,7 @@ with col3:
     )
 
 with col4:
+
     st.metric(
         "🛍️ 발견한 특산품",
         f"{len(filtered_df)}개"
@@ -595,10 +637,47 @@ with col4:
 
 
 # =========================================================
+# 대한민국 지도 GeoJSON
+# =========================================================
+
+KOREA_GEOJSON_URL = (
+    "https://raw.githubusercontent.com/"
+    "southkorea/southkorea-maps/master/"
+    "gadm/json/skorea-provinces-geo.json"
+)
+
+
+@st.cache_data(ttl=86400)
+def load_korea_geojson():
+
+    try:
+
+        response = requests.get(
+            KOREA_GEOJSON_URL,
+            timeout=15
+        )
+
+        response.raise_for_status()
+
+        return response.json()
+
+    except Exception:
+
+        return None
+
+
+korea_geojson = load_korea_geojson()
+
+
+# =========================================================
 # 지도
 # =========================================================
 
-st.subheader("🗺️ 추천 지역 지도")
+st.subheader("🗺️ 대한민국 숨은 지역 지도")
+
+map_data = None
+clicked_region = None
+
 
 if len(filtered_df) == 0:
 
@@ -608,16 +687,120 @@ if len(filtered_df) == 0:
 
 else:
 
+    # -----------------------------------------------------
+    # 지도 생성
+    # -----------------------------------------------------
+
     m = folium.Map(
         location=[36.2, 127.8],
-        zoom_start=7
+        zoom_start=7,
+        min_zoom=7,
+        max_zoom=12,
+        tiles="CartoDB positron",
+        control_scale=True
     )
 
-    for _, row in filtered_df.iterrows():
+    # -----------------------------------------------------
+    # 대한민국 영역으로 초기 화면 고정
+    # -----------------------------------------------------
 
-        # -------------------------------------------------
-        # 추천 지역 핀
-        # -------------------------------------------------
+    korea_bounds = [
+        [33.0, 124.0],
+        [39.0, 132.0]
+    ]
+
+    m.fit_bounds(korea_bounds)
+
+    # -----------------------------------------------------
+    # 대한민국 외부 영역 어둡게 표시
+    #
+    # 바깥쪽에 반투명 사각형을 깔고
+    # 대한민국 영역을 다시 밝게 표시
+    # -----------------------------------------------------
+
+    outside_bounds = [
+        [30.0, 120.0],
+        [45.0, 140.0]
+    ]
+
+    folium.Rectangle(
+        bounds=outside_bounds,
+        color="#555555",
+        weight=0,
+        fill=True,
+        fill_color="#555555",
+        fill_opacity=0.72,
+        interactive=False
+    ).add_to(m)
+
+    # -----------------------------------------------------
+    # 대한민국 실제 행정구역 표시
+    # -----------------------------------------------------
+
+    if korea_geojson is not None:
+
+        folium.GeoJson(
+            korea_geojson,
+            name="대한민국",
+            style_function=lambda feature: {
+                "fillColor": "#ffffff",
+                "color": "#555555",
+                "weight": 1.2,
+                "fillOpacity": 0.05
+            },
+            highlight_function=lambda feature: {
+                "weight": 2,
+                "color": "#ff4b4b",
+                "fillOpacity": 0.12
+            },
+            tooltip=folium.GeoJsonTooltip(
+                fields=["name"],
+                aliases=["지역"],
+                localize=True,
+                sticky=False
+            )
+        ).add_to(m)
+
+    # -----------------------------------------------------
+    # 대한민국 이동 범위 제한
+    # -----------------------------------------------------
+
+    m.get_root().html.add_child(
+        folium.Element("""
+        <script>
+        document.addEventListener("DOMContentLoaded", function() {
+
+            var mapElement = document.querySelector(
+                '.folium-map'
+            );
+
+            if (mapElement) {
+
+                var mapId = mapElement.id;
+
+                var map = window[mapId];
+
+                if (map) {
+
+                    map.setMaxBounds([
+                        [32.5, 123.0],
+                        [39.8, 133.5]
+                    ]);
+
+                    map.options.maxBoundsViscosity = 1.0;
+                }
+            }
+
+        });
+        </script>
+        """)
+    )
+
+    # -----------------------------------------------------
+    # 추천 지역 핀
+    # -----------------------------------------------------
+
+    for _, row in filtered_df.iterrows():
 
         if show_region:
 
@@ -682,9 +865,8 @@ else:
 
             ).add_to(m)
 
-
         # -------------------------------------------------
-        # 음식점 핀
+        # 음식점
         # -------------------------------------------------
 
         if show_food:
@@ -711,9 +893,8 @@ else:
 
             ).add_to(m)
 
-
         # -------------------------------------------------
-        # 관광지 핀
+        # 관광지
         # -------------------------------------------------
 
         if show_tour:
@@ -740,9 +921,8 @@ else:
 
             ).add_to(m)
 
-
         # -------------------------------------------------
-        # 지역행사 핀
+        # 지역 행사
         # -------------------------------------------------
 
         if show_event:
@@ -769,9 +949,8 @@ else:
 
             ).add_to(m)
 
-
         # -------------------------------------------------
-        # 특산품 핀
+        # 특산품
         # -------------------------------------------------
 
         if show_specialty:
@@ -798,19 +977,23 @@ else:
 
             ).add_to(m)
 
+    # -----------------------------------------------------
+    # 지도 표시
+    # -----------------------------------------------------
 
     map_data = st_folium(
         m,
         width=1200,
-        height=600
+        height=600,
+        returned_objects=[
+            "last_object_clicked"
+        ]
     )
 
 
 # =========================================================
 # 지도 핀 클릭 감지
 # =========================================================
-
-clicked_region = None
 
 if map_data:
 
@@ -823,17 +1006,21 @@ if map_data:
         clicked_lat = clicked.get("lat")
         clicked_lon = clicked.get("lng")
 
-        if clicked_lat and clicked_lon:
+        if (
+            clicked_lat is not None
+            and clicked_lon is not None
+        ):
 
-            # 가장 가까운 지역 찾기
+            # 거리 계산용 복사본
+            temp_df = filtered_df.copy()
 
-            filtered_df["거리"] = (
-                (filtered_df["위도"] - clicked_lat) ** 2
+            temp_df["거리"] = (
+                (temp_df["위도"] - clicked_lat) ** 2
                 +
-                (filtered_df["경도"] - clicked_lon) ** 2
+                (temp_df["경도"] - clicked_lon) ** 2
             )
 
-            closest = filtered_df.sort_values(
+            closest = temp_df.sort_values(
                 "거리"
             ).iloc[0]
 
@@ -841,12 +1028,13 @@ if map_data:
 
 
 # =========================================================
-# 지역 선택
+# 지역 상세 정보
 # =========================================================
 
 st.subheader("📍 추천 지역 상세 정보")
 
 region_names = filtered_df["지역"].tolist()
+
 
 if len(region_names) == 0:
 
@@ -856,7 +1044,6 @@ if len(region_names) == 0:
 
 else:
 
-    # 지도에서 핀을 눌렀다면 해당 지역을 자동 선택
     default_index = 0
 
     if clicked_region in region_names:
@@ -941,7 +1128,7 @@ else:
 
 
     # =====================================================
-    # 상세 콘텐츠 탭
+    # 상세 콘텐츠
     # =====================================================
 
     tab1, tab2, tab3, tab4, tab5 = st.tabs(
@@ -986,7 +1173,9 @@ else:
                 selected["음식설명"]
             )
 
-            st.markdown("### 🍴 추천 음식점")
+            st.markdown(
+                "### 🍴 추천 음식점"
+            )
 
             st.write(
                 f"**{selected['음식점']}**"
@@ -1138,8 +1327,14 @@ else:
 
                 st.divider()
 
-        # 리뷰 작성 UI
-        st.markdown("### ✍️ 리뷰 작성")
+
+        # -------------------------------------------------
+        # 리뷰 작성
+        # -------------------------------------------------
+
+        st.markdown(
+            "### ✍️ 리뷰 작성"
+        )
 
         review_rating = st.slider(
             "평점",
@@ -1225,7 +1420,8 @@ else:
         )
 
         st.caption(
-            "지역 특산품 구매")
+            "지역 특산품 구매"
+        )
 
 
 # =========================================================
@@ -1239,6 +1435,7 @@ top5 = df.sort_values(
     ascending=False
 ).head(5)
 
+
 for rank, (_, row) in enumerate(
     top5.iterrows(),
     start=1
@@ -1249,21 +1446,25 @@ for rank, (_, row) in enumerate(
     )
 
     with col1:
+
         st.markdown(
             f"## {rank}"
         )
 
     with col2:
+
         st.markdown(
             f"**{row['지역']}**"
         )
 
     with col3:
+
         st.markdown(
             f"⭐ **{row['숨은지역점수']}점**"
         )
 
     with col4:
+
         st.write(
             f"🍚 {row['대표음식']} · "
             f"🏞️ {row['관광지']}"
@@ -1282,3 +1483,9 @@ st.caption(
     "실제 서비스에서는 SGIS OpenAPI 및 관광·지역 데이터 API와 "
     "데이터베이스를 연결하여 운영할 수 있습니다."
 )
+
+st.caption(
+    "※ 대한민국 행정구역 GeoJSON은 공개된 KOSTAT/SGIS 기반 "
+    "대한민국 행정경계 데이터를 활용합니다."
+)
+```
