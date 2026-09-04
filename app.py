@@ -1,6 +1,6 @@
 # `app.py` — 숨은 로컬 발견 플랫폼
 
-```python
+
 import streamlit as st
 import pandas as pd
 import folium
