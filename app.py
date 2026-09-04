@@ -565,7 +565,7 @@ st.markdown("""
     <div>
         <div class="header-title-box">
             <span class="header-icon">🚗</span>
-            <h1 class="header-title">SGIS(통계지리정보서비스)를 활용한 숨은 로컬 발견</h1>
+            <h1 class="header-title">SGIS(통계지리정보서비스)를 활용한 숨은 지역 발견</h1>
         </div>
         <div class="header-subtitle">SGIS(통계지리정보서비스)로 발견하는 대한민국의 숨은 지역과 로컬 경험</div>
     </div>
@@ -649,11 +649,18 @@ curr_data = df[df["id"] == st.session_state.selected_region_id].iloc[0]
 # 지도 생성 (다크 모드 레이어 타일 적용: CartoDB dark_all)
 m = folium.Map(
     location=[curr_data["위도"], curr_data["경도"]],
-    zoom_start=7,
-    tiles="CartoDB dark_all",
-    attr="CartoDB Dark"
+    zoom_start=8,
+    tiles="https://api.vworld.kr/req/wmts/1.0.0/ce22209e25be3e0c064972e259e8f1ec/Satellite/{z}/{y}/{x}.jpeg",
+    attr="Vworld Satellite"
 )
 
+# 지명/도로 라벨 레이어 추가
+folium.TileLayer(
+    tiles="https://api.vworld.kr/req/wmts/1.0.0/ce22209e25be3e0c064972e259e8f1ec/Hybrid/{z}/{x}/{y}.png",
+    attr="Vworld Hybrid",
+    name="Hybrid",
+    overlay=True
+).add_to(m)
 # 마커 추가
 for _, row in filtered_df.iterrows():
     is_sel = (row["id"] == st.session_state.selected_region_id)
