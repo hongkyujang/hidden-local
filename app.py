@@ -21,35 +21,98 @@ st.set_page_config(
 # =========================================================
 st.markdown("""
 <style>
+
+/* =========================================================
+   기본 폰트
+   ========================================================= */
+
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap');
 
-html, body, [class*="css"] {
+html, body {
     font-family: "Noto Sans KR", "Malgun Gothic", sans-serif;
 }
 
-.stApp {
-    background: #f7f8fa;
+
+/* =========================================================
+   Streamlit 전체 배경
+   ========================================================= */
+
+/* 브라우저 전체 */
+html,
+body {
+    background-color: #f7f8fa !important;
 }
+
+/* Streamlit 앱 전체 */
+.stApp {
+    background-color: #f7f8fa !important;
+}
+
+/* 실제 앱 화면 */
+[data-testid="stAppViewContainer"] {
+    background-color: #f7f8fa !important;
+}
+
+/* 메인 영역 */
+[data-testid="stMain"] {
+    background-color: #f7f8fa !important;
+}
+
+/* 메인 section */
+[data-testid="stAppViewContainer"] > section {
+    background-color: #f7f8fa !important;
+}
+
+/* 상단 헤더 */
+[data-testid="stHeader"] {
+    background-color: #f7f8fa !important;
+}
+
+
+/* =========================================================
+   메인 콘텐츠
+   ========================================================= */
 
 .block-container {
-    max-width: 1450px;
-    padding-top: 2rem;
-    padding-bottom: 3rem;
+    max-width: 1450px !important;
+    padding-top: 2rem !important;
+    padding-bottom: 3rem !important;
 }
 
+
+/* =========================================================
+   사이드바
+   ========================================================= */
+
 [data-testid="stSidebar"] {
-    background: #ffffff;
+    background-color: #ffffff !important;
     border-right: 1px solid #e9edf2;
 }
 
+[data-testid="stSidebar"] > div:first-child {
+    background-color: #ffffff !important;
+}
+
 [data-testid="stSidebar"] .block-container {
+    background-color: #ffffff !important;
     padding-top: 2rem;
 }
 
+
+/* =========================================================
+   Hero
+   ========================================================= */
+
 .hero {
-    background: linear-gradient(135deg, #ffffff 0%, #f5f8ff 100%);
+    background: linear-gradient(
+        135deg,
+        #ffffff 0%,
+        #f5f8ff 100%
+    );
+
     border: 1px solid #e7ebf2;
     border-radius: 22px;
+
     padding: 26px 30px;
     margin-bottom: 18px;
 }
@@ -67,13 +130,22 @@ html, body, [class*="css"] {
     font-size: 15px;
 }
 
+
+/* =========================================================
+   통계 카드
+   ========================================================= */
+
 .metric-card {
     background: #ffffff;
+
     border: 1px solid #e8ecf2;
     border-radius: 18px;
+
     padding: 18px 20px;
     min-height: 112px;
-    box-shadow: 0 3px 15px rgba(30, 41, 59, 0.04);
+
+    box-shadow:
+        0 3px 15px rgba(30, 41, 59, 0.04);
 }
 
 .metric-label {
@@ -94,54 +166,105 @@ html, body, [class*="css"] {
     margin-top: 4px;
 }
 
+
+/* =========================================================
+   섹션 제목
+   ========================================================= */
+
 .section-title {
     font-size: 22px;
     font-weight: 800;
+
     margin: 28px 0 12px 0;
+
     letter-spacing: -0.7px;
 }
 
+
+/* =========================================================
+   지역 카드
+   ========================================================= */
+
 .region-card {
     background: #ffffff;
+
     border: 1px solid #e7ebf2;
     border-radius: 20px;
+
     overflow: hidden;
-    box-shadow: 0 4px 18px rgba(30, 41, 59, 0.05);
+
+    box-shadow:
+        0 4px 18px rgba(30, 41, 59, 0.05);
 }
+
+
+/* =========================================================
+   점수 뱃지
+   ========================================================= */
 
 .score-badge {
     display: inline-block;
+
     background: #fff0f1;
     color: #e53935;
+
     border-radius: 999px;
+
     padding: 5px 10px;
+
     font-size: 12px;
     font-weight: 800;
 }
 
+
+/* =========================================================
+   정보 칩
+   ========================================================= */
+
 .info-chip {
     display: inline-block;
+
     background: #f2f4f7;
     color: #475467;
+
     border-radius: 999px;
+
     padding: 5px 9px;
+
     margin: 2px 3px 2px 0;
+
     font-size: 11px;
 }
 
+
+/* =========================================================
+   추천 이유
+   ========================================================= */
+
 .reason-box {
     background: #f8fafc;
+
     border: 1px solid #e7ebf2;
     border-radius: 15px;
+
     padding: 16px;
+
     line-height: 1.8;
 }
 
+
+/* =========================================================
+   리뷰
+   ========================================================= */
+
 .review-card {
     background: #ffffff;
+
     border: 1px solid #e8ecf2;
     border-radius: 16px;
+
     padding: 16px;
+
     margin-bottom: 10px;
 }
 
@@ -157,21 +280,38 @@ html, body, [class*="css"] {
 
 .review-text {
     color: #475467;
+
     line-height: 1.7;
+
     margin-top: 8px;
 }
 
+
+/* =========================================================
+   사진 설명
+   ========================================================= */
+
 .photo-caption {
     color: #98a2b3;
+
     font-size: 10px;
+
     margin-top: 3px;
 }
 
+
+/* =========================================================
+   TOP 카드
+   ========================================================= */
+
 .top-card {
     background: #ffffff;
+
     border: 1px solid #e7ebf2;
     border-radius: 16px;
+
     padding: 15px;
+
     min-height: 105px;
 }
 
@@ -187,7 +327,9 @@ html, body, [class*="css"] {
 
 .top-score {
     color: #e53935;
+
     font-weight: 800;
+
     font-size: 18px;
 }
 
@@ -196,32 +338,59 @@ html, body, [class*="css"] {
     font-size: 11px;
 }
 
+
+/* =========================================================
+   하단 안내
+   ========================================================= */
+
 .footer-note {
     background: #ffffff;
+
     border: 1px solid #e7ebf2;
     border-radius: 15px;
+
     padding: 15px;
+
     color: #667085;
+
     font-size: 12px;
+
     line-height: 1.7;
 }
 
+
+/* =========================================================
+   버튼
+   ========================================================= */
+
 .stButton > button {
     border-radius: 10px;
+
     border: 1px solid #d9dee7;
+
     font-weight: 600;
 }
+
+
+/* =========================================================
+   Selectbox
+   ========================================================= */
 
 div[data-baseweb="select"] > div {
     border-radius: 10px;
 }
 
+
+/* =========================================================
+   이미지
+   ========================================================= */
+
 img {
     border-radius: 14px;
 }
+
 </style>
 """, unsafe_allow_html=True)
-
 # =========================================================
 # 실제 공개 사진
 # Wikimedia Commons의 실제 지역/음식 사진을 사용한다.
