@@ -22,7 +22,7 @@ st.set_page_config(
 
 
 # =========================================================
-# 2. Helper 함수 (HTML, 이미지, 거리계산)
+# 2. Helper 함수
 # =========================================================
 
 def render_html(content, sidebar=False):
@@ -33,7 +33,6 @@ def render_html(content, sidebar=False):
     else:
         st.markdown(dedented, unsafe_allow_html=True)
 
-# 하버사인 공식 (위도/경도 기준 직선 거리 km 계산)
 def calculate_distance(lat1, lon1, lat2, lon2):
     R = 6371  # 지구 반지름 (km)
     dlat = math.radians(lat2 - lat1)
@@ -42,11 +41,10 @@ def calculate_distance(lat1, lon1, lat2, lon2):
     c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
     return R * c
 
-# 대략적인 도로/교통 반영 예상 소요 시간 (차량 평균 시속 70km 기준)
 def estimate_travel_time(distance_km):
     if distance_km == 0:
         return "0분"
-    travel_hours = (distance_km * 1.25) / 70  # 실제 도로 굴곡율 약 1.25배 반영
+    travel_hours = (distance_km * 1.25) / 70
     total_minutes = int(travel_hours * 60)
     
     hours = total_minutes // 60
@@ -58,7 +56,7 @@ def estimate_travel_time(distance_km):
 
 
 # =========================================================
-# 3. 완벽 다크 모드 Custom CSS
+# 3. 완벽 다크 모드 Custom CSS (상단 여백 & 제목 짤림 수정)
 # =========================================================
 
 render_html("""
@@ -75,9 +73,10 @@ html, body, [data-testid="stApp"], [data-testid="stAppViewContainer"],
     background-color: #0e1117 !important;
 }
 
+/* 상단 패딩 증가로 제목 짤림 해결 */
 .block-container {
     max-width: 1400px !important;
-    padding-top: 25px !important;
+    padding-top: 65px !important;
     padding-bottom: 60px !important;
 }
 
@@ -87,17 +86,19 @@ section[data-testid="stSidebar"] {
     border-right: 1px solid #30363d !important;
 }
 
-/* 헤더 타이틀 */
+/* 헤더 타이틀 보정 */
 .header-title-container {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 25px;
+    padding-top: 5px;
 }
 .header-title {
     font-size: 32px;
     font-weight: 850;
     color: #f0f6fc;
+    line-height: 1.3 !important;
 }
 .header-subtitle {
     font-size: 14px;
@@ -194,11 +195,10 @@ iframe {
 # 4. 주요 지역 데이터
 # =========================================================
 
-# 주요 출발지 좌표 사전 (길찾기 용)
 START_LOCATIONS = {
     "서울특별시 (강남)": (37.4979, 127.0276),
     "서울특별시 (종로)": (37.5729, 126.9793),
-    "경기도 수 원시": (37.2636, 127.0286),
+    "경기도 수원시": (37.2636, 127.0286),
     "인천광역시": (37.4563, 126.7052),
     "대전광역시": (36.3504, 127.3845),
     "대구광역시": (35.8714, 128.6014),
@@ -287,7 +287,7 @@ if "selected_region" not in st.session_state:
 
 
 # =========================================================
-# 5. 사이드바 (길찾기 및 필터)
+# 5. 사이드바
 # =========================================================
 
 with st.sidebar:
@@ -326,7 +326,6 @@ c1, c2, c3, c4 = st.columns(4)
 
 selected_data = df[df["지역"] == st.session_state.selected_region].iloc[0]
 
-# 길찾기 거리/시간 계산
 dist_km = calculate_distance(start_lat, start_lon, selected_data["위도"], selected_data["경도"])
 time_str = estimate_travel_time(dist_km)
 
@@ -376,23 +375,21 @@ with c4:
 
 
 # =========================================================
-# 7. 네이버 지도 느낌의 한반도 고정 지도 & 길찾기 라인
+# 7. 네이버 지도 느낌의 한반도 지도 & 길찾기 라인
 # =========================================================
 
 st.markdown("<h3 style='color:#f0f6fc; margin-top:35px; margin-bottom:15px;'>🗺️ 한반도 로컬 지도 및 길찾기</h3>", unsafe_allow_html=True)
 
-# 한반도 중심 (대한민국에 화면 고정)
 m = folium.Map(
     location=[36.0, 127.8],
     zoom_start=7,
-    tiles="https://xdworld.vworld.kr/2d/Base/service/{z}/{x}/{y}.png", # Vworld 한반도 지도 타일 (네이버 스타일)
+    tiles="https://xdworld.vworld.kr/2d/Base/service/{z}/{x}/{y}.png",
     attr="VWorld Base Map",
     max_bounds=True,
     min_lat=33.0, max_lat=38.8,
     min_lon=124.0, max_lon=132.0
 )
 
-# 출발지 핀 (파란색 아이콘)
 folium.Marker(
     location=[start_lat, start_lon],
     popup=f"<b>출발지: {start_point_name}</b>",
@@ -400,11 +397,9 @@ folium.Marker(
     icon=folium.Icon(color="blue", icon="home")
 ).add_to(m)
 
-# 추천 지역 핀 및 길찾기 경로 연결
 for _, row in df.iterrows():
     is_selected = row["지역"] == st.session_state.selected_region
     
-    # 선택된 지역만 출발지와의 길찾기 연결선(Polyline) 그리기
     if is_selected:
         folium.PolyLine(
             locations=[[start_lat, start_lon], [row["위도"], row["경도"]]],
@@ -441,7 +436,6 @@ with col_head2:
     )
     st.session_state.selected_region = selected_r_name
 
-# 길찾기 경로 요약 정보
 render_html(f"""
 <div class="route-box">
     <span style="color:#58a6ff; font-weight:800; font-size:15px;">🛣️ Real-Time 길찾기 경로 안내</span><br>
@@ -454,7 +448,6 @@ render_html(f"""
 <div style="height:15px;"></div>
 """)
 
-# 3열 상세 정보 카드
 mc1, mc2, mc3 = st.columns([1.2, 1, 1], gap="medium")
 
 with mc1:
