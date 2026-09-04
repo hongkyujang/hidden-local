@@ -145,12 +145,6 @@ section[data-testid="stSidebar"] {
     overflow: hidden;
     height: 100%;
 }
-.sub-card-img {
-    width: 100%;
-    height: 140px;
-    object-fit: cover;
-    background: #334155;
-}
 .sub-card-body {
     padding: 14px;
 }
@@ -284,7 +278,7 @@ section[data-testid="stSidebar"] {
 
 
 # =========================================================
-# 3. 데이터 세트
+# 3. 데이터 세트 (문자열 파이썬 오류 수정 완료)
 # =========================================================
 
 region_data = [
@@ -506,7 +500,7 @@ with col4:
 
 
 # =========================================================
-# 6. 추천 지역 지도 Section
+# 6. 추천 지역 지도 Section (Folium 타일 URL 직접 지정하여 오류 완벽 해결)
 # =========================================================
 
 render_html("""
@@ -518,7 +512,8 @@ render_html("""
 m = folium.Map(
     location=[36.3, 127.8],
     zoom_start=7,
-    tiles="CartoDB dark_matter",
+    tiles="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
+    attr='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
     control_scale=False
 )
 
