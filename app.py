@@ -2,40 +2,41 @@ import streamlit as st
 import pandas as pd
 import folium
 from streamlit_folium import st_folium
+import urllib.parse
 
 # =========================================================
 # 1. 페이지 설정
 # =========================================================
 st.set_page_config(
-    page_title="숨은 로컬 발견",
-    page_icon="📍",
+    page_title="SGIS(통계지리정보서비스)를 활용한 숨은 로컬 발견",
+    page_icon="🚗",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
 # =========================================================
-# 2. 커스텀 CSS (제목 짤림 방지 & 디자인 복원)
+# 2. 커스텀 CSS (다크 모드 및 스타일 반영)
 # =========================================================
 st.markdown("""
 <style>
-/* 글로벌 배경 및 폰트 설정 */
+/* 글로벌 다크 배경 및 기본 폰트 설정 */
 html, body, [data-testid="stApp"], [data-testid="stAppViewContainer"], [data-testid="stMain"] {
-    background-color: #f8f9fa !important;
+    background-color: #121212 !important;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    color: #212529;
+    color: #e0e0e0 !important;
 }
 
-/* 제목 짤림 방지: 상단 패딩 확보 */
+/* 상단 패딩 확보 및 반응형 너비 설정 */
 .main .block-container {
     padding-top: 3.5rem !important;
     padding-bottom: 3rem !important;
     max-width: 1280px !important;
 }
 
-/* 사이드바 스타일링 */
+/* 사이드바 다크 스타일링 */
 section[data-testid="stSidebar"] {
-    background-color: #ffffff !important;
-    border-right: 1px solid #e9ecef !important;
+    background-color: #1e1e1e !important;
+    border-right: 1px solid #2d2d2d !important;
 }
 
 /* 메인 타이틀 헤더 */
@@ -52,41 +53,41 @@ section[data-testid="stSidebar"] {
 }
 .header-icon {
     font-size: 28px;
-    color: #e63946;
+    color: #ff6b6b;
 }
 .header-title {
     font-size: 28px;
     font-weight: 800;
-    color: #111111;
+    color: #ffffff !important;
     line-height: 1.3 !important;
     margin: 0;
 }
 .header-subtitle {
     font-size: 14px;
-    color: #6c757d;
+    color: #a0a0a0;
     margin-top: 4px;
 }
 .fav-btn {
-    background-color: #ffffff;
-    border: 1px solid #e9ecef;
+    background-color: #2b2b2b;
+    border: 1px solid #3d3d3d;
     border-radius: 20px;
     padding: 6px 14px;
     font-size: 13px;
-    color: #e63946;
+    color: #ff6b6b;
     font-weight: 600;
     display: inline-flex;
     align-items: center;
     gap: 5px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
 }
 
-/* 대시보드 지표 카드 (4열) */
+/* 대시보드 지표 카드 */
 .metric-card {
-    background: #ffffff;
+    background: #1e1e1e;
     border-radius: 12px;
     padding: 16px 20px;
-    border: 1px solid #f1f3f5;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+    border: 1px solid #2d2d2d;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -107,17 +108,17 @@ section[data-testid="stSidebar"] {
 }
 .metric-label {
     font-size: 12px;
-    color: #868e96;
+    color: #a0a0a0;
     font-weight: 600;
 }
 .metric-value {
     font-size: 20px;
     font-weight: 800;
-    color: #212529;
+    color: #ffffff;
 }
 .metric-sub {
     font-size: 11px;
-    color: #adb5bd;
+    color: #707070;
     margin-top: 2px;
 }
 
@@ -129,7 +130,7 @@ section[data-testid="stSidebar"] {
     margin-top: 10px;
     margin-bottom: 25px;
     font-size: 12px;
-    color: #495057;
+    color: #b0b0b0;
 }
 .legend-item {
     display: flex;
@@ -143,17 +144,10 @@ section[data-testid="stSidebar"] {
 }
 
 /* 상세 정보 섹션 */
-.section-title-box {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 30px;
-    margin-bottom: 15px;
-}
 .section-title {
     font-size: 20px;
     font-weight: 700;
-    color: #212529;
+    color: #ffffff;
     display: flex;
     align-items: center;
     gap: 8px;
@@ -161,11 +155,11 @@ section[data-testid="stSidebar"] {
 
 /* 메인 지역 정보 카드 */
 .main-region-card {
-    background: #ffffff;
+    background: #1e1e1e;
     border-radius: 12px;
-    border: 1px solid #f1f3f5;
+    border: 1px solid #2d2d2d;
     overflow: hidden;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
     height: 100%;
     position: relative;
 }
@@ -178,7 +172,7 @@ section[data-testid="stSidebar"] {
     position: absolute;
     top: 12px;
     right: 12px;
-    background: #e63946;
+    background: #ff6b6b;
     color: white;
     font-weight: 700;
     font-size: 12px;
@@ -190,7 +184,7 @@ section[data-testid="stSidebar"] {
 }
 .main-region-desc {
     font-size: 13px;
-    color: #495057;
+    color: #cccccc;
     line-height: 1.5;
     margin-bottom: 15px;
 }
@@ -198,33 +192,33 @@ section[data-testid="stSidebar"] {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 8px;
-    border-top: 1px solid #f1f3f5;
+    border-top: 1px solid #2d2d2d;
     padding-top: 12px;
     text-align: center;
 }
 .stat-item-label {
     font-size: 11px;
-    color: #868e96;
+    color: #a0a0a0;
 }
 .stat-item-val {
     font-size: 12px;
     font-weight: 700;
-    color: #212529;
+    color: #ffffff;
 }
 
-/* 서브 아이템 카드 (대표음식, 특산품, 축제) */
+/* 서브 아이템 카드 */
 .sub-info-card {
-    background: #ffffff;
+    background: #1e1e1e;
     border-radius: 12px;
-    border: 1px solid #f1f3f5;
+    border: 1px solid #2d2d2d;
     padding: 14px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
     height: 100%;
 }
 .sub-info-title {
     font-size: 14px;
     font-weight: 700;
-    color: #212529;
+    color: #ffffff;
     margin-bottom: 10px;
 }
 .sub-info-img {
@@ -237,11 +231,11 @@ section[data-testid="stSidebar"] {
 .sub-info-name {
     font-size: 15px;
     font-weight: 700;
-    color: #212529;
+    color: #ffffff;
 }
 .sub-info-desc {
     font-size: 12px;
-    color: #6c757d;
+    color: #a0a0a0;
     line-height: 1.4;
     margin-top: 4px;
     margin-bottom: 12px;
@@ -251,20 +245,20 @@ section[data-testid="stSidebar"] {
     width: 100%;
     text-align: center;
     padding: 6px 0;
-    background: #f8f9fa;
-    border: 1px solid #dee2e6;
+    background: #2b2b2b;
+    border: 1px solid #3d3d3d;
     border-radius: 6px;
     font-size: 12px;
-    color: #495057;
+    color: #e0e0e0;
     font-weight: 600;
     text-decoration: none;
 }
 
 /* 추천 맛집 카드 */
 .place-card {
-    background: #ffffff;
+    background: #1e1e1e;
     border-radius: 10px;
-    border: 1px solid #f1f3f5;
+    border: 1px solid #2d2d2d;
     padding: 12px;
     display: flex;
     gap: 12px;
@@ -279,7 +273,7 @@ section[data-testid="stSidebar"] {
 .place-name {
     font-size: 14px;
     font-weight: 700;
-    color: #212529;
+    color: #ffffff;
 }
 .place-star {
     font-size: 12px;
@@ -289,16 +283,16 @@ section[data-testid="stSidebar"] {
 }
 .place-addr {
     font-size: 11px;
-    color: #868e96;
+    color: #a0a0a0;
 }
 
 /* 리뷰 카드 */
 .review-card {
-    background: #ffffff;
+    background: #1e1e1e;
     border-radius: 12px;
-    border: 1px solid #f1f3f5;
+    border: 1px solid #2d2d2d;
     padding: 16px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
 }
 .review-header {
     display: flex;
@@ -315,7 +309,7 @@ section[data-testid="stSidebar"] {
     width: 36px;
     height: 36px;
     border-radius: 50%;
-    background: #e9ecef;
+    background: #2b2b2b;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -324,15 +318,15 @@ section[data-testid="stSidebar"] {
 .review-username {
     font-size: 13px;
     font-weight: 700;
-    color: #212529;
+    color: #ffffff;
 }
 .review-date {
     font-size: 11px;
-    color: #adb5bd;
+    color: #707070;
 }
 .review-text {
     font-size: 12px;
-    color: #495057;
+    color: #cccccc;
     line-height: 1.5;
     margin-bottom: 12px;
 }
@@ -345,6 +339,35 @@ section[data-testid="stSidebar"] {
     height: 70px;
     border-radius: 6px;
     object-fit: cover;
+}
+
+/* 길찾기 커스텀 버튼 스타일 */
+.navi-btn-container {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+}
+.navi-btn-naver {
+    flex: 1;
+    background-color: #03C75A;
+    color: white !important;
+    text-align: center;
+    padding: 8px 0;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 700;
+    text-decoration: none;
+}
+.navi-btn-kakao {
+    flex: 1;
+    background-color: #FEE500;
+    color: #191919 !important;
+    text-align: center;
+    padding: 8px 0;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 700;
+    text-decoration: none;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -510,22 +533,22 @@ if "selected_region_id" not in st.session_state:
 # 4. 사이드바 (필터 컨트롤)
 # =========================================================
 with st.sidebar:
-    st.markdown("<h4 style='font-weight:700; color:#212529;'>🔍 지역 탐색 필터</h4>", unsafe_allow_html=True)
+    st.markdown("<h4 style='font-weight:700; color:#ffffff;'>🔍 지역 탐색 필터</h4>", unsafe_allow_html=True)
     
     score_slider = st.slider("최소 숨은 지역 점수", 0, 100, 60)
     food_type = st.selectbox("선호 음식 타입", ["전체", "향토음식", "해산물", "산채요리", "육류"])
     
-    st.markdown("<p style='font-size:13px; font-weight:700; color:#495057; margin-top:15px; margin-bottom:5px;'>지도 표시 옵션</p>", unsafe_allow_html=True)
+    st.markdown("<p style='font-size:13px; font-weight:700; color:#a0a0a0; margin-top:15px; margin-bottom:5px;'>지도 표시 옵션</p>", unsafe_allow_html=True)
     chk_pin = st.checkbox("추천 지역 핀", value=True)
     chk_food = st.checkbox("음식점", value=True)
     chk_tour = st.checkbox("관광지", value=True)
     chk_fest = st.checkbox("축제/행사", value=True)
     chk_prod = st.checkbox("특산품", value=True)
     
-    st.markdown("<p style='font-size:13px; font-weight:700; color:#495057; margin-top:15px; margin-bottom:5px;'>정렬 기준</p>", unsafe_allow_html=True)
+    st.markdown("<p style='font-size:13px; font-weight:700; color:#a0a0a0; margin-top:15px; margin-bottom:5px;'>정렬 기준</p>", unsafe_allow_html=True)
     sort_order = st.selectbox("", ["숨은 지역 점수 순", "인구 적은 순", "관광지 많은 순"], label_visibility="collapsed")
     
-    st.markdown("<p style='font-size:13px; font-weight:700; color:#495057; margin-top:15px; margin-bottom:5px;'>키워드 검색</p>", unsafe_allow_html=True)
+    st.markdown("<p style='font-size:13px; font-weight:700; color:#a0a0a0; margin-top:15px; margin-bottom:5px;'>키워드 검색</p>", unsafe_allow_html=True)
     keyword = st.text_input("", placeholder="지역명 또는 키워드 입력", label_visibility="collapsed")
     
     st.button("검색", use_container_width=True, type="primary")
@@ -563,7 +586,7 @@ with c1:
     st.markdown(f"""
     <div class="metric-card">
         <div class="metric-left">
-            <div class="metric-icon" style="background:#e6fcf5; color:#0ca678;">★</div>
+            <div class="metric-icon" style="background:#1b382b; color:#2b8a3e;">★</div>
             <div>
                 <div class="metric-label">추천 지역 수</div>
                 <div class="metric-value">{len(filtered_df)}곳</div>
@@ -577,7 +600,7 @@ with c2:
     st.markdown(f"""
     <div class="metric-card">
         <div class="metric-left">
-            <div class="metric-icon" style="background:#e7f5ff; color:#1c7ed6;">📈</div>
+            <div class="metric-icon" style="background:#182c4d; color:#339af0;">📈</div>
             <div>
                 <div class="metric-label">평균 숨은 점수</div>
                 <div class="metric-value">{avg_score:.1f}점</div>
@@ -591,7 +614,7 @@ with c3:
     st.markdown("""
     <div class="metric-card">
         <div class="metric-left">
-            <div class="metric-icon" style="background:#f3f0ff; color:#748ffc;">💬</div>
+            <div class="metric-icon" style="background:#2b2353; color:#91a7ff;">💬</div>
             <div>
                 <div class="metric-label">리뷰 수</div>
                 <div class="metric-value">237개</div>
@@ -605,7 +628,7 @@ with c4:
     st.markdown("""
     <div class="metric-card">
         <div class="metric-left">
-            <div class="metric-icon" style="background:#fff9db; color:#f59f00;">🎁</div>
+            <div class="metric-icon" style="background:#423213; color:#fcc419;">🎁</div>
             <div>
                 <div class="metric-label">특산품</div>
                 <div class="metric-value">32개</div>
@@ -618,17 +641,17 @@ with c4:
 # =========================================================
 # 6. 지도 및 범례
 # =========================================================
-st.markdown("<h3 style='font-size:18px; font-weight:700; margin-top:25px; margin-bottom:10px;'>🗺️ 추천 지역 지도</h3>", unsafe_allow_html=True)
+st.markdown("<h3 style='font-size:18px; font-weight:700; margin-top:25px; margin-bottom:10px; color:#ffffff;'>🗺️ 추천 지역 지도</h3>", unsafe_allow_html=True)
 
 # 현재 선택된 데이터
 curr_data = df[df["id"] == st.session_state.selected_region_id].iloc[0]
 
-# 지도 생성
+# 지도 생성 (다크 모드 레이어 타일 적용: CartoDB dark_all)
 m = folium.Map(
     location=[curr_data["위도"], curr_data["경도"]],
     zoom_start=7,
-    tiles="https://xdworld.vworld.kr/2d/Base/service/{z}/{x}/{y}.png",
-    attr="VWorld Base Map"
+    tiles="CartoDB dark_all",
+    attr="CartoDB Dark"
 )
 
 # 마커 추가
@@ -665,7 +688,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # =========================================================
-# 7. 지역 상세 정보 카드
+# 7. 지역 상세 정보 카드 & 길찾기 연동
 # =========================================================
 sec_col1, sec_col2 = st.columns([3, 1])
 with sec_col1:
@@ -682,6 +705,11 @@ with sec_col2:
     if new_id != st.session_state.selected_region_id:
         st.session_state.selected_region_id = new_id
         st.rerun()
+
+# 길찾기 URL 생성 (네이버 / 카카오)
+encoded_region = urllib.parse.quote(curr_data['지역'])
+naver_navi_url = f"https://map.naver.com/v5/directions/-/-/-/nat?e={curr_data['경도']},{curr_data['위도']},{encoded_region},,,ADDRESS_POI"
+kakao_navi_url = f"https://map.kakao.com/link/to/{encoded_region},{curr_data['위도']},{curr_data['경도']}"
 
 dc1, dc2, dc3, dc4 = st.columns([1.3, 1, 1, 1])
 
@@ -710,6 +738,11 @@ with dc1:
                     <div class="stat-item-label">🏞️ 관광지</div>
                     <div class="stat-item-val">{curr_data['관광지수']}</div>
                 </div>
+            </div>
+            <div style="margin-top:15px; font-size:12px; font-weight:700; color:#ffffff;">🚗 길찾기</div>
+            <div class="navi-btn-container">
+                <a href="{naver_navi_url}" target="_blank" class="navi-btn-naver">네이버 지도</a>
+                <a href="{kakao_navi_url}" target="_blank" class="navi-btn-kakao">카카오맵</a>
             </div>
         </div>
     </div>
@@ -774,6 +807,9 @@ with tab1:
         
         for idx, res in enumerate(curr_data["맛집목록"]):
             target_col = [rc1, rc2, rc3][idx % 3]
+            encoded_res_name = urllib.parse.quote(res['이름'])
+            res_naver_url = f"https://map.naver.com/v5/search/{encoded_res_name}"
+            
             with target_col:
                 st.markdown(f"""
                 <div class="place-card">
@@ -782,6 +818,7 @@ with tab1:
                         <div class="place-name">{res['이름']}</div>
                         <div class="place-star">{res['평점']}</div>
                         <div class="place-addr">📍 {res['주소']}</div>
+                        <a href="{res_naver_url}" target="_blank" style="font-size:11px; color:#339af0; text-decoration:none; display:inline-block; margin-top:4px;">네이버 지도 보기 ></a>
                     </div>
                 </div>
                 """, unsafe_allow_html=True)
@@ -796,7 +833,7 @@ with tab4:
     st.info(f"{curr_data['지역']}의 주요 특산품 정보 페이지입니다.")
 
 with tab5:
-    st.markdown("<div style='display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;'><span style='font-size:14px; font-weight:700;'>실제 방문객 리뷰</span><a href='#' style='font-size:12px; color:#1c7ed6;'>전체 리뷰 보기 ></a></div>", unsafe_allow_html=True)
+    st.markdown("<div style='display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;'><span style='font-size:14px; font-weight:700; color:#ffffff;'>실제 방문객 리뷰</span><a href='#' style='font-size:12px; color:#339af0;'>전체 리뷰 보기 ></a></div>", unsafe_allow_html=True)
     
     rev_c1, rev_c2, rev_c3, rev_c4 = st.columns(4)
     
@@ -828,4 +865,3 @@ with tab5:
                 </div>
             </div>
             """, unsafe_allow_html=True)
-        
