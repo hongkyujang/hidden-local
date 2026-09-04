@@ -8,7 +8,7 @@ import urllib.parse
 # 1. 페이지 설정
 # =========================================================
 st.set_page_config(
-    page_title="SGIS(통계지리정보서비스)를 활용한 숨은 로컬 발견",
+    page_title="SGIS(통계지리정보서비스)를 활용한 숨은 지역 발견",
     page_icon="🚗",
     layout="wide",
     initial_sidebar_state="expanded"
