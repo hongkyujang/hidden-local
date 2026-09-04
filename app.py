@@ -13,7 +13,7 @@ from streamlit_folium import st_folium
 # =========================================================
 
 st.set_page_config(
-    page_title="숨은 로컬 발견",
+    page_title="숨은 로컬 발견 - Dark Mode",
     page_icon="📍",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -34,24 +34,25 @@ def render_html(content, sidebar=False):
 
 
 # =========================================================
-# CSS
+# 다크 모드 CSS (Dark Mode Custom Styling)
 # =========================================================
 
 render_html("""
 <style>
 
-/* 전체 배경 */
+/* 전체 배경 및 기본 폰트 색상 */
 html,
 body,
 [data-testid="stApp"],
 [data-testid="stAppViewContainer"],
 [data-testid="stMain"],
 [data-testid="stMainBlockContainer"] {
-    background-color: #f3f7f5 !important;
+    background-color: #0e1117 !important;
+    color: #e0e6ed !important;
 }
 
 [data-testid="stHeader"] {
-    background-color: #f3f7f5 !important;
+    background-color: #0e1117 !important;
 }
 
 .block-container {
@@ -60,29 +61,29 @@ body,
     padding-bottom: 50px !important;
 }
 
-/* 사이드바 */
+/* 사이드바 다크 스타일 */
 section[data-testid="stSidebar"] {
-    background-color: #eaf2ee !important;
-    border-right: 1px solid #d8e5de;
+    background-color: #161b22 !important;
+    border-right: 1px solid #30363d !important;
 }
 
 section[data-testid="stSidebar"] > div {
-    background-color: #eaf2ee !important;
+    background-color: #161b22 !important;
 }
 
-/* 제목 카드 */
+/* 메인 타이틀 카드 */
 .main-title-card {
-    background: #ffffff;
+    background: #161b22;
     padding: 32px 38px;
     border-radius: 22px;
-    border: 1px solid #e2ebe6;
-    box-shadow: 0 6px 22px rgba(34, 62, 52, 0.06);
+    border: 1px solid #30363d;
+    box-shadow: 0 6px 22px rgba(0, 0, 0, 0.4);
     margin-bottom: 25px;
 }
 
 .main-title-small {
     font-size: 15px;
-    color: #6f897d;
+    color: #58a6ff;
     font-weight: 700;
     margin-bottom: 8px;
 }
@@ -90,19 +91,19 @@ section[data-testid="stSidebar"] > div {
 .main-title {
     font-size: 42px;
     font-weight: 850;
-    color: #18352c;
+    color: #f0f6fc;
     letter-spacing: -2px;
     margin-bottom: 8px;
 }
 
 .main-subtitle {
     font-size: 16px;
-    color: #718078;
+    color: #8b949e;
 }
 
 /* 섹션 제목 */
 .section-title {
-    color: #18352c;
+    color: #f0f6fc;
     font-size: 24px;
     font-weight: 850;
     margin-top: 30px;
@@ -111,57 +112,57 @@ section[data-testid="stSidebar"] > div {
 
 /* 통계 카드 */
 .metric-card {
-    background: #ffffff;
-    border: 1px solid #e1ebe5;
+    background: #161b22;
+    border: 1px solid #30363d;
     border-radius: 18px;
     padding: 20px;
-    box-shadow: 0 5px 18px rgba(34, 62, 52, 0.06);
+    box-shadow: 0 5px 18px rgba(0, 0, 0, 0.3);
     min-height: 120px;
 }
 
 .metric-title {
-    color: #718078;
+    color: #8b949e;
     font-size: 14px;
     font-weight: 700;
     margin-bottom: 8px;
 }
 
 .metric-value {
-    color: #18352c;
+    color: #58a6ff;
     font-size: 30px;
     font-weight: 850;
 }
 
 .metric-sub {
-    color: #7d8d86;
+    color: #6e7681;
     font-size: 12px;
     margin-top: 5px;
 }
 
 /* 지역 카드 */
 .region-card {
-    background: #ffffff;
-    border: 1px solid #e1ebe5;
+    background: #161b22;
+    border: 1px solid #30363d;
     border-radius: 20px;
     padding: 24px;
     margin-bottom: 18px;
-    box-shadow: 0 5px 18px rgba(34, 62, 52, 0.05);
+    box-shadow: 0 5px 18px rgba(0, 0, 0, 0.3);
 }
 
 .region-name {
-    color: #18352c;
+    color: #f0f6fc;
     font-size: 25px;
     font-weight: 850;
 }
 
 .region-score {
-    color: #2d7657;
+    color: #3fb950;
     font-size: 32px;
     font-weight: 850;
 }
 
 .small-label {
-    color: #718078;
+    color: #8b949e;
     font-size: 13px;
     font-weight: 700;
 }
@@ -169,7 +170,7 @@ section[data-testid="stSidebar"] > div {
 /* 점수 바 */
 .score-bar {
     height: 9px;
-    background: #e5eee9;
+    background: #21262d;
     border-radius: 10px;
     overflow: hidden;
     margin-top: 7px;
@@ -178,43 +179,47 @@ section[data-testid="stSidebar"] > div {
 
 .score-fill {
     height: 100%;
-    background: #6da88a;
+    background: #238636;
     border-radius: 10px;
 }
 
-/* 카드 상세 박스 */
+/* 카드 상세 박스 (다크 테마) */
 .food-box {
-    background: #fffaf3;
-    border: 1px solid #f0e3cc;
+    background: #1c2128;
+    border: 1px solid #343b45;
     border-radius: 16px;
     padding: 20px;
+    color: #adbac7;
 }
 
 .tour-box {
-    background: #f3f8ff;
-    border: 1px solid #dce9f5;
+    background: #1c2128;
+    border: 1px solid #343b45;
     border-radius: 16px;
     padding: 20px;
+    color: #adbac7;
 }
 
 .special-box {
-    background: #f8f4ff;
-    border: 1px solid #e6ddf4;
+    background: #1c2128;
+    border: 1px solid #343b45;
     border-radius: 16px;
     padding: 20px;
+    color: #adbac7;
 }
 
 /* 리뷰 */
 .review-box {
-    background: #ffffff;
-    border-left: 4px solid #6da88a;
+    background: #161b22;
+    border-left: 4px solid #238636;
     border-radius: 10px;
     padding: 15px 18px;
     margin-bottom: 10px;
-    box-shadow: 0 3px 10px rgba(34, 62, 52, 0.04);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+    color: #adbac7;
 }
 
-/* 지도 */
+/* 지도 iframe 코너 라운딩 */
 iframe {
     border-radius: 16px !important;
 }
@@ -224,54 +229,25 @@ iframe {
 
 
 # =========================================================
-# 로컬 이미지 설정
+# 로컬 이미지 / 온라인 폴백 이미지 설정
 # =========================================================
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 ASSET_DIR = os.path.join(BASE_DIR, "assets")
 
 
-def get_image_path(filename):
-    return os.path.join(ASSET_DIR, filename)
-
-
-def show_local_image(filename, caption=None):
-    path = get_image_path(filename)
+def show_local_or_web_image(filename, fallback_url, caption=None):
+    """로컬 assets 디렉토리에 파일이 없으면 고화질 온라인 대체 이미지를 사용"""
+    path = os.path.join(ASSET_DIR, filename)
 
     if os.path.isfile(path):
-        st.image(
-            path,
-            caption=caption,
-            use_container_width=True
-        )
+        st.image(path, caption=caption, use_container_width=True)
     else:
-        render_html(f"""
-        <div style="
-            width:100%;
-            height:300px;
-            background:linear-gradient(135deg, #e9f1ed, #f7faf8);
-            border:1px solid #dce8e1;
-            border-radius:16px;
-            display:flex;
-            align-items:center;
-            justify-content:center;
-            text-align:center;
-            color:#718078;
-            font-weight:700;
-        ">
-            <div>
-                <div style="font-size:42px; margin-bottom:10px;">📷</div>
-                <div>이미지 준비 중</div>
-                <div style="font-size:11px; font-weight:400; margin-top:5px;">
-                    assets/{html.escape(filename)}
-                </div>
-            </div>
-        </div>
-        """)
+        st.image(fallback_url, caption=f"{caption} (웹 이미지 예시)", use_container_width=True)
 
 
 # =========================================================
-# 지역 데이터
+# 지역 데이터 (온라인 대체 이미지 URL 포함)
 # =========================================================
 
 region_data = [
@@ -297,6 +273,9 @@ region_data = [
         "음식사진": "jeongseon_food.jpg",
         "관광사진": "jeongseon_tour.jpg",
         "특산품사진": "jeongseon_specialty.jpg",
+        "음식_web": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80",
+        "관광_web": "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=800&q=80",
+        "특산품_web": "https://images.unsplash.com/photo-1518843875459-f738682238a6?auto=format&fit=crop&w=800&q=80",
         "리뷰": [
             "곤드레밥이 생각보다 훨씬 맛있었습니다.",
             "관광객이 너무 많지 않아서 여유롭게 여행하기 좋았습니다.",
@@ -325,6 +304,9 @@ region_data = [
         "음식사진": "danyang_food.jpg",
         "관광사진": "danyang_tour.jpg",
         "특산품사진": "danyang_specialty.jpg",
+        "음식_web": "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=800&q=80",
+        "관광_web": "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80",
+        "특산품_web": "https://images.unsplash.com/photo-1615485290382-441e4d049cb5?auto=format&fit=crop&w=800&q=80",
         "리뷰": [
             "마늘을 좋아한다면 음식 때문에라도 방문할 만합니다.",
             "도담삼봉 주변 풍경이 정말 좋았습니다.",
@@ -353,6 +335,9 @@ region_data = [
         "음식사진": "gurye_food.jpg",
         "관광사진": "gurye_tour.jpg",
         "특산품사진": "gurye_specialty.jpg",
+        "음식_web": "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=800&q=80",
+        "관광_web": "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&w=800&q=80",
+        "특산품_web": "https://images.unsplash.com/photo-1563245372-f21724e3856d?auto=format&fit=crop&w=800&q=80",
         "리뷰": [
             "산채비빔밥이 담백하고 건강한 느낌이었습니다.",
             "산수유 시즌에 방문하면 정말 예쁠 것 같습니다.",
@@ -381,6 +366,9 @@ region_data = [
         "음식사진": "yeongdeok_food.jpg",
         "관광사진": "yeongdeok_tour.jpg",
         "특산품사진": "yeongdeok_specialty.jpg",
+        "음식_web": "https://images.unsplash.com/photo-1559737679-d65e94b59f77?auto=format&fit=crop&w=800&q=80",
+        "관광_web": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80",
+        "특산품_web": "https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?auto=format&fit=crop&w=800&q=80",
         "리뷰": [
             "대게가 정말 신선했습니다.",
             "바다를 보면서 식사할 수 있어서 좋았습니다.",
@@ -409,6 +397,9 @@ region_data = [
         "음식사진": "muju_food.jpg",
         "관광사진": "muju_tour.jpg",
         "특산품사진": "muju_specialty.jpg",
+        "음식_web": "https://images.unsplash.com/photo-1547592166-23ac45744acd?auto=format&fit=crop&w=800&q=80",
+        "관광_web": "https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=800&q=80",
+        "특산품_web": "https://images.unsplash.com/photo-1537640538966-79f369143f8f?auto=format&fit=crop&w=800&q=80",
         "리뷰": [
             "어죽이 생각보다 담백하고 맛있었습니다.",
             "덕유산 풍경이 정말 아름다웠습니다.",
@@ -437,6 +428,9 @@ region_data = [
         "음식사진": "seocheon_food.jpg",
         "관광사진": "seocheon_tour.jpg",
         "특산품사진": "seocheon_specialty.jpg",
+        "음식_web": "https://images.unsplash.com/photo-1606851094655-b2593a9af63f?auto=format&fit=crop&w=800&q=80",
+        "관광_web": "https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=800&q=80",
+        "특산품_web": "https://images.unsplash.com/photo-1528458909336-e7a0adfac1d5?auto=format&fit=crop&w=800&q=80",
         "리뷰": [
             "바다 음식이 신선해서 좋았습니다.",
             "국립생태원이 생각보다 볼거리가 많았습니다.",
@@ -465,6 +459,9 @@ region_data = [
         "음식사진": "uiryeong_food.jpg",
         "관광사진": "uiryeong_tour.jpg",
         "특산품사진": "uiryeong_specialty.jpg",
+        "음식_web": "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&w=800&q=80",
+        "관광_web": "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=800&q=80",
+        "특산품_web": "https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=800&q=80",
         "리뷰": [
             "의령소바가 깔끔하고 맛있었습니다.",
             "관광객이 많지 않아 한적하게 여행할 수 있었습니다.",
@@ -493,6 +490,9 @@ region_data = [
         "음식사진": "samcheok_food.jpg",
         "관광사진": "samcheok_tour.jpg",
         "특산품사진": "samcheok_specialty.jpg",
+        "음식_web": "https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?auto=format&fit=crop&w=800&q=80",
+        "관광_web": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80",
+        "특산품_web": "https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=800&q=80",
         "리뷰": [
             "곰치국이 시원하고 해장하기 좋았습니다.",
             "장호항 바다가 정말 예뻤습니다.",
@@ -520,51 +520,51 @@ df["숨은지역점수"] = df.apply(calculate_hidden_score, axis=1)
 
 
 # =========================================================
-# 메인 제목
+# 메인 제목 (다크)
 # =========================================================
 
 render_html("""
 <div class="main-title-card">
     <div class="main-title-small">📍 LOCAL DISCOVERY</div>
     <div class="main-title">숨은 로컬 발견</div>
-    <div class="main-subtitle">데이터로 발견하는 대한민국의 숨은 지역과 로컬 경험</div>
+    <div class="main-subtitle">데이터로 발견하는 대한민국의 숨은 지역과 로컬 경험 (다크 모드)</div>
 </div>
 """)
 
 
 # =========================================================
-# 사이드바
+# 사이드바 (다크 모드)
 # =========================================================
 
 render_html("""
-<div style="font-size:25px; font-weight:850; color:#18352c; margin-bottom:5px;">
-    📍 검색 & 검색 옵션
+<div style="font-size:22px; font-weight:850; color:#f0f6fc; margin-bottom:5px;">
+    🔍 검색 & 옵션
 </div>
-<div style="font-size:13px; color:#718078; margin-bottom:20px;">
-    조건을 설정해 대한민국 로컬을 탐색해보세요
+<div style="font-size:13px; color:#8b949e; margin-bottom:20px;">
+    다크 테마에서 탐색 조건을 설정하세요
 </div>
 """, sidebar=True)
 
-# 1. 키워드 검색 기능
+# 1. 키워드 검색
 search_query = st.sidebar.text_input("🔍 키워드 검색", placeholder="지역, 음식, 관광지, 특산품")
 
-# 2. 지역 선택 기능
+# 2. 지역 선택
 selected_region = st.sidebar.selectbox("지역 선택", ["전체"] + df["지역"].tolist())
 
-# 3. 지도 스타일 변경 옵션
+# 3. 다크 지도 지원을 포함한 스타일 선택
 map_style = st.sidebar.radio(
     "🗺️ 지도 스타일",
-    ["한국 기본 지도", "위성 영상 지도", "OpenStreetMap"],
+    ["다크 테마 지도", "한국 기본 지도", "위성 영상 지도", "OpenStreetMap"],
     index=0
 )
 
-# 4. 점수 필터링 슬라이더
+# 4. 점수 슬라이더
 min_score = st.sidebar.slider("최소 숨은지역 점수", 0, 100, 70)
 food_min = st.sidebar.slider("최소 음식 점수", 0, 100, 80)
 
 
 # =========================================================
-# 데이터 필터링 기능 (검색어 + 옵션 반영)
+# 데이터 필터링
 # =========================================================
 
 filtered_df = df[(df["숨은지역점수"] >= min_score) & (df["음식점수"] >= food_min)].copy()
@@ -572,7 +572,6 @@ filtered_df = df[(df["숨은지역점수"] >= min_score) & (df["음식점수"] >
 if selected_region != "전체":
     filtered_df = filtered_df[filtered_df["지역"] == selected_region]
 
-# 검색어가 입력된 경우 다중 필드 통합 검색 수행
 if search_query.strip():
     q = search_query.strip().lower()
     filtered_df = filtered_df[
@@ -630,17 +629,19 @@ with col4:
 
 
 # =========================================================
-# 대한민국 중심 지도 (타일 스타일 선택 및 바운더리 제약)
+# 지도 (다크 타일 연동 & 한반도 영역 제약)
 # =========================================================
 
 render_html("""
 <div class="section-title">🗺️ 대한민국 숨은 지역 지도</div>
 """)
 
-# 선택된 옵션에 따른 지도 타일 설정 (VWorld 한국 고해상도 타일 사용)
-if map_style == "한국 기본 지도":
+if map_style == "다크 테마 지도":
+    tiles_url = "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+    attr = "CartoDB dark_all"
+elif map_style == "한국 기본 지도":
     tiles_url = "https://xdworld.vworld.kr/2d/Base/service/{z}/{x}/{y}.png"
-    attr = "VWorld"
+    attr = "VWorld Base"
 elif map_style == "위성 영상 지도":
     tiles_url = "https://xdworld.vworld.kr/2d/Satellite/service/{z}/{x}/{y}.jpeg"
     attr = "VWorld Satellite"
@@ -649,7 +650,7 @@ else:
     attr = "OpenStreetMap"
 
 m = folium.Map(
-    location=[36.0, 127.8],  # 한반도 중심
+    location=[36.0, 127.8],
     zoom_start=7,
     min_zoom=7,
     max_zoom=13,
@@ -659,14 +660,13 @@ m = folium.Map(
     no_wrap=True
 )
 
-# 대한민국 주변 영역을 벗어나지 못하도록 Strict Limit 설정
 m.fit_bounds([[33.1, 124.5], [38.6, 131.0]])
 m.options["maxBounds"] = [[32.5, 123.5], [39.0, 132.0]]
 m.options["maxBoundsViscosity"] = 1.0
 
 for _, row in filtered_df.iterrows():
     popup_html = f"""
-    <div style="width:230px; font-family:sans-serif;">
+    <div style="width:230px; font-family:sans-serif; color:#111;">
         <h4 style="margin-bottom:8px; color:#18352c;">📍 {html.escape(row["지역"])}</h4>
         <b>숨은지역 점수</b><br>⭐ {row["숨은지역점수"]}<hr>
         <b>대표 음식</b><br>🍚 {html.escape(row["대표음식"])}<br><br>
@@ -704,7 +704,7 @@ else:
             <div style="display:flex; justify-content:space-between; align-items:center;">
                 <div>
                     <div class="region-name">📍 {html.escape(row["지역"])}</div>
-                    <div style="color:#718078; margin-top:6px;">
+                    <div style="color:#8b949e; margin-top:6px;">
                         대표 음식 · {html.escape(row["대표음식"])}
                     </div>
                 </div>
@@ -728,7 +728,7 @@ else:
 
 
 # =========================================================
-# 상세 지역
+# 상세 지역 (이미지 자동 폴백 렌더링 포함)
 # =========================================================
 
 render_html("""
@@ -742,23 +742,23 @@ if len(filtered_df) > 0:
     render_html(f"""
     <div class="region-card">
         <div class="region-name">📍 {html.escape(selected["지역"])}</div>
-        <div style="color:#718078; margin-top:7px;">데이터 기반 숨은 지역 탐색 결과</div>
+        <div style="color:#8b949e; margin-top:7px;">데이터 기반 숨은 지역 탐색 결과</div>
         <div style="display:flex; gap:30px; margin-top:18px;">
             <div>
                 <div class="small-label">숨은지역 점수</div>
-                <div style="font-size:27px; font-weight:850; color:#2d7657;">
+                <div style="font-size:27px; font-weight:850; color:#3fb950;">
                     {selected["숨은지역점수"]}
                 </div>
             </div>
             <div>
                 <div class="small-label">음식 점수</div>
-                <div style="font-size:27px; font-weight:850; color:#a46b32;">
+                <div style="font-size:27px; font-weight:850; color:#d29922;">
                     {selected["음식점수"]}
                 </div>
             </div>
             <div>
                 <div class="small-label">지역 특색</div>
-                <div style="font-size:27px; font-weight:850; color:#6f5595;">
+                <div style="font-size:27px; font-weight:850; color:#a371f7;">
                     {selected["지역특색"]}
                 </div>
             </div>
@@ -771,18 +771,18 @@ if len(filtered_df) > 0:
     with tab1:
         col1, col2 = st.columns([1, 1], gap="large")
         with col1:
-            show_local_image(selected["음식사진"], selected["대표음식"])
+            show_local_or_web_image(selected["음식사진"], selected["음식_web"], selected["대표음식"])
         with col2:
             render_html(f"""
             <div class="food-box">
                 <div class="small-label">대표 로컬 음식</div>
-                <h2 style="color:#18352c; margin-top:6px;">🍚 {html.escape(selected["대표음식"])}</h2>
+                <h2 style="color:#f0f6fc; margin-top:6px;">🍚 {html.escape(selected["대표음식"])}</h2>
                 <p>{html.escape(selected["음식설명"])}</p>
-                <hr>
+                <hr style="border-color:#30363d;">
                 <div class="small-label">추천 음식점</div>
-                <h3>{html.escape(selected["음식점"])}</h3>
+                <h3 style="color:#f0f6fc;">{html.escape(selected["음식점"])}</h3>
                 <p>{html.escape(selected["음식점설명"])}</p>
-                <div style="margin-top:20px; font-size:30px; font-weight:850; color:#a46b32;">
+                <div style="margin-top:20px; font-size:30px; font-weight:850; color:#d29922;">
                     {selected["음식점수"]}점
                 </div>
             </div>
@@ -791,18 +791,18 @@ if len(filtered_df) > 0:
     with tab2:
         col1, col2 = st.columns([1, 1], gap="large")
         with col1:
-            show_local_image(selected["관광사진"], selected["관광지"])
+            show_local_or_web_image(selected["관광사진"], selected["관광_web"], selected["관광지"])
         with col2:
             render_html(f"""
             <div class="tour-box">
                 <div class="small-label">추천 관광지</div>
-                <h2 style="color:#18352c;">🏔️ {html.escape(selected["관광지"])}</h2>
+                <h2 style="color:#f0f6fc;">🏔️ {html.escape(selected["관광지"])}</h2>
                 <p>{html.escape(selected["관광지설명"])}</p>
-                <hr>
+                <hr style="border-color:#30363d;">
                 <div class="small-label">지역 행사</div>
-                <h3>🎉 {html.escape(selected["지역행사"])}</h3>
+                <h3 style="color:#f0f6fc;">🎉 {html.escape(selected["지역행사"])}</h3>
                 <p>{html.escape(selected["행사설명"])}</p>
-                <div style="margin-top:18px; color:#718078; font-size:13px;">관광 인지도</div>
+                <div style="margin-top:18px; color:#8b949e; font-size:13px;">관광 인지도</div>
                 <div class="score-bar">
                     <div class="score-fill" style="width:{selected["관광인지도"]}%"></div>
                 </div>
@@ -813,16 +813,16 @@ if len(filtered_df) > 0:
     with tab3:
         col1, col2 = st.columns([1, 1], gap="large")
         with col1:
-            show_local_image(selected["특산품사진"], selected["특산품"])
+            show_local_or_web_image(selected["특산품사진"], selected["특산품_web"], selected["특산품"])
         with col2:
             render_html(f"""
             <div class="special-box">
                 <div class="small-label">지역 특산품</div>
-                <h2 style="color:#18352c;">🎁 {html.escape(selected["특산품"])}</h2>
+                <h2 style="color:#f0f6fc;">🎁 {html.escape(selected["특산품"])}</h2>
                 <p>{html.escape(selected["특산품설명"])}</p>
-                <hr>
+                <hr style="border-color:#30363d;">
                 <div class="small-label">지역 특색 점수</div>
-                <div style="font-size:34px; font-weight:850; color:#6f5595; margin-top:5px;">
+                <div style="font-size:34px; font-weight:850; color:#a371f7; margin-top:5px;">
                     {selected["지역특색"]}점
                 </div>
                 <div class="score-bar">
@@ -833,7 +833,7 @@ if len(filtered_df) > 0:
 
     with tab4:
         render_html(f"""
-        <div style="margin-bottom:18px; color:#718078;">
+        <div style="margin-bottom:18px; color:#8b949e;">
             {html.escape(selected["지역"])}에 대한 로컬 여행자들의 간단한 후기입니다.
         </div>
         """)
@@ -860,18 +860,18 @@ for rank, (_, row) in enumerate(top5.iterrows(), start=1):
 
     with col1:
         render_html(f"""
-        <div style="font-size:28px; font-weight:850; color:#6d8f7c; padding-top:10px;">
+        <div style="font-size:28px; font-weight:850; color:#58a6ff; padding-top:10px;">
             #{rank}
         </div>
         """)
 
     with col2:
         render_html(f"""
-        <div style="background:#ffffff; border:1px solid #e1ebe5; border-radius:14px; padding:15px 18px; margin-bottom:10px;">
-            <div style="font-size:20px; font-weight:800; color:#18352c;">
+        <div style="background:#161b22; border:1px solid #30363d; border-radius:14px; padding:15px 18px; margin-bottom:10px;">
+            <div style="font-size:20px; font-weight:800; color:#f0f6fc;">
                 📍 {html.escape(row["지역"])}
             </div>
-            <div style="color:#718078; font-size:13px; margin-top:4px;">
+            <div style="color:#8b949e; font-size:13px; margin-top:4px;">
                 🍚 {html.escape(row["대표음식"])} &nbsp;·&nbsp; 🏔️ {html.escape(row["관광지"])} &nbsp;·&nbsp; ⭐ {row["숨은지역점수"]}점
             </div>
         </div>
