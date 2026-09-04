@@ -647,12 +647,11 @@ st.markdown("<h3 style='font-size:18px; font-weight:700; margin-top:25px; margin
 curr_data = df[df["id"] == st.session_state.selected_region_id].iloc[0]
 
 # 지도 생성 (다크 모드 레이어 타일 적용: CartoDB dark_all)
-# 네이버 일반지도 적용
 m = folium.Map(
     location=[curr_data["위도"], curr_data["경도"]],
     zoom_start=8,
-    tiles="https://map.naver.com/v5/api/tiles/map?x={x}&y={y}&z={z}",
-    attr="Naver Map"
+    tiles="https://api.vworld.kr/req/wmts/1.0.0/ce22209e25be3e0c064972e259e8f1ec/Satellite/{z}/{y}/{x}.jpeg",
+    attr="Vworld Satellite"
 )
 # 마커 추가
 for _, row in filtered_df.iterrows():
