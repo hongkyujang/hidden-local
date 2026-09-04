@@ -8,25 +8,25 @@ import urllib.parse
 # 1. 페이지 설정
 # =========================================================
 st.set_page_config(
-    page_title="SGIS(통계지리정보서비스)를 활용한 숨은 지역 발견",
-    page_icon="🚗",
+    page_title="숨은 로컬 발견 - 네이버 지도 버전",
+    page_icon="📍",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
 # =========================================================
-# 2. 커스텀 CSS (다크 모드 및 스타일 반영)
+# 2. 커스텀 CSS (다크 모드 & 네이버 지도 스타일 연동)
 # =========================================================
 st.markdown("""
 <style>
-/* 글로벌 다크 배경 및 기본 폰트 설정 */
+/* 글로벌 다크 배경 설정 */
 html, body, [data-testid="stApp"], [data-testid="stAppViewContainer"], [data-testid="stMain"] {
     background-color: #121212 !important;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Pretendard", "Segoe UI", Roboto, sans-serif;
     color: #e0e0e0 !important;
 }
 
-/* 상단 패딩 확보 및 반응형 너비 설정 */
+/* 상단 패딩 확보 */
 .main .block-container {
     padding-top: 3.5rem !important;
     padding-bottom: 3rem !important;
@@ -53,7 +53,7 @@ section[data-testid="stSidebar"] {
 }
 .header-icon {
     font-size: 28px;
-    color: #ff6b6b;
+    color: #03C75A; /* 네이버 시그니처 그린 */
 }
 .header-title {
     font-size: 28px;
@@ -73,7 +73,7 @@ section[data-testid="stSidebar"] {
     border-radius: 20px;
     padding: 6px 14px;
     font-size: 13px;
-    color: #ff6b6b;
+    color: #03C75A;
     font-weight: 600;
     display: inline-flex;
     align-items: center;
@@ -122,27 +122,6 @@ section[data-testid="stSidebar"] {
     margin-top: 2px;
 }
 
-/* 지도 범례 */
-.legend-container {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    margin-top: 10px;
-    margin-bottom: 25px;
-    font-size: 12px;
-    color: #b0b0b0;
-}
-.legend-item {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-}
-.legend-dot {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-}
-
 /* 상세 정보 섹션 */
 .section-title {
     font-size: 20px;
@@ -172,7 +151,7 @@ section[data-testid="stSidebar"] {
     position: absolute;
     top: 12px;
     right: 12px;
-    background: #ff6b6b;
+    background: #03C75A;
     color: white;
     font-weight: 700;
     font-size: 12px;
@@ -240,21 +219,24 @@ section[data-testid="stSidebar"] {
     margin-top: 4px;
     margin-bottom: 12px;
 }
-.btn-more {
-    display: inline-block;
+
+/* 네이버 전용 길찾기 버튼 */
+.naver-navi-btn {
+    display: block;
     width: 100%;
+    background-color: #03C75A;
+    color: #ffffff !important;
     text-align: center;
-    padding: 6px 0;
-    background: #2b2b2b;
-    border: 1px solid #3d3d3d;
-    border-radius: 6px;
-    font-size: 12px;
-    color: #e0e0e0;
-    font-weight: 600;
+    padding: 10px 0;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 700;
     text-decoration: none;
+    margin-top: 15px;
+    box-shadow: 0 2px 6px rgba(3, 199, 90, 0.3);
 }
 
-/* 추천 맛집 카드 */
+/* 맛집 카드 */
 .place-card {
     background: #1e1e1e;
     border-radius: 10px;
@@ -285,95 +267,11 @@ section[data-testid="stSidebar"] {
     font-size: 11px;
     color: #a0a0a0;
 }
-
-/* 리뷰 카드 */
-.review-card {
-    background: #1e1e1e;
-    border-radius: 12px;
-    border: 1px solid #2d2d2d;
-    padding: 16px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-}
-.review-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 10px;
-}
-.review-user {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-.review-avatar {
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    background: #2b2b2b;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 18px;
-}
-.review-username {
-    font-size: 13px;
-    font-weight: 700;
-    color: #ffffff;
-}
-.review-date {
-    font-size: 11px;
-    color: #707070;
-}
-.review-text {
-    font-size: 12px;
-    color: #cccccc;
-    line-height: 1.5;
-    margin-bottom: 12px;
-}
-.review-imgs {
-    display: flex;
-    gap: 6px;
-}
-.review-img {
-    width: 48%;
-    height: 70px;
-    border-radius: 6px;
-    object-fit: cover;
-}
-
-/* 길찾기 커스텀 버튼 스타일 */
-.navi-btn-container {
-    display: flex;
-    gap: 8px;
-    margin-top: 10px;
-}
-.navi-btn-naver {
-    flex: 1;
-    background-color: #03C75A;
-    color: white !important;
-    text-align: center;
-    padding: 8px 0;
-    border-radius: 6px;
-    font-size: 12px;
-    font-weight: 700;
-    text-decoration: none;
-}
-.navi-btn-kakao {
-    flex: 1;
-    background-color: #FEE500;
-    color: #191919 !important;
-    text-align: center;
-    padding: 8px 0;
-    border-radius: 6px;
-    font-size: 12px;
-    font-weight: 700;
-    text-decoration: none;
-}
 </style>
 """, unsafe_allow_html=True)
 
 # =========================================================
-# 3. 데이터 로드 (추천 지역 10곳)
+# 3. 데이터 로드 (대한민국 숨은 로컬 10곳)
 # =========================================================
 @st.cache_data
 def load_data():
@@ -391,8 +289,7 @@ def load_data():
             "메인이미지": "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1000&q=80",
             "맛집목록": [
                 {"이름": "정선곤드레본가", "평점": "★ 4.6 (126)", "주소": "정선읍 5일장길 31", "img": "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=300&q=80"},
-                {"이름": "함백산식당", "평점": "★ 4.4 (98)", "주소": "고한읍 고한로 123", "img": "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=300&q=80"},
-                {"이름": "정선아리랑시장 맛집", "평점": "★ 4.3 (87)", "주소": "정선읍 봉양3길 322", "img": "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=300&q=80"}
+                {"이름": "함백산식당", "평점": "★ 4.4 (98)", "주소": "고한읍 고한로 123", "img": "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=300&q=80"}
             ]
         },
         {
@@ -525,86 +422,67 @@ def load_data():
 data = load_data()
 df = pd.DataFrame(data)
 
-# 세션 상태 설정
+# 세션 상태 초기화
 if "selected_region_id" not in st.session_state:
     st.session_state.selected_region_id = 1
 
 # =========================================================
-# 4. 사이드바 (필터 컨트롤)
+# 4. 사이드바 (필터)
 # =========================================================
 with st.sidebar:
-    st.markdown("<h4 style='font-weight:700; color:#ffffff;'>🔍 지역 탐색 필터</h4>", unsafe_allow_html=True)
-    
+    st.markdown("<h4 style='font-weight:700; color:#ffffff;'>🔍 네이버 지도 지역 탐색</h4>", unsafe_allow_html=True)
     score_slider = st.slider("최소 숨은 지역 점수", 0, 100, 60)
-    food_type = st.selectbox("선호 음식 타입", ["전체", "향토음식", "해산물", "산채요리", "육류"])
-    
-    st.markdown("<p style='font-size:13px; font-weight:700; color:#a0a0a0; margin-top:15px; margin-bottom:5px;'>지도 표시 옵션</p>", unsafe_allow_html=True)
-    chk_pin = st.checkbox("추천 지역 핀", value=True)
-    chk_food = st.checkbox("음식점", value=True)
-    chk_tour = st.checkbox("관광지", value=True)
-    chk_fest = st.checkbox("축제/행사", value=True)
-    chk_prod = st.checkbox("특산품", value=True)
-    
-    st.markdown("<p style='font-size:13px; font-weight:700; color:#a0a0a0; margin-top:15px; margin-bottom:5px;'>정렬 기준</p>", unsafe_allow_html=True)
-    sort_order = st.selectbox("", ["숨은 지역 점수 순", "인구 적은 순", "관광지 많은 순"], label_visibility="collapsed")
-    
-    st.markdown("<p style='font-size:13px; font-weight:700; color:#a0a0a0; margin-top:15px; margin-bottom:5px;'>키워드 검색</p>", unsafe_allow_html=True)
-    keyword = st.text_input("", placeholder="지역명 또는 키워드 입력", label_visibility="collapsed")
-    
-    st.button("검색", use_container_width=True, type="primary")
+    keyword = st.text_input("지역명 또는 키워드", placeholder="예: 정선, 곤드레")
     
     if st.button("🔄 필터 초기화", use_container_width=True):
         st.session_state.selected_region_id = 1
         st.rerun()
 
 # =========================================================
-# 5. 헤더 타이틀 및 상단 카드
+# 5. 헤더 타이틀 및 대시보드
 # =========================================================
 st.markdown("""
 <div class="main-header">
     <div>
         <div class="header-title-box">
-            <span class="header-icon">🚗</span>
-            <h1 class="header-title">SGIS(통계지리정보서비스)를 활용한 숨은 지역 발견</h1>
+            <span class="header-icon">🗺️</span>
+            <h1 class="header-title">대한민국 숨은 로컬 지도</h1>
         </div>
-        <div class="header-subtitle">SGIS(통계지리정보서비스)로 발견하는 대한민국의 숨은 지역과 로컬 경험</div>
+        <div class="header-subtitle">네이버 지도 기반으로 탐색하는 전국 로컬 명소 및 맛집</div>
     </div>
-    <div class="fav-btn">♥ 찜한 지역 0</div>
+    <div class="fav-btn">💚 네이버 지도 연동됨</div>
 </div>
 """, unsafe_allow_html=True)
 
-# 지표 계산
 filtered_df = df[df["점수"] >= score_slider]
 if keyword:
     filtered_df = filtered_df[filtered_df["지역"].str.contains(keyword) | filtered_df["소개"].str.contains(keyword)]
 
-avg_score = filtered_df["점수"].mean() if not filtered_df.empty else 0
-
 c1, c2, c3, c4 = st.columns(4)
-
 with c1:
     st.markdown(f"""
     <div class="metric-card">
         <div class="metric-left">
-            <div class="metric-icon" style="background:#1b382b; color:#2b8a3e;">★</div>
+            <div class="metric-icon" style="background:#03C75A22; color:#03C75A;">📍</div>
             <div>
-                <div class="metric-label">추천 지역 수</div>
+                <div class="metric-label">탐색된 지역</div>
                 <div class="metric-value">{len(filtered_df)}곳</div>
-                <div class="metric-sub">조건에 맞는 지역</div>
+                <div class="metric-sub">대한민국 전역</div>
             </div>
         </div>
     </div>
     """, unsafe_allow_html=True)
 
 with c2:
+    avg_sc = filtered_df["점수"].mean() if not filtered_df.empty else 0
     st.markdown(f"""
     <div class="metric-card">
         <div class="metric-left">
-            <div class="metric-icon" style="background:#182c4d; color:#339af0;">📈</div>
+            <div class="metric-icon" style="background:#182c4d; color:#339af0;">⭐</div>
             <div>
-                <div class="metric-label">평균 숨은 점수</div>
-                <div class="metric-value">{avg_score:.1f}점</div>
-                <div class="metric-sub">상위 30% 지역</div>
+                <div class="metric-label">평균 로컬 점수</div>
+                <div class="metric-value">{avg_sc:.1f}점</div>
+                <div class="metric-sub">우수 로컬 지역</div>
             </div>
         </div>
     </div>
@@ -614,11 +492,11 @@ with c3:
     st.markdown("""
     <div class="metric-card">
         <div class="metric-left">
-            <div class="metric-icon" style="background:#2b2353; color:#91a7ff;">💬</div>
+            <div class="metric-icon" style="background:#2b2353; color:#91a7ff;">🍱</div>
             <div>
-                <div class="metric-label">리뷰 수</div>
-                <div class="metric-value">237개</div>
-                <div class="metric-sub">실제 방문객 리뷰</div>
+                <div class="metric-label">특산 먹거리</div>
+                <div class="metric-value">10종</div>
+                <div class="metric-sub">대표 향토 음식</div>
             </div>
         </div>
     </div>
@@ -628,96 +506,95 @@ with c4:
     st.markdown("""
     <div class="metric-card">
         <div class="metric-left">
-            <div class="metric-icon" style="background:#423213; color:#fcc419;">🎁</div>
+            <div class="metric-icon" style="background:#423213; color:#fcc419;">🚗</div>
             <div>
-                <div class="metric-label">특산품</div>
-                <div class="metric-value">32개</div>
-                <div class="metric-sub">지역 특산품</div>
+                <div class="metric-label">길찾기 연동</div>
+                <div class="metric-value">N MAP</div>
+                <div class="metric-sub">네이버 지도 바로가기</div>
             </div>
         </div>
     </div>
     """, unsafe_allow_html=True)
 
 # =========================================================
-# 6. 지도 및 범례
+# 6. 네이버 지도 (대한민국 전역 범위 고정)
 # =========================================================
-st.markdown("<h3 style='font-size:18px; font-weight:700; margin-top:25px; margin-bottom:10px; color:#ffffff;'>🗺️ 추천 지역 지도</h3>", unsafe_allow_html=True)
+st.markdown("<h3 style='font-size:18px; font-weight:700; margin-top:25px; margin-bottom:10px; color:#ffffff;'>🇳🇰🇰🇷 대한민국 로컬 지도</h3>", unsafe_allow_html=True)
 
-# 현재 선택된 데이터
 curr_data = df[df["id"] == st.session_state.selected_region_id].iloc[0]
 
-# 지도 생성 (다크 모드 레이어 타일 적용: CartoDB dark_all)
+# 대한민국 영역 바운더리 제한 (위도 33~39도, 경도 124~132도)
+south_korea_bounds = [[33.0, 124.5], [38.9, 132.0]]
+
 m = folium.Map(
     location=[curr_data["위도"], curr_data["경도"]],
     zoom_start=7,
-    tiles="CartoDB dark_all",
-    attr="CartoDB Dark"
+    min_zoom=6,
+    max_zoom=14,
+    max_bounds=True,
+    min_lat=33.0,
+    max_lat=38.9,
+    min_lon=124.5,
+    max_lon=132.0,
+    tiles="https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}", # 한국 지리 정보에 최적화된 지도 타일 사용
+    attr="National Map Data"
 )
 
-# 마커 추가
+# 지도 이동 범위 강제 고정
+m.fit_bounds(south_korea_bounds)
+
+# 전국 핀 추가
 for _, row in filtered_df.iterrows():
     is_sel = (row["id"] == st.session_state.selected_region_id)
-    color = "red" if row["점수"] >= 85 else ("orange" if row["점수"] >= 80 else "blue")
     
+    # 네이버 전용 스타일 팝업
+    naver_map_url = f"https://map.naver.com/v5/search/{urllib.parse.quote(row['지역'])}"
     popup_html = f"""
-    <div style='width:160px; font-family:sans-serif;'>
-        <b>{row['지역']}</b><br>
-        <span style='color:#e63946; font-size:12px;'>★ 숨은 지역 점수 {row['점수']}점</span><br>
-        <span style='font-size:11px; color:#555;'>대표 음식: {row['대표음식']}</span>
+    <div style='width:180px; font-family:sans-serif; padding:5px;'>
+        <b style='font-size:14px; color:#111;'>{row['지역']}</b><br>
+        <span style='color:#03C75A; font-weight:bold; font-size:12px;'>★ 로컬 점수 {row['점수']}점</span><br>
+        <p style='font-size:11px; color:#666; margin:4px 0;'>대표 음식: {row['대표음식']}</p>
+        <a href='{naver_map_url}' target='_blank' style='display:block; text-align:center; background:#03C75A; color:white; font-size:11px; padding:4px; border-radius:4px; text-decoration:none; font-weight:bold;'>네이버 지도로 보기</a>
     </div>
     """
     
     folium.Marker(
         location=[row["위도"], row["경도"]],
-        popup=folium.Popup(popup_html, max_width=200),
+        popup=folium.Popup(popup_html, max_width=220),
         tooltip=row["지역"],
-        icon=folium.Icon(color="red" if is_sel else color, icon="star" if is_sel else "info-sign")
+        icon=folium.Icon(color="green" if is_sel else "blue", icon="info-sign")
     ).add_to(m)
 
-st_folium(m, use_container_width=True, height=450, returned_objects=[])
-
-# 범례 표시
-st.markdown("""
-<div class="legend-container">
-    <div class="legend-item"><div class="legend-dot" style="background:#e63946;"></div> 숨은 점수 90점 이상</div>
-    <div class="legend-item"><div class="legend-dot" style="background:#f76707;"></div> 80~90점</div>
-    <div class="legend-item"><div class="legend-dot" style="background:#2f9e44;"></div> 70~80점</div>
-    <div class="legend-item"><div class="legend-dot" style="background:#1c7ed6;"></div> 60~70점</div>
-    <div class="legend-item"><div class="legend-dot" style="background:#868e96;"></div> 60점 이하</div>
-</div>
-""", unsafe_allow_html=True)
+st_folium(m, use_container_width=True, height=480, returned_objects=[])
 
 # =========================================================
-# 7. 지역 상세 정보 카드 & 길찾기 연동
+# 7. 네이버 지도 연동 상세 카드
 # =========================================================
 sec_col1, sec_col2 = st.columns([3, 1])
 with sec_col1:
-    st.markdown(f"<div class='section-title'>📍 {curr_data['지역']} 상세 정보</div>", unsafe_allow_html=True)
+    st.markdown(f"<div class='section-title'>📍 {curr_data['지역']} 상세 로컬 정보</div>", unsafe_allow_html=True)
 with sec_col2:
     selected_name = st.selectbox(
-        "목록으로 돌아가기",
+        "지역 선택",
         df["지역"].tolist(),
         index=df["지역"].tolist().index(curr_data["지역"]),
         label_visibility="collapsed"
     )
-    # 변경 시 업데이트
     new_id = df[df["지역"] == selected_name].iloc[0]["id"]
     if new_id != st.session_state.selected_region_id:
         st.session_state.selected_region_id = new_id
         st.rerun()
 
-# 길찾기 URL 생성 (네이버 / 카카오)
+# 네이버 지도 길찾기 Direct URL
 encoded_region = urllib.parse.quote(curr_data['지역'])
-naver_navi_url = f"https://map.naver.com/v5/directions/-/-/-/nat?e={curr_data['경도']},{curr_data['위도']},{encoded_region},,,ADDRESS_POI"
-kakao_navi_url = f"https://map.kakao.com/link/to/{encoded_region},{curr_data['위도']},{curr_data['경도']}"
+naver_directions_url = f"https://map.naver.com/v5/directions/-/-/-/nat?e={curr_data['경도']},{curr_data['위도']},{encoded_region},,,ADDRESS_POI"
 
 dc1, dc2, dc3, dc4 = st.columns([1.3, 1, 1, 1])
 
-# 메인 카드가 포함된 4열 구조
 with dc1:
     st.markdown(f"""
     <div class="main-region-card">
-        <span class="badge-score">숨은 점수 {curr_data['점수']}점</span>
+        <span class="badge-score">로컬 점수 {curr_data['점수']}점</span>
         <img src="{curr_data['메인이미지']}" class="main-region-img">
         <div class="main-region-body">
             <div class="main-region-desc">{curr_data['소개']}</div>
@@ -739,11 +616,7 @@ with dc1:
                     <div class="stat-item-val">{curr_data['관광지수']}</div>
                 </div>
             </div>
-            <div style="margin-top:15px; font-size:12px; font-weight:700; color:#ffffff;">🚗 길찾기</div>
-            <div class="navi-btn-container">
-                <a href="{naver_navi_url}" target="_blank" class="navi-btn-naver">네이버 지도</a>
-                <a href="{kakao_navi_url}" target="_blank" class="navi-btn-kakao">카카오맵</a>
-            </div>
+            <a href="{naver_directions_url}" target="_blank" class="naver-navi-btn">N 네이버 지도로 길찾기</a>
         </div>
     </div>
     """, unsafe_allow_html=True)
@@ -751,22 +624,20 @@ with dc1:
 with dc2:
     st.markdown(f"""
     <div class="sub-info-card">
-        <div class="sub-info-title">대표 음식</div>
+        <div class="sub-info-title">대표 향토 음식</div>
         <img src="{curr_data['대표음식_img']}" class="sub-info-img">
         <div class="sub-info-name">{curr_data['대표음식']}</div>
         <div class="sub-info-desc">{curr_data['대표음식_설명']}</div>
-        <a href="#" class="btn-more">더 알아보기</a>
     </div>
     """, unsafe_allow_html=True)
 
 with dc3:
     st.markdown(f"""
     <div class="sub-info-card">
-        <div class="sub-info-title">주요 특산품</div>
+        <div class="sub-info-title">지역 특산품</div>
         <img src="{curr_data['특산품_img']}" class="sub-info-img">
         <div class="sub-info-name">{curr_data['특산품']}</div>
         <div class="sub-info-desc">{curr_data['특산품_설명']}</div>
-        <a href="#" class="btn-more">더 알아보기</a>
     </div>
     """, unsafe_allow_html=True)
 
@@ -777,91 +648,29 @@ with dc4:
         <img src="{curr_data['축제_img']}" class="sub-info-img">
         <div class="sub-info-name">{curr_data['축제']}</div>
         <div class="sub-info-desc">{curr_data['축제_설명']}</div>
-        <a href="#" class="btn-more">더 알아보기</a>
     </div>
     """, unsafe_allow_html=True)
 
 # =========================================================
-# 8. 상세 하단 탭
+# 8. 네이버 지도 연동 맛집 세션
 # =========================================================
-st.markdown("<div style='height:20px;'></div>", unsafe_allow_html=True)
+st.markdown("<div style='height:25px;'></div>", unsafe_allow_html=True)
+st.markdown(f"<h4 style='font-size:16px; font-weight:700; color:#ffffff;'>🍚 {curr_data['지역']} 네이버 지도 추천 맛집</h4>", unsafe_allow_html=True)
 
-tab1, tab2, tab3, tab4, tab5 = st.tabs(["🍚 음식&맛집", "🏞️ 관광지", "🎉 축제&행사", "🎁 특산품", "💬 리뷰 (32)"])
-
-with tab1:
-    tc1, tc2 = st.columns([1, 2.5])
-    with tc1:
+rc1, rc2 = st.columns(2)
+for idx, res in enumerate(curr_data["맛집목록"]):
+    target_col = rc1 if idx % 2 == 0 else rc2
+    res_naver_search = f"https://map.naver.com/v5/search/{urllib.parse.quote(res['이름'])}"
+    
+    with target_col:
         st.markdown(f"""
-        <div class="sub-info-card">
-            <div class="sub-info-title">대표 음식</div>
-            <img src="{curr_data['대표음식_img']}" style="width:100%; height:140px; object-fit:cover; border-radius:8px; margin-bottom:10px;">
-            <div class="sub-info-name">{curr_data['대표음식']}</div>
-            <div class="sub-info-desc">{curr_data['대표음식_설명']}</div>
-            <a href="#" class="btn-more">더 알아보기</a>
+        <div class="place-card">
+            <img src="{res['img']}" class="place-img">
+            <div>
+                <div class="place-name">{res['이름']}</div>
+                <div class="place-star">{res['평점']}</div>
+                <div class="place-addr">📍 {res['주소']}</div>
+                <a href="{res_naver_search}" target="_blank" style="font-size:12px; color:#03C75A; font-weight:700; text-decoration:none; display:inline-block; margin-top:6px;">N 네이버 지도로 장소 확인 ></a>
+            </div>
         </div>
         """, unsafe_allow_html=True)
-    
-    with tc2:
-        st.markdown("<div class='sub-info-title' style='margin-bottom:10px;'>추천 맛집</div>", unsafe_allow_html=True)
-        rc1, rc2, rc3 = st.columns(3)
-        
-        for idx, res in enumerate(curr_data["맛집목록"]):
-            target_col = [rc1, rc2, rc3][idx % 3]
-            encoded_res_name = urllib.parse.quote(res['이름'])
-            res_naver_url = f"https://map.naver.com/v5/search/{encoded_res_name}"
-            
-            with target_col:
-                st.markdown(f"""
-                <div class="place-card">
-                    <img src="{res['img']}" class="place-img">
-                    <div>
-                        <div class="place-name">{res['이름']}</div>
-                        <div class="place-star">{res['평점']}</div>
-                        <div class="place-addr">📍 {res['주소']}</div>
-                        <a href="{res_naver_url}" target="_blank" style="font-size:11px; color:#339af0; text-decoration:none; display:inline-block; margin-top:4px;">네이버 지도 보기 ></a>
-                    </div>
-                </div>
-                """, unsafe_allow_html=True)
-
-with tab2:
-    st.info(f"{curr_data['지역']}의 주요 관광지 정보 페이지입니다.")
-
-with tab3:
-    st.info(f"{curr_data['지역']}의 주요 축제 및 행사 정보 페이지입니다.")
-
-with tab4:
-    st.info(f"{curr_data['지역']}의 주요 특산품 정보 페이지입니다.")
-
-with tab5:
-    st.markdown("<div style='display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;'><span style='font-size:14px; font-weight:700; color:#ffffff;'>실제 방문객 리뷰</span><a href='#' style='font-size:12px; color:#339af0;'>전체 리뷰 보기 ></a></div>", unsafe_allow_html=True)
-    
-    rev_c1, rev_c2, rev_c3, rev_c4 = st.columns(4)
-    
-    reviews = [
-        {"user": "여행매니아", "date": "2024.05.12", "text": "자연경관이 정말 아름답고 음식도 건강하고 맛있어요! 대표 음식 꼭 드셔보세요.", "star": "★★★★★ 5"},
-        {"user": "산책러버", "date": "2024.04.28", "text": "전통시장 구경도 재밌고 주민들도 친절하세요. 지역 분위기가 정말 정겹습니다.", "star": "★★★★★ 5"},
-        {"user": "맛집탐방가", "date": "2024.04.15", "text": "조용하고 깨끗해서 힐링하기 좋아요. 지방은 역시 식도락 여행이 최고!", "star": "★★★★☆ 4"},
-        {"user": "캠핑가는부자", "date": "2024.03.10", "text": "주변 관광지와 산책로가 가을에 꼭 가보세요. 풍경이 정말 장관입니다.", "star": "★★★★★ 5"}
-    ]
-    
-    for idx, rev in enumerate(reviews):
-        with [rev_c1, rev_c2, rev_c3, rev_c4][idx]:
-            st.markdown(f"""
-            <div class="review-card">
-                <div class="review-header">
-                    <div class="review-user">
-                        <div class="review-avatar">👤</div>
-                        <div>
-                            <div class="review-username">{rev['user']}</div>
-                            <div style="font-size:10px; color:#fcc419;">{rev['star']}</div>
-                        </div>
-                    </div>
-                    <div class="review-date">{rev['date']}</div>
-                </div>
-                <div class="review-text">{rev['text']}</div>
-                <div class="review-imgs">
-                    <img src="{curr_data['메인이미지']}" class="review-img">
-                    <img src="{curr_data['대표음식_img']}" class="review-img">
-                </div>
-            </div>
-            """, unsafe_allow_html=True)
