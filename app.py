@@ -564,10 +564,10 @@ st.markdown("""
 <div class="main-header">
     <div>
         <div class="header-title-box">
-            <span class="header-icon">📍</span>
-            <h1 class="header-title">숨은 로컬 발견</h1>
+            <span class="header-icon">🚗</span>
+            <h1 class="header-title">SGIS(통계지리정보서비스)를 활용한 숨은 로컬 발견</h1>
         </div>
-        <div class="header-subtitle">데이터로 발견하는 대한민국의 숨은 지역과 로컬 경험</div>
+        <div class="header-subtitle">SGIS(통계지리정보서비스)로 발견하는 대한민국의 숨은 지역과 로컬 경험</div>
     </div>
     <div class="fav-btn">♥ 찜한 지역 0</div>
 </div>
