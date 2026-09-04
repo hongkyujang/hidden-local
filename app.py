@@ -647,12 +647,24 @@ st.markdown("<h3 style='font-size:18px; font-weight:700; margin-top:25px; margin
 curr_data = df[df["id"] == st.session_state.selected_region_id].iloc[0]
 
 # 지도 생성 (다크 모드 레이어 타일 적용: CartoDB dark_all)
+# Vworld WMTS 오픈 API 타일 URL (인증키 없이 사용 가능한 공용 오픈 URL 적용)
+satellite_url = "https://map.vworld.kr/jquery/plugins/openlayers/theme/default/img/blank.gif" # fallback 예시
+
+# Vworld 위성 지도 (Satellite)
 m = folium.Map(
     location=[curr_data["위도"], curr_data["경도"]],
     zoom_start=8,
-    tiles="https://api.vworld.kr/req/wmts/1.0.0/ce22209e25be3e0c064972e259e8f1ec/Satellite/{z}/{y}/{x}.jpeg",
+    tiles="https://xdworld.vworld.kr/2d/Satellite/service/{z}/{x}/{y}.jpeg",
     attr="Vworld Satellite"
 )
+
+# Vworld 지명/도로망 레이어 (Hybrid)
+folium.TileLayer(
+    tiles="https://xdworld.vworld.kr/2d/Hybrid/service/{z}/{x}/{y}.png",
+    attr="Vworld Hybrid",
+    name="Hybrid",
+    overlay=True
+).add_to(m)
 # 마커 추가
 for _, row in filtered_df.iterrows():
     is_sel = (row["id"] == st.session_state.selected_region_id)
