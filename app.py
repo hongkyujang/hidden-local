@@ -769,6 +769,129 @@ with tab5:
 
 
 # =========================================================
+# 맞춤 여행 코스 생성기
+# =========================================================
+st.markdown("---")
+st.markdown("## 🧭 맞춤 여행 코스 만들기")
+st.write("선택한 지역과 여행 조건을 바탕으로 추천 여행 코스를 자동으로 구성합니다.")
+
+duration_days = {
+    "당일치기": 1,
+    "1박 2일": 2,
+    "2박 3일": 3,
+    "3박 이상": 4,
+}
+
+selected_duration = st.session_state.travel_duration
+if selected_duration == "전체":
+    selected_duration = row["추천기간"][0]
+
+days = duration_days.get(selected_duration, 1)
+
+# 선택 조건에 맞는 코스 구성 요소
+theme = st.session_state.travel_theme
+group = st.session_state.group_size
+age = st.session_state.age_group
+
+course_title = f"{row['지역']} {selected_duration} 추천 코스"
+
+if theme == "액티비티":
+    first_activity = "대표 관광지에서 체험·전망 활동"
+    second_activity = "주변 산책 또는 자연 체험"
+elif theme == "역사·문화":
+    first_activity = "지역 문화·역사 명소 탐방"
+    second_activity = "전통시장 또는 지역 문화 공간 방문"
+elif theme == "맛집·미식":
+    first_activity = f"{row['음식점']}에서 대표 음식 즐기기"
+    second_activity = f"{row['대표음식']} 관련 로컬 먹거리 탐방"
+elif theme == "축제·행사":
+    first_activity = f"{row['지역행사']} 관련 장소 방문"
+    second_activity = "지역 행사장 주변 산책 및 체험"
+elif theme == "사진 명소":
+    first_activity = f"{row['관광지']}에서 사진 촬영"
+    second_activity = "노을·전망·자연 풍경 감상"
+elif theme == "가족 여행":
+    first_activity = "가족 단위로 이동하기 좋은 관광지 방문"
+    second_activity = "무리 없는 산책과 지역 먹거리 체험"
+else:
+    first_activity = f"{row['관광지']} 방문"
+    second_activity = "주변 자연 경관과 로컬 공간 탐방"
+
+if group == "1인 (혼행)":
+    group_tip = "혼자 이동하기 편하도록 주요 명소 중심으로 구성"
+elif group == "2인 (커플/친구)":
+    group_tip = "사진 명소와 여유로운 식사 시간을 포함"
+elif group == "3인":
+    group_tip = "관광·식사·휴식의 균형을 고려"
+elif group == "4인 이상 (가족)":
+    group_tip = "이동 부담을 줄이고 가족 체험 중심으로 구성"
+else:
+    group_tip = "다양한 여행객이 이용할 수 있는 기본 코스"
+
+if age == "10대":
+    age_tip = "체험·사진·활동 중심"
+elif age == "20대":
+    age_tip = "감성 명소·맛집·활동 중심"
+elif age == "30~40대":
+    age_tip = "관광·식사·휴식이 균형 잡힌 구성"
+elif age == "50대 이상":
+    age_tip = "무리 없는 이동과 자연·문화 중심"
+else:
+    age_tip = "일반적인 관광·식사·휴식 중심"
+
+st.markdown(
+    f"""
+    <div class="section-card">
+        <h3>📌 {html.escape(course_title)}</h3>
+        <p><b>여행 인원 조건:</b> {html.escape(group)}</p>
+        <p><b>여행자 특성:</b> {html.escape(age_tip)}</p>
+        <p><b>코스 구성:</b> {html.escape(group_tip)}</p>
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
+
+# 하루 단위 기본 일정
+daily_plan = []
+for day in range(1, days + 1):
+    if day == 1:
+        daily_plan.append({
+            "day": day,
+            "morning": f"09:30 · {first_activity}",
+            "lunch": f"12:30 · {row['음식점']} / {row['대표음식']}",
+            "afternoon": f"14:00 · {second_activity}",
+            "evening": f"17:30 · {row['지역']} 로컬 거리 또는 시장 산책",
+        })
+    elif day == days:
+        daily_plan.append({
+            "day": day,
+            "morning": f"09:30 · {row['특산품']} 알아보기 및 기념품 구입",
+            "lunch": f"12:00 · {row['대표음식']} 중심의 지역 식사",
+            "afternoon": f"14:00 · {row['관광지']} 중 방문하지 못한 장소 탐방",
+            "evening": "16:30 · 여행 정리 및 귀가",
+        })
+    else:
+        daily_plan.append({
+            "day": day,
+            "morning": f"09:30 · {row['관광지']} 주변 산책 및 자유 일정",
+            "lunch": f"12:30 · {row['음식점']} 또는 인근 로컬 식당",
+            "afternoon": f"14:00 · {row['지역행사']} 또는 지역 특색 체험",
+            "evening": f"17:30 · {row['특산품']} 쇼핑 및 휴식",
+        })
+
+for plan in daily_plan:
+    with st.expander(f"📅 {plan['day']}일 차 일정", expanded=(plan["day"] == 1)):
+        st.markdown(f"- **오전:** {plan['morning']}")
+        st.markdown(f"- **점심:** {plan['lunch']}")
+        st.markdown(f"- **오후:** {plan['afternoon']}")
+        st.markdown(f"- **저녁:** {plan['evening']}")
+
+st.info(
+    "위 코스는 플랫폼의 예시 데이터로 생성된 추천 일정입니다. "
+    "실제 이동시간, 영업시간, 기상 상황과 행사 개최 여부를 방문 전에 확인하세요."
+)
+
+# =========================================================
 # 길찾기 링크
 # =========================================================
 query = urllib.parse.quote(f"{row['지역']} {row['관광지']}")
