@@ -131,6 +131,53 @@ st.markdown(
         border-radius: 12px;
         border: 1px solid #527b62;
     }
+
+    [data-testid="stSidebar"] .stSlider, [data-testid="stSidebar"] .stSelectbox,
+    [data-testid="stSidebar"] .stTextInput {
+        background: #20352a;
+        border-radius: 16px;
+        padding: 8px 10px;
+        margin-bottom: 10px;
+    }
+
+    .filter-heading {
+        background: linear-gradient(135deg, #315d46, #244434);
+        padding: 14px 16px;
+        border-radius: 16px;
+        color: #ffffff;
+        font-weight: 800;
+        margin: 8px 0 14px 0;
+    }
+
+    .photo-card {
+        background: #1b2b24;
+        border: 1px solid #355143;
+        border-radius: 18px;
+        overflow: hidden;
+        height: 100%;
+    }
+
+    .photo-card img {
+        width: 100%;
+        height: 185px;
+        object-fit: cover;
+    }
+
+    .photo-card-content {
+        padding: 14px 16px;
+    }
+
+    .photo-card-title {
+        color: #ffffff;
+        font-size: 17px;
+        font-weight: 800;
+    }
+
+    .photo-card-desc {
+        color: #b4cbbb;
+        font-size: 13px;
+        margin-top: 6px;
+    }
     </style>
     """,
     unsafe_allow_html=True,
@@ -367,6 +414,31 @@ def load_data():
 
 
 # =========================================================
+# 이미지 URL 생성
+# =========================================================
+def photo_url(query):
+    # Unsplash Source 기반 검색형 이미지 URL
+    encoded = urllib.parse.quote(query)
+    return f"https://source.unsplash.com/900x600/?{encoded}"
+
+
+def photo_card(title, image_query, description):
+    url = photo_url(image_query)
+    st.markdown(
+        f"""
+        <div class="photo-card">
+            <img src="{url}" alt="{html.escape(title)}">
+            <div class="photo-card-content">
+                <div class="photo-card-title">{html.escape(title)}</div>
+                <div class="photo-card-desc">{html.escape(description)}</div>
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
+# =========================================================
 # 점수 계산
 # =========================================================
 def calculate_hidden_score(row):
@@ -412,8 +484,8 @@ for key, value in defaults.items():
 # 사이드바
 # =========================================================
 with st.sidebar:
-    st.markdown("## 📍 지역 탐색 필터")
-    st.caption("나에게 맞는 숨은 로컬 여행지를 찾아보세요.")
+    st.markdown('<div class="filter-heading">🧭 나만의 로컬 여행 찾기</div>', unsafe_allow_html=True)
+    st.caption("여행 취향을 선택하면 추천 지역과 코스가 달라집니다.")
 
     st.slider(
         "최소 추천 점수",
@@ -537,8 +609,8 @@ else:
 st.markdown(
     """
     <div class="main-title">
-        <h1>📍 우리끼리 맵</h1>
-        <p>SGIS를 활용한 숨은 지역 발굴 및 맞춤형 여행 코스 추천 플랫폼</p>
+        <h1>📍 숨은 로컬 발견</h1>
+        <p>데이터로 발견하는 대한민국의 숨은 지역과 로컬 미식 여행</p>
     </div>
     """,
     unsafe_allow_html=True,
@@ -669,6 +741,35 @@ selected_region = st.selectbox(
 st.session_state.selected_region = selected_region
 
 row = filtered_df[filtered_df["지역"] == selected_region].iloc[0]
+
+
+# =========================================================
+# 여행지·구경거리·먹거리 사진
+# =========================================================
+st.markdown("## 📸 이 지역의 볼거리와 먹거리")
+
+photo1, photo2, photo3 = st.columns(3)
+
+with photo1:
+    photo_card(
+        "추천 여행지",
+        f"{row['지역']} 자연 관광지 한국 여행",
+        row["관광지"],
+    )
+
+with photo2:
+    photo_card(
+        "구경거리",
+        f"{row['지역']} 지역 행사 전통 문화 풍경",
+        row["지역행사"],
+    )
+
+with photo3:
+    photo_card(
+        "로컬 먹거리",
+        f"{row['대표음식']} 한국 음식",
+        f"{row['대표음식']} · {row['음식점']}",
+    )
 
 
 # =========================================================
