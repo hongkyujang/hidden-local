@@ -191,7 +191,7 @@ st.markdown(
 def load_data():
     return [
         {
-            "지역": "정선군",
+            "지역": "강원특별자치도 정선군",
             "위도": 37.3806,
             "경도": 128.6608,
             "인구": 36000,
@@ -213,7 +213,7 @@ def load_data():
             "소개": "산과 시장, 향토음식이 어우러진 로컬 여행지입니다.",
         },
         {
-            "지역": "구례군",
+            "지역": "전라남도 구례군",
             "위도": 35.2025,
             "경도": 127.4628,
             "인구": 24000,
@@ -235,7 +235,7 @@ def load_data():
             "소개": "지리산의 자연과 산수유 마을의 정취를 느낄 수 있습니다.",
         },
         {
-            "지역": "의령군",
+            "지역": "경상남도 의령군",
             "위도": 35.3222,
             "경도": 128.2617,
             "인구": 26000,
@@ -257,7 +257,7 @@ def load_data():
             "소개": "전통 먹거리와 역사 이야기가 살아 있는 지역입니다.",
         },
         {
-            "지역": "무주군",
+            "지역": "전북특별자치도 무주군",
             "위도": 36.0071,
             "경도": 127.6608,
             "인구": 23000,
@@ -279,7 +279,7 @@ def load_data():
             "소개": "산과 체험시설, 계절 축제를 함께 즐길 수 있습니다.",
         },
         {
-            "지역": "단양군",
+            "지역": "충청북도 단양군",
             "위도": 36.9846,
             "경도": 128.3656,
             "인구": 27000,
@@ -301,7 +301,7 @@ def load_data():
             "소개": "강과 절벽 풍경, 전망대와 마늘 음식이 특징입니다.",
         },
         {
-            "지역": "영양군",
+            "지역": "경상북도 영양군",
             "위도": 36.6668,
             "경도": 129.1124,
             "인구": 16000,
@@ -323,7 +323,7 @@ def load_data():
             "소개": "청정 자연과 산나물 음식이 어우러진 지역입니다.",
         },
         {
-            "지역": "청송군",
+            "지역": "경상북도 청송군",
             "위도": 36.4363,
             "경도": 129.0571,
             "인구": 24000,
@@ -345,7 +345,7 @@ def load_data():
             "소개": "주왕산의 절경과 사과 특산품이 유명합니다.",
         },
         {
-            "지역": "태안군",
+            "지역": "충청남도 태안군",
             "위도": 36.7456,
             "경도": 126.2980,
             "인구": 61000,
@@ -367,7 +367,7 @@ def load_data():
             "소개": "해변, 노을, 해산물을 함께 즐길 수 있는 서해안 지역입니다.",
         },
         {
-            "지역": "고흥군",
+            "지역": "전라남도 고흥군",
             "위도": 34.6112,
             "경도": 127.2851,
             "인구": 62000,
@@ -389,7 +389,7 @@ def load_data():
             "소개": "우주과학과 해안 풍경, 유자 먹거리가 공존합니다.",
         },
         {
-            "지역": "울릉군",
+            "지역": "경상북도 울릉군",
             "위도": 37.4845,
             "경도": 130.9057,
             "인구": 9000,
@@ -459,6 +459,77 @@ def make_tags(items):
 
 df = pd.DataFrame(load_data())
 df["숨은지역점수"] = df.apply(calculate_hidden_score, axis=1)
+
+# 지역별 사진 URL
+# 실제 서비스에서는 저작권을 확인한 뒤 공식 관광 사이트 또는 직접 보유한 사진을 사용하는 것을 권장합니다.
+IMAGE_DATA = {
+    "강원특별자치도 정선군": {
+        "여행지": "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=1200",
+        "먹거리": "https://images.unsplash.com/photo-1547592180-85f173990554?w=1200",
+        "구경거리": "https://images.unsplash.com/photo-1500534623283-312aade485b7?w=1200",
+    },
+    "전라남도 구례군": {
+        "여행지": "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1200",
+        "먹거리": "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=1200",
+        "구경거리": "https://images.unsplash.com/photo-1500534623283-312aade485b7?w=1200",
+    },
+    "경상남도 의령군": {
+        "여행지": "https://images.unsplash.com/photo-1470770841072-f978cf4d019e?w=1200",
+        "먹거리": "https://images.unsplash.com/photo-1498837167922-ddd27525d352?w=1200",
+        "구경거리": "https://images.unsplash.com/photo-1519681393784-d120267933ba?w=1200",
+    },
+    "전북특별자치도 무주군": {
+        "여행지": "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=1200",
+        "먹거리": "https://images.unsplash.com/photo-1547592180-85f173990554?w=1200",
+        "구경거리": "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1200",
+    },
+    "충청북도 단양군": {
+        "여행지": "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=1200",
+        "먹거리": "https://images.unsplash.com/photo-1498837167922-ddd27525d352?w=1200",
+        "구경거리": "https://images.unsplash.com/photo-1519681393784-d120267933ba?w=1200",
+    },
+    "경상북도 영양군": {
+        "여행지": "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=1200",
+        "먹거리": "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=1200",
+        "구경거리": "https://images.unsplash.com/photo-1470770841072-f978cf4d019e?w=1200",
+    },
+    "경상북도 청송군": {
+        "여행지": "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1200",
+        "먹거리": "https://images.unsplash.com/photo-1498837167922-ddd27525d352?w=1200",
+        "구경거리": "https://images.unsplash.com/photo-1500534623283-312aade485b7?w=1200",
+    },
+    "충청남도 태안군": {
+        "여행지": "https://images.unsplash.com/photo-1507524275556-7e4f7b3f0f7f?w=1200",
+        "먹거리": "https://images.unsplash.com/photo-154 seafood?w=1200".replace(" seafood", ""),
+        "구경거리": "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=1200",
+    },
+    "전라남도 고흥군": {
+        "여행지": "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=1200",
+        "먹거리": "https://images.unsplash.com/photo-1547592180-85f173990554?w=1200",
+        "구경거리": "https://images.unsplash.com/photo-1470770841072-f978cf4d019e?w=1200",
+    },
+    "경상북도 울릉군": {
+        "여행지": "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1200",
+        "먹거리": "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=1200",
+        "구경거리": "https://images.unsplash.com/photo-1507524275556-7e4f7b3f0f7f?w=1200",
+    },
+}
+
+def render_image_card(title, image_url, description):
+    st.markdown(
+        f"""
+        <div style="background:#1b2b24;border:1px solid #355143;border-radius:18px;
+                    overflow:hidden;height:100%;margin-bottom:12px;">
+            <img src="{image_url}" style="width:100%;height:210px;object-fit:cover;"
+                 onerror="this.style.display='none';">
+            <div style="padding:15px;">
+                <h4 style="margin:0 0 8px;color:#ffffff;">{title}</h4>
+                <p style="margin:0;color:#b8cdbf;font-size:14px;">{description}</p>
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
 
 
 # =========================================================
@@ -830,6 +901,33 @@ if recommendation_parts:
 else:
     st.info("사이드바에서 나이대, 인원, 기간, 테마를 선택하면 맞춤 추천이 표시됩니다.")
 
+
+
+# =========================================================
+# 여행지·구경거리·먹거리 사진
+# =========================================================
+st.markdown("## 📸 지역 사진 미리보기")
+region_images = IMAGE_DATA.get(row["지역"], {})
+
+photo1, photo2, photo3 = st.columns(3)
+with photo1:
+    render_image_card(
+        "🏞️ 여행지",
+        region_images.get("여행지", ""),
+        row["관광지"],
+    )
+with photo2:
+    render_image_card(
+        "👀 구경거리",
+        region_images.get("구경거리", ""),
+        row["지역행사"],
+    )
+with photo3:
+    render_image_card(
+        "🍴 먹거리",
+        region_images.get("먹거리", ""),
+        f"{row['대표음식']} · {row['음식점']}",
+    )
 
 tab1, tab2, tab3, tab4, tab5 = st.tabs(
     ["🍴 음식", "🏞️ 관광지", "🎉 지역 행사", "🎁 특산품", "💬 로컬 리뷰"]
