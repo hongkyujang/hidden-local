@@ -12,8 +12,8 @@ from streamlit_folium import st_folium
 # 페이지 설정
 # =========================================================
 st.set_page_config(
-    page_title="숨은 로컬 발견",
-    page_icon="📍",
+    page_title="로컬 쉼표",
+    page_icon="🚗",
     layout="wide",
     initial_sidebar_state="expanded",
 )
@@ -680,8 +680,9 @@ else:
 st.markdown(
     """
     <div class="main-title">
-        <h1>🚗우리끼리 맵</h1>
-        <p>지도로 찾는 숨은 보물! SGIS 기반 맞춤형 여행 코스 추천</p>
+        <h1>🚗로컬 쉼표</h1>
+        <p> 음악의 '쉼표(숨을 쉬는 기호)'처럼, SGIS기술과 함께하여 붐비는 관광지에서 벗어나 우리 일행만 조용히 숨 돌릴 수 있는 명소 코스
+</p>
     </div>
     """,
     unsafe_allow_html=True,
