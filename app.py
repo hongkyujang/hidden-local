@@ -5,6 +5,10 @@ from streamlit_folium import st_folium
 import urllib.parse
 
 # =========================================================
+import streamlit as st
+from streamlit_folium import st_folium
+import folium
+
 # 페이지 기본 설정
 st.set_page_config(
     page_title="지역 탐색 필터 및 추천 대시보드",
@@ -65,73 +69,6 @@ with st.sidebar:
     
     # [기존] 키워드 검색
     search_keyword = st.text_input("키워드 검색", placeholder="지역명 또는 키워드 입력")
-
-
-# -------------------------------------------------------------------
-# 2. 메인 화면: 지도 및 상세 정보
-# -------------------------------------------------------------------
-
-# (1) 지도 영역 (CartoDB Dark Matter 스타일 반영)
-m = folium.Map(
-    location=[37.3806, 128.6608], # 강원도 정선 중심 좌표
-    zoom_start=9,
-    tiles="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
-    attr='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
-)
-
-# 추천 지역 핀 추가 (예시 데이터)
-pins = [
-    {"name": "강원도 정선군", "lat": 37.3806, "lng": 128.6608},
-    {"name": "강원도 평창군", "lat": 37.3704, "lng": 128.3900},
-    {"name": "강원도 영월군", "lat": 37.1834, "lng": 128.4619},
-]
-
-if show_pins:
-    for pin in pins:
-        folium.Marker(
-            location=[pin["lat"], pin["lng"]],
-            popup=pin["name"],
-            icon=folium.Icon(color="info", icon="info-sign")
-        ).add_to(m)
-
-# Folium 지도를 Streamlit에 출력
-st_folium(m, width="100%", height=350)
-
-# 범례
-st.markdown("🔵 **추천 지역 핀** &nbsp;&nbsp;&nbsp;&nbsp; 🔴 **현재 선택된 지역**")
-st.markdown("---")
-
-# (2) 선택된 지역 상세 정보 영역
-st.header("📍 강원도 정선군 상세 정보")
-
-col1, col2, col3 = st.columns([1.2, 1, 1])
-
-# 카드 1: 지역 대표 이미지 & 점수
-with col1:
-    st.image(
-        "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80",
-        caption="정선 아우라지 풍경",
-        use_column_width=True
-    )
-    st.metric(label="숨은 지역 점수", value="88.7점")
-
-# 카드 2: 대표 향토 음식
-with col2:
-    st.subheader("🍚 대표 향토 음식")
-    st.image(
-        "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=400&q=80",
-        use_column_width=True
-    )
-    st.markdown("**곤드레밥**")
-
-# 카드 3: 대표 축제 및 행사
-with col3:
-    st.subheader("🎉 대표 축제 및 행사")
-    st.image(
-        "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=400&q=80",
-        use_column_width=True
-    )
-    st.markdown("**정선 아리랑제**")
 
 # =========================================================
 # 2. 커스텀 CSS (다크 모드 및 스타일 반영)
@@ -373,18 +310,6 @@ section[data-testid="stSidebar"] {
     text-decoration: none;
 }
 
-/* 신규 추천 스타일 카드 (나이대/인원수용) */
-.rec-tag {
-    display: inline-block;
-    padding: 2px 8px;
-    border-radius: 4px;
-    font-size: 11px;
-    font-weight: 700;
-    margin-bottom: 6px;
-}
-.tag-age { background-color: #2b3a4a; color: #4dabf7; }
-.tag-group { background-color: #3b2b4a; color: #da77f2; }
-
 /* 추천 맛집 카드 */
 .place-card {
     background: #1e1e1e;
@@ -504,7 +429,7 @@ section[data-testid="stSidebar"] {
 """, unsafe_allow_html=True)
 
 # =========================================================
-# 3. 데이터 로드 (나이대/인원수별 추천 정보 추가)
+# 3. 데이터 로드 (추천 지역 10곳)
 # =========================================================
 @st.cache_data
 def load_data():
@@ -520,16 +445,6 @@ def load_data():
             "축제": "정선 아리랑제", "축제_설명": "정선아리랑을 주제로 한 전통 문화 축제.",
             "축제_img": "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=600&q=80",
             "메인이미지": "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1000&q=80",
-            "나이대별_추천": {
-                "20대": {"장소": "병방치 짚와이어 & 스카이워크", "설명": "절벽 위에서 익스트림 액티비티를 즐기고 인스타 인생샷 남기기!"},
-                "30-40대": {"장소": "정선 아리랑시장 & 레일바イク", "설명": "가족과 함께 시골 장터 체상 구경 후 풍경길 레일바이크 타기"},
-                "50대이상": {"장소": "가리왕산 케이블카 & 힐링숲", "설명": "편안하게 정선의 웅장한 산세를 관람하고 소나무 숲길 산책하기"}
-            },
-            "인원수별_추천": {
-                "1인 (혼행)": {"장소": "아우라지 둘레길 Walk", "설명": "강물을 따라 잔잔한 음악을 들으며 아늑하게 거닐 수 있는 산책로"},
-                "2인 (커플)": {"장소": "화암동굴 동굴 탐험", "설명": "신비로운 금광 역사와 대형 종유석을 만나는 이색 데이트 코스"},
-                "4인이상 (가족)": {"장소": "정선 레일바이크 체험", "설명": "남녀노소 누구나 같이 페달을 밝으며 정선의 사계절 풍경을 만끽"}
-            },
             "맛집목록": [
                 {"이름": "정선곤드레본가", "평점": "★ 4.6 (126)", "주소": "정선읍 5일장길 31", "img": "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=300&q=80"},
                 {"이름": "함백산식당", "평점": "★ 4.4 (98)", "주소": "고한읍 고한로 123", "img": "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=300&q=80"},
@@ -547,16 +462,6 @@ def load_data():
             "축제": "구례 산수유꽃축제", "축제_설명": "노란 산수유 꽃물결을 감상하는 대표 봄축제.",
             "축제_img": "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&w=600&q=80",
             "메인이미지": "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1000&q=80",
-            "나이대별_추천": {
-                "20대": {"장소": "지리산 치즈랜드", "설명": "넓은 초원과 호수를 배경으로 유럽 감성 스냅 사진 촬영하기"},
-                "30-40대": {"장소": "쌍산재 한옥 다도 체험", "설명": "윤스테이 촬영지로 유명한 고풍스러운 한옥에서 다도 힐링하기"},
-                "50대이상": {"장소": "화엄사 & 천은사 템플스테이", "설명": "천년 고찰의 호젓함 속에서 단경과 산사 둘레길 걸어보기"}
-            },
-            "인원수별_추천": {
-                "1인 (혼행)": {"장소": "천은사 수홍루 소나무길", "설명": "고요함 속에서 자기만의 시간을 갖는 호수 둘레길 산책"},
-                "2인 (커플)": {"장소": "쌍산재 비밀정원", "설명": "고즈넉한 한옥 정원을 거닐며 나누는 깊은 대화와 차 한 잔"},
-                "4인이상 (가족)": {"장소": "산수유마을 산책로", "설명": "가족 모두 부담 없이 걸으며 붉은 수유열매와 노란 꽃 감상"}
-            },
             "맛집목록": [
                 {"이름": "지리산산채식당", "평점": "★ 4.8 (210)", "주소": "구례군 마산면 88", "img": "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=300&q=80"}
             ]
@@ -572,16 +477,6 @@ def load_data():
             "축제": "의령 의병제전", "축제_설명": "임진왜란 의병들의 숭고한 호국정신을 기리는 축제.",
             "축제_img": "https://images.unsplash.com/photo-1533105079780-92b9be482077?auto=format&fit=crop&w=600&q=80",
             "메인이미지": "https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=1000&q=80",
-            "나이대별_추천": {
-                "20대": {"장소": "의령 구름다리 & 출렁다리", "설명": "아찔한 인공 스카이워크 구름다리 위에서 스릴 만점 포토타임"},
-                "30-40대": {"장소": "솥바위 부자 기운 체험", "설명": "삼성/LG 창업주 기운이 흐르는 솥바위에서 부자 기원 사진 찍기"},
-                "50대이상": {"장소": "한우산 드라이브 길", "설명": "차를 타고 편안하게 올라 탁 트인 산세와 억새 군락 관람"}
-            },
-            "인원수별_추천": {
-                "1인 (혼행)": {"장소": "의령 전통시장 탐방", "설명": "전통 소바 맛집 혼밥 후 갓 만든 쫄깃한 망개떡 맛보기"},
-                "2인 (커플)": {"장소": "충익사 한적한 백화원", "설명": "남강 변을 따라 호젓하게 거니는 고요한 데이트 산책길"},
-                "4인이상 (가족)": {"장소": "자굴산 치유의 숲", "설명": "아이들과 함께하는 숲속 놀이터와 온 가족 힐링 산림욕"}
-            },
             "맛집목록": [
                 {"이름": "의령소바 본점", "평점": "★ 4.5 (320)", "주소": "의령읍 의병로 18", "img": "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&w=300&q=80"}
             ]
@@ -597,16 +492,6 @@ def load_data():
             "축제": "무주 반딧불축제", "축제_설명": "천연기념물 반딧불이와 함께하는 생태 환경 축제.",
             "축제_img": "https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=600&q=80",
             "메인이미지": "https://images.unsplash.com/photo-1472214103451-9374bd1c798e?auto=format&fit=crop&w=1000&q=80",
-            "나이대별_추천": {
-                "20대": {"장소": "머루와인 동굴 & 테이스팅", "설명": "시원한 와인 동굴에서 머루와인 시음하고 인생 사진 완성"},
-                "30-40대": {"장소": "덕유산 곤돌라 & 향적봉", "설명": "어린아이도 부담 없이 곤돌라 타고 올라가는 정상의 비경"},
-                "50대이상": {"장소": "구천동 33경 계곡길", "설명": "맑은 계곡물 소리와 피톤치드 가득한 단풍 명소 걷기"}
-            },
-            "인원수별_추천": {
-                "1인 (혼행)": {"장소": "반디길 생태 탐방로", "설명": "자연을 보존한 숲길을 따라 혼자 느긋하게 걸어보는 사색"},
-                "2인 (커플)": {"장소": "머루와인동굴 족욕 체험", "설명": "와인 족욕으로 피로를 풀고 로맨틱한 와인 한 잔 기분 내기"},
-                "4인이상 (가족)": {"장소": "반딧불이 생태공원", "설명": "어린이 생태 교육과 신비로운 반딧불이 관찰 체험"}
-            },
             "맛집목록": [
                 {"이름": "금강식당 어죽", "평점": "★ 4.7 (180)", "주소": "무주읍 단산리 12", "img": "https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=300&q=80"}
             ]
@@ -622,16 +507,6 @@ def load_data():
             "축제": "단양 마늘축제", "축제_설명": "단양 마늘과 로컬 먹거리를 만끽하는 여름 축제.",
             "축제_img": "https://images.unsplash.com/photo-1533105079780-92b9be482077?auto=format&fit=crop&w=600&q=80",
             "메인이미지": "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1000&q=80",
-            "나이대별_추천": {
-                "20대": {"장소": "패러글라이딩 & 카페산", "설명": "하늘을 나는 패러글라이딩 후 산정상 카페에서 뷰 즐기기"},
-                "30-40대": {"장소": "만천하스카이워크 & 알파인코스터", "설명": "남한강이 내려다보이는 전망대와 짜릿한 슬라이드 체험"},
-                "50대이상": {"장소": "도담삼봉 유람선 탐방", "설명": "단양팔경의 으뜸 도담삼봉을 유람선 타고 편안하게 감상"}
-            },
-            "인원수별_추천": {
-                "1인 (혼행)": {"장소": "단양 잔도길 산책", "설명": "절벽에 붙은 암벽 길을 혼자 유유자적 걸으며 느끼는 남한강의 운치"},
-                "2인 (커플)": {"장소": "수양개빛터널 야경 데이트", "설명": "화려한 LED 조명 예술과 환상적인 빛으로 둘러싸인 정원"},
-                "4인이상 (가족)": {"장소": "고수동굴 동굴 탐험", "설명": "천연기념물 고수동굴 속 신비로운 신비의 석순과 종유석 관람"}
-            },
             "맛집목록": [
                 {"이름": "단양마늘원조집", "평점": "★ 4.7 (150)", "주소": "단양읍 중앙로 15", "img": "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=300&q=80"}
             ]
@@ -645,18 +520,8 @@ def load_data():
             "특산품": "영양 고추", "특산품_설명": "빛깔이 곱고 매운맛이 적당하며 당도가 높은 명품 고추.",
             "특산품_img": "https://images.unsplash.com/photo-1588880331179-bc9b93a8cb5e?auto=format&fit=crop&w=600&q=80",
             "축제": "영양 산나물축제", "축제_설명": "봄철 싱싱한 산나물을 맛보고 경험하는 축제.",
-            "축제_img": "https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=1000&q=80",
+            "축제_img": "https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=600&q=80",
             "메인이미지": "https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=1000&q=80",
-            "나이대별_추천": {
-                "20대": {"장소": "국제밤하늘보호공원 별빛 캠핑", "설명": "은하수를 눈에 담고 야간 별자리 타임랩스 사진 촬영"},
-                "30-40대": {"장소": "외씨버선길 숲길 트레킹", "설명": "청정 오지 자연의 신선함을 마시며 오붓하게 걷는 코스"},
-                "50대이상": {"장소": "지훈시문학관 & 주실마을", "설명": "조지훈 시인의 생가와 한옥 단지에서 문학적 정취 만끽"}
-            },
-            "인원수별_추천": {
-                "1인 (혼행)": {"장소": "영양 반딧불이 천문대", "설명": "스마트폰을 끄고 밤하늘의 쏟아지는 별을 보며 즐기는 멍때리기"},
-                "2인 (커플)": {"장소": "선바위관광지 자작나무 숲", "설명": "하얀 자작나무 사이로 펼쳐진 로맨틱하고 환상적인 길"},
-                "4인이상 (가족)": {"장소": "영양 산나물 체험장", "설명": "아이들과 직접 산나물을 채취하고 건강한 한 끼 만드는 체험"}
-            },
             "맛집목록": [{"이름": "선바위가든", "평점": "★ 4.5 (62)", "주소": "영양읍 입암면 45", "img": "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=300&q=80"}]
         },
         {
@@ -670,16 +535,6 @@ def load_data():
             "축제": "청송 사과축제", "축제_설명": "가을철 사과 수확 기쁨을 나누는 경북 대표 축제.",
             "축제_img": "https://images.unsplash.com/photo-1533105079780-92b9be482077?auto=format&fit=crop&w=600&q=80",
             "메인이미지": "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1000&q=80",
-            "나이대별_추천": {
-                "20대": {"장소": "주산지 수중 버드나무 관람", "설명": "물속에 뿌리내린 신비로운 버드나무 사진 명소"},
-                "30-40대": {"장소": "청송 소노벨 솔샘온천", "설명": "야외 노천탕에서 피로를 풀고 가족과 호캉스"},
-                "50대이상": {"장소": "주왕산 용추폭포 무장애길", "설명": "평지처럼 완만한 암봉 계곡길을 거닐며 기암절벽 구경"}
-            },
-            "인원수별_추천": {
-                "1인 (혼행)": {"장소": "송소고택 한옥 마루 체류", "설명": "고즈넉한 고택 툇마루에서 빗소리 들으며 책 읽는 시간"},
-                "2인 (커플)": {"장소": "달기약수탕 시음 & 백숙 데이트", "설명": "신기한 톡 쏘는 약수 맛보고 건강 몸보신 요리 나누기"},
-                "4인이상 (가족)": {"장소": "청송 사과 따기 과수원 체험", "설명": "탐스럽게 익은 사과를 직접 따서 먹는 신나는 과수원 체험"}
-            },
             "맛집목록": [{"이름": "서울여관식당", "평점": "★ 4.6 (140)", "주소": "청송읍 약수길 18", "img": "https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=300&q=80"}]
         },
         {
@@ -693,16 +548,6 @@ def load_data():
             "축제": "태안 튤립꽃축제", "축제_설명": "세계 5대 튤립축제로 꼽히는 화려한 꽃의 향연.",
             "축제_img": "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&w=600&q=80",
             "메인이미지": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1000&q=80",
-            "나이대별_추천": {
-                "20대": {"장소": "파도리 해식동굴 포토존", "설명": "파도가 깎아낸 신비로운 동굴 사이로 바다 일몰 촬영"},
-                "30-40대": {"장소": "신두리 해안사구 갯벌", "설명": "한국의 사하라 사막 사구 관람 및 갯벌 갯지렁이/조개잡이"},
-                "50대이상": {"장소": "안면도 자연휴양림 Pine trail", "설명": "울창한 붉은 소나무 숲길을 걸으며 건강 피톤치드 충전"}
-            },
-            "인원수별_추천": {
-                "1인 (혼행)": {"장소": "꽃지해수욕장 일몰 드라이브", "설명": "할미·할아비 바위 사이로 넘어가 노을을 보며 센치해지는 밤"},
-                "2인 (커플)": {"장소": "청산수목원 팜파스 & 핑크뮬리", "설명": "가을 무드가 연출되는 수목원 거닐며 이국적인 샷 완성"},
-                "4인이상 (가족)": {"장소": "몽산포 해수욕장 갯벌 체험", "설명": "맛조개 잡는 재미에 아이 어른 할 것 없이 빠져드는 체험"}
-            },
             "맛집목록": [{"이름": "딴뚝통나무집", "평점": "★ 4.5 (410)", "주소": "안면읍 승언리 67", "img": "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=300&q=80"}]
         },
         {
@@ -716,16 +561,6 @@ def load_data():
             "축제": "고흥 우주항공축제", "축제_설명": "나로우주센터와 함께하는 이색 과학 테마 축제.",
             "축제_img": "https://images.unsplash.com/photo-1517976487492-5750f3195933?auto=format&fit=crop&w=600&q=80",
             "메인이미지": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1000&q=80",
-            "나이대별_추천": {
-                "20대": {"장소": "쑥섬 (애도) 고양이 섬 투어", "설명": "정원 속 자유롭게 노니는 고양이들과 인생 사진 남기기"},
-                "30-40대": {"장소": "나로우주센터 우주과학관", "설명": "로켓과 우주선 실물 전시로 아이들의 창의력 상승시키는 코스"},
-                "50대이상": {"장소": "팔영산 힐링 치유의 숲", "설명": "편백나무 숲 아래 피톤치드 마시며 편안히 휴식하기"}
-            },
-            "인원수별_추천": {
-                "1인 (혼행)": {"장소": "남열해돋이해수욕장 멍때리기", "설명": "넓게 펼쳐진 수평선을 바라보며 시원한 바람을 맞는 시간"},
-                "2인 (커플)": {"장소": "고흥 유자공원 & 피크닉", "설명": "노랗게 물든 유자밭 사잇길에서 향긋한 바람 즐기기"},
-                "4인이상 (가족)": {"장소": "거금도 해안도로 드라이브", "설명": "다리를 건너 만나는 시원한 바다 전경과 해산물 파티"}
-            },
             "맛집목록": [{"이름": "나로도수산식당", "평점": "★ 4.6 (95)", "주소": "동일면 봉영리 12", "img": "https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?auto=format&fit=crop&w=300&q=80"}]
         },
         {
@@ -739,16 +574,6 @@ def load_data():
             "축제": "울릉도 오징어축제", "축제_설명": "동해안 대표 수산물 오징어를 테마로 한 체험형 축제.",
             "축제_img": "https://images.unsplash.com/photo-1533105079780-92b9be482077?auto=format&fit=crop&w=600&q=80",
             "메인이미지": "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1000&q=80",
-            "나이대별_추천": {
-                "20대": {"장소": "삼선암 & 관음도 투어", "설명": "에메랄드빛 바다 스노클링 및 관람 연도교 위 인생 샷"},
-                "30-40대": {"장소": "독도 탐방 & 독도박물관", "설명": "우리 땅 독도를 품에 안고 자녀에게 역사의식 전달"},
-                "50대이상": {"장소": "나리분지 & 신령수 산책", "설명": "화산 분지 야생화 밭을 여유 있게 둘러보고 원시림 산책"}
-            },
-            "인원수별_추천": {
-                "1인 (혼행)": {"장소": "행남해안산책로 도보", "설명": "깎아지른 해안절벽 옆 난간 길을 따라 바다 소리 듣는 코스"},
-                "2인 (커플)": {"장소": "독도전망대 케이블카", "설명": "울릉도 도동항 전경을 높은 곳에서 한눈에 바라는 뷰 스팟"},
-                "4인이상 (가족)": {"장소": "울릉도 섬 한 바퀴 유람선", "설명": "기암괴석 코끼리 바위 등을 선상에서 다 같이 관람하는 코스"}
-            },
             "맛집목록": [{"이름": "울릉약소마을", "평점": "★ 4.7 (130)", "주소": "울릉읍 도동리 88", "img": "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=300&q=80"}]
         }
     ]
@@ -877,6 +702,10 @@ st.markdown("<h3 style='font-size:18px; font-weight:700; margin-top:25px; margin
 # 현재 선택된 데이터
 curr_data = df[df["id"] == st.session_state.selected_region_id].iloc[0]
 
+# 지도 생성 (다크 모드 레이어 타일 적용: CartoDB dark_all)
+# Vworld WMTS 오픈 API 타일 URL (인증키 없이 사용 가능한 공용 오픈 URL 적용)
+satellite_url = "https://map.vworld.kr/jquery/plugins/openlayers/theme/default/img/blank.gif" # fallback 예시
+
 # Vworld 위성 지도 (Satellite)
 m = folium.Map(
     location=[curr_data["위도"], curr_data["경도"]],
@@ -892,7 +721,6 @@ folium.TileLayer(
     name="Hybrid",
     overlay=True
 ).add_to(m)
-
 # 마커 추가
 for _, row in filtered_df.iterrows():
     is_sel = (row["id"] == st.session_state.selected_region_id)
@@ -939,18 +767,20 @@ with sec_col2:
         index=df["지역"].tolist().index(curr_data["지역"]),
         label_visibility="collapsed"
     )
+    # 변경 시 업데이트
     new_id = df[df["지역"] == selected_name].iloc[0]["id"]
     if new_id != st.session_state.selected_region_id:
         st.session_state.selected_region_id = new_id
         st.rerun()
 
-# 길찾기 URL 생성
+# 길찾기 URL 생성 (네이버 / 카카오)
 encoded_region = urllib.parse.quote(curr_data['지역'])
 naver_navi_url = f"https://map.naver.com/v5/directions/-/-/-/nat?e={curr_data['경도']},{curr_data['위도']},{encoded_region},,,ADDRESS_POI"
 kakao_navi_url = f"https://map.kakao.com/link/to/{encoded_region},{curr_data['위도']},{curr_data['경도']}"
 
 dc1, dc2, dc3, dc4 = st.columns([1.3, 1, 1, 1])
 
+# 메인 카드가 포함된 4열 구조
 with dc1:
     st.markdown(f"""
     <div class="main-region-card">
@@ -1018,71 +848,6 @@ with dc4:
     </div>
     """, unsafe_allow_html=True)
 
-
-# =========================================================
-# 7.5 [NEW] 나이대별 및 인원수별 맞춤 추천 섹션 
-# =========================================================
-st.markdown("<div style='height:25px;'></div>", unsafe_allow_html=True)
-
-col_age, col_grp = st.columns(2)
-
-with col_age:
-    st.markdown(f"<div class='section-title' style='font-size:16px;'>👴 {curr_data['지역']} 나이대별 추천 여행지</div>", unsafe_allow_html=True)
-    st.markdown("<div style='height:8px;'></div>", unsafe_allow_html=True)
-    
-    age_20 = curr_data["나이대별_추천"]["20대"]
-    age_3040 = curr_data["나이대별_추천"]["30-40대"]
-    age_50 = curr_data["나이대별_추천"]["50대이상"]
-    
-    st.markdown(f"""
-    <div class="sub-info-card">
-        <div style="margin-bottom:12px;">
-            <span class="rec-tag tag-age">20대 추천</span>
-            <div style="font-weight:700; color:#ffffff; font-size:14px;">📍 {age_20['장소']}</div>
-            <div style="font-size:12px; color:#aaaaaa; margin-top:2px;">{age_20['설명']}</div>
-        </div>
-        <div style="border-top:1px solid #2d2d2d; padding-top:10px; margin-bottom:12px;">
-            <span class="rec-tag tag-age">30~40대 추천</span>
-            <div style="font-weight:700; color:#ffffff; font-size:14px;">📍 {age_3040['장소']}</div>
-            <div style="font-size:12px; color:#aaaaaa; margin-top:2px;">{age_3040['설명']}</div>
-        </div>
-        <div style="border-top:1px solid #2d2d2d; padding-top:10px;">
-            <span class="rec-tag tag-age">50대 이상 추천</span>
-            <div style="font-weight:700; color:#ffffff; font-size:14px;">📍 {age_50['장소']}</div>
-            <div style="font-size:12px; color:#aaaaaa; margin-top:2px;">{age_50['설명']}</div>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
-
-with col_grp:
-    st.markdown(f"<div class='section-title' style='font-size:16px;'>👥 {curr_data['지역']} 인원수별 추천 여행지</div>", unsafe_allow_html=True)
-    st.markdown("<div style='height:8px;'></div>", unsafe_allow_html=True)
-    
-    grp_1 = curr_data["인원수별_추천"]["1인 (혼행)"]
-    grp_2 = curr_data["인원수별_추천"]["2인 (커플)"]
-    grp_4 = curr_data["인원수별_추천"]["4인이상 (가족)"]
-    
-    st.markdown(f"""
-    <div class="sub-info-card">
-        <div style="margin-bottom:12px;">
-            <span class="rec-tag tag-group">1인 (혼자 여행)</span>
-            <div style="font-weight:700; color:#ffffff; font-size:14px;">📍 {grp_1['장소']}</div>
-            <div style="font-size:12px; color:#aaaaaa; margin-top:2px;">{grp_1['설명']}</div>
-        </div>
-        <div style="border-top:1px solid #2d2d2d; padding-top:10px; margin-bottom:12px;">
-            <span class="rec-tag tag-group">2인 (커플/친구)</span>
-            <div style="font-weight:700; color:#ffffff; font-size:14px;">📍 {grp_2['장소']}</div>
-            <div style="font-size:12px; color:#aaaaaa; margin-top:2px;">{grp_2['설명']}</div>
-        </div>
-        <div style="border-top:1px solid #2d2d2d; padding-top:10px;">
-            <span class="rec-tag tag-group">4인 이상 (가족 모임)</span>
-            <div style="font-weight:700; color:#ffffff; font-size:14px;">📍 {grp_4['장소']}</div>
-            <div style="font-size:12px; color:#aaaaaa; margin-top:2px;">{grp_4['설명']}</div>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
-
-
 # =========================================================
 # 8. 상세 하단 탭
 # =========================================================
@@ -1126,31 +891,7 @@ with tab1:
                 """, unsafe_allow_html=True)
 
 with tab2:
-    st.markdown(f"<h4 style='color:#ffffff;'>🏞️ {curr_data['지역']} 주요 맞춤 관광지</h4>", unsafe_allow_html=True)
-    
-    t2_col1, t2_col2 = st.columns(2)
-    with t2_col1:
-        st.markdown(f"""
-        <div class="sub-info-card">
-            <div class="sub-info-title">👨‍👩‍👧‍👦 테마별 관광지 코스</div>
-            <p style="font-size:13px; color:#cccccc;">
-                • <b>20대 선호:</b> {curr_data['나이대별_추천']['20대']['장소']}<br>
-                • <b>3040대 선호:</b> {curr_data['나이대별_추천']['30-40대']['장소']}<br>
-                • <b>50대+ 선호:</b> {curr_data['나이대별_추천']['50대이상']['장소']}
-            </p>
-        </div>
-        """, unsafe_allow_html=True)
-    with t2_col2:
-        st.markdown(f"""
-        <div class="sub-info-card">
-            <div class="sub-info-title">🚗 인원 규모별 동선 추천</div>
-            <p style="font-size:13px; color:#cccccc;">
-                • <b>1인 (혼행):</b> {curr_data['인원수별_추천']['1인 (혼행)']['장소']}<br>
-                • <b>2인 (커플):</b> {curr_data['인원수별_추천']['2인 (커플)']['장소']}<br>
-                • <b>4인+ (가족):</b> {curr_data['인원수별_추천']['4인이상 (가족)']['장소']}
-            </p>
-        </div>
-        """, unsafe_allow_html=True)
+    st.info(f"{curr_data['지역']}의 주요 관광지 정보 페이지입니다.")
 
 with tab3:
     st.info(f"{curr_data['지역']}의 주요 축제 및 행사 정보 페이지입니다.")
@@ -1164,16 +905,14 @@ with tab5:
     rev_c1, rev_c2, rev_c3, rev_c4 = st.columns(4)
     
     reviews = [
-        {"user": "여행매니아", "date": "2024.05.12", "text": "전통시장과 먹거리가 정말 알차서 가족 여행으로 최고였습니다!", "img1": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=300&q=80", "img2": "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=300&q=80"},
-        {"user": "로컬탐험가", "date": "2024.05.08", "text": "조용하고 힐링하기 딱 좋은 곳이에요. 현지인 추천 맛집이 정말 훌륭했습니다.", "img1": "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=300&q=80", "img2": "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=300&q=80"},
-        {"user": "맛따라길따라", "date": "2024.04.29", "text": "지역 특산물 요리가 별미네요. 주말 여행지로 강추합니다!", "img1": "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=300&q=80", "img2": "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=300&q=80"},
-        {"user": "힐링캠퍼", "date": "2024.04.15", "text": "자연 경관이 정말 수려하고 공기가 좋아요. 또 방문하고 싶습니다.", "img1": "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=300&q=80", "img2": "https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=300&q=80"}
+        {"user": "여행매니아", "date": "2024.05.12", "text": "자연경관이 정말 아름답고 음식도 건강하고 맛있어요! 대표 음식 꼭 드셔보세요.", "star": "★★★★★ 5"},
+        {"user": "산책러버", "date": "2024.04.28", "text": "전통시장 구경도 재밌고 주민들도 친절하세요. 지역 분위기가 정말 정겹습니다.", "star": "★★★★★ 5"},
+        {"user": "맛집탐방가", "date": "2024.04.15", "text": "조용하고 깨끗해서 힐링하기 좋아요. 지방은 역시 식도락 여행이 최고!", "star": "★★★★☆ 4"},
+        {"user": "캠핑가는부자", "date": "2024.03.10", "text": "주변 관광지와 산책로가 가을에 꼭 가보세요. 풍경이 정말 장관입니다.", "star": "★★★★★ 5"}
     ]
     
-    rev_cols = [rev_c1, rev_c2, rev_c3, rev_c4]
-    
     for idx, rev in enumerate(reviews):
-        with rev_cols[idx]:
+        with [rev_c1, rev_c2, rev_c3, rev_c4][idx]:
             st.markdown(f"""
             <div class="review-card">
                 <div class="review-header">
@@ -1181,14 +920,15 @@ with tab5:
                         <div class="review-avatar">👤</div>
                         <div>
                             <div class="review-username">{rev['user']}</div>
-                            <div class="review-date">{rev['date']}</div>
+                            <div style="font-size:10px; color:#fcc419;">{rev['star']}</div>
                         </div>
                     </div>
+                    <div class="review-date">{rev['date']}</div>
                 </div>
                 <div class="review-text">{rev['text']}</div>
                 <div class="review-imgs">
-                    <img src="{rev['img1']}" class="review-img">
-                    <img src="{rev['img2']}" class="review-img">
+                    <img src="{curr_data['메인이미지']}" class="review-img">
+                    <img src="{curr_data['대표음식_img']}" class="review-img">
                 </div>
             </div>
             """, unsafe_allow_html=True)
