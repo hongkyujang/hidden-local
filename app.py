@@ -5,14 +5,133 @@ from streamlit_folium import st_folium
 import urllib.parse
 
 # =========================================================
-# 1. 페이지 설정
-# =========================================================
+# 페이지 기본 설정
 st.set_page_config(
-    page_title="숨은 로컬 발견",
-    page_icon="📍",
+    page_title="지역 탐색 필터 및 추천 대시보드",
     layout="wide",
     initial_sidebar_state="expanded"
 )
+
+# -------------------------------------------------------------------
+# 1. 사이드바: 지역 탐색 필터
+# -------------------------------------------------------------------
+with st.sidebar:
+    st.title("📍 지역 탐색 필터")
+    
+    # [기존] 최소 숨은 지역 점수
+    min_score = st.slider("최소 숨은 지역 점수", min_value=0, max_value=100, value=60)
+    
+    # [기존] 선호 음식 타입
+    food_type = st.selectbox("선호 음식 타입", ["전체", "한식", "양식", "중식", "일식", "기타"])
+    
+    # ✨ [추가 1] 여행자 나이대별 섹션
+    st.markdown("### 👥 여행자 나이대")
+    age_groups = st.multiselect(
+        "나이대 선택",
+        options=["10대", "20대", "30대", "40대", "50대", "60대 이상"],
+        default=["20대", "30대"]
+    )
+    
+    # ✨ [추가 2] 인원수별 섹션
+    st.markdown("### 👨‍👩‍👧‍👦 여행 인원수")
+    group_type = st.selectbox(
+        "구성 형태",
+        options=["전체", "나홀로 (1인)", "커플/2인", "친구 (3~4인)", "가족/단체 (5인 이상)"]
+    )
+    headcount = st.number_input("상세 인원수 (명)", min_value=1, max_value=20, value=2, step=1)
+    
+    # ✨ [추가 3] 여행지 테마 선택 섹션
+    st.markdown("### 🎯 여행지 테마")
+    themes = st.multiselect(
+        "테마 선택 (다중 선택 가능)",
+        options=["자연/힐링", "액티비티/레저", "문화/역사", "식도락/맛집", "카페/핫플", "휴양/호캉스"],
+        default=["자연/힐링", "식도락/맛집"]
+    )
+    
+    st.divider()
+    
+    # [기존] 지도 표시 옵션
+    st.markdown("### 지도 표시 옵션")
+    show_pins = st.checkbox("추천 지역 핀", value=True)
+    show_restaurants = st.checkbox("음식점", value=True)
+    show_attractions = st.checkbox("관광지", value=True)
+    show_festivals = st.checkbox("축제/행사", value=True)
+    show_specialties = st.checkbox("특산품", value=True)
+    
+    st.divider()
+    
+    # [기존] 정렬 기준
+    sort_by = st.selectbox("정렬 기준", ["숨은 지역 점수 순", "인기순", "거리순"])
+    
+    # [기존] 키워드 검색
+    search_keyword = st.text_input("키워드 검색", placeholder="지역명 또는 키워드 입력")
+
+
+# -------------------------------------------------------------------
+# 2. 메인 화면: 지도 및 상세 정보
+# -------------------------------------------------------------------
+
+# (1) 지도 영역 (CartoDB Dark Matter 스타일 반영)
+m = folium.Map(
+    location=[37.3806, 128.6608], # 강원도 정선 중심 좌표
+    zoom_start=9,
+    tiles="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
+    attr='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+)
+
+# 추천 지역 핀 추가 (예시 데이터)
+pins = [
+    {"name": "강원도 정선군", "lat": 37.3806, "lng": 128.6608},
+    {"name": "강원도 평창군", "lat": 37.3704, "lng": 128.3900},
+    {"name": "강원도 영월군", "lat": 37.1834, "lng": 128.4619},
+]
+
+if show_pins:
+    for pin in pins:
+        folium.Marker(
+            location=[pin["lat"], pin["lng"]],
+            popup=pin["name"],
+            icon=folium.Icon(color="info", icon="info-sign")
+        ).add_to(m)
+
+# Folium 지도를 Streamlit에 출력
+st_folium(m, width="100%", height=350)
+
+# 범례
+st.markdown("🔵 **추천 지역 핀** &nbsp;&nbsp;&nbsp;&nbsp; 🔴 **현재 선택된 지역**")
+st.markdown("---")
+
+# (2) 선택된 지역 상세 정보 영역
+st.header("📍 강원도 정선군 상세 정보")
+
+col1, col2, col3 = st.columns([1.2, 1, 1])
+
+# 카드 1: 지역 대표 이미지 & 점수
+with col1:
+    st.image(
+        "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80",
+        caption="정선 아우라지 풍경",
+        use_column_width=True
+    )
+    st.metric(label="숨은 지역 점수", value="88.7점")
+
+# 카드 2: 대표 향토 음식
+with col2:
+    st.subheader("🍚 대표 향토 음식")
+    st.image(
+        "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=400&q=80",
+        use_column_width=True
+    )
+    st.markdown("**곤드레밥**")
+
+# 카드 3: 대표 축제 및 행사
+with col3:
+    st.subheader("🎉 대표 축제 및 행사")
+    st.image(
+        "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=400&q=80",
+        use_column_width=True
+    )
+    st.markdown("**정선 아리랑제**")
 
 # =========================================================
 # 2. 커스텀 CSS (다크 모드 및 스타일 반영)
