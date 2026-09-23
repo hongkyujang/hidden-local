@@ -128,7 +128,7 @@ section[data-testid="stSidebar"] {
     align-items: center;
     gap: 15px;
     margin-top: 10px;
-    margin-bottom: 25px;
+    margin-bottom: 15px;
     font-size: 12px;
     color: #b0b0b0;
 }
@@ -151,6 +151,8 @@ section[data-testid="stSidebar"] {
     display: flex;
     align-items: center;
     gap: 8px;
+    margin-top: 25px;
+    margin-bottom: 15px;
 }
 
 /* 메인 지역 정보 카드 */
@@ -240,21 +242,15 @@ section[data-testid="stSidebar"] {
     margin-top: 4px;
     margin-bottom: 12px;
 }
-.btn-more {
-    display: inline-block;
-    width: 100%;
-    text-align: center;
-    padding: 6px 0;
-    background: #2b2b2b;
-    border: 1px solid #3d3d3d;
-    border-radius: 6px;
-    font-size: 12px;
-    color: #e0e0e0;
-    font-weight: 600;
-    text-decoration: none;
-}
 
-/* 신규 추천 스타일 카드 (나이대/인원수용) */
+/* 신규 추천 스타일 카드 */
+.rec-card {
+    background: #1e1e1e;
+    border-radius: 10px;
+    border: 1px solid #2d2d2d;
+    padding: 12px;
+    margin-bottom: 8px;
+}
 .rec-tag {
     display: inline-block;
     padding: 2px 8px;
@@ -275,6 +271,7 @@ section[data-testid="stSidebar"] {
     display: flex;
     gap: 12px;
     align-items: center;
+    margin-bottom: 10px;
 }
 .place-img {
     width: 80px;
@@ -298,75 +295,20 @@ section[data-testid="stSidebar"] {
     color: #a0a0a0;
 }
 
-/* 리뷰 카드 */
-.review-card {
-    background: #1e1e1e;
-    border-radius: 12px;
-    border: 1px solid #2d2d2d;
-    padding: 16px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-}
-.review-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 10px;
-}
-.review-user {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-.review-avatar {
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    background: #2b2b2b;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 18px;
-}
-.review-username {
-    font-size: 13px;
-    font-weight: 700;
-    color: #ffffff;
-}
-.review-date {
-    font-size: 11px;
-    color: #707070;
-}
-.review-text {
-    font-size: 12px;
-    color: #cccccc;
-    line-height: 1.5;
-    margin-bottom: 12px;
-}
-.review-imgs {
-    display: flex;
-    gap: 6px;
-}
-.review-img {
-    width: 48%;
-    height: 70px;
-    border-radius: 6px;
-    object-fit: cover;
-}
-
 /* 길찾기 커스텀 버튼 스타일 */
 .navi-btn-container {
     display: flex;
     gap: 8px;
-    margin-top: 10px;
+    margin-top: 8px;
 }
 .navi-btn-naver {
     flex: 1;
     background-color: #03C75A;
     color: white !important;
     text-align: center;
-    padding: 8px 0;
+    padding: 6px 0;
     border-radius: 6px;
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 700;
     text-decoration: none;
 }
@@ -375,9 +317,9 @@ section[data-testid="stSidebar"] {
     background-color: #FEE500;
     color: #191919 !important;
     text-align: center;
-    padding: 8px 0;
+    padding: 6px 0;
     border-radius: 6px;
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 700;
     text-decoration: none;
 }
@@ -385,7 +327,7 @@ section[data-testid="stSidebar"] {
 """, unsafe_allow_html=True)
 
 # =========================================================
-# 3. 데이터 로드 (나이대/인원수별 추천 정보 추가)
+# 3. 데이터 로드
 # =========================================================
 @st.cache_data
 def load_data():
@@ -403,7 +345,7 @@ def load_data():
             "메인이미지": "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1000&q=80",
             "나이대별_추천": {
                 "20대": {"장소": "병방치 짚와이어 & 스카이워크", "설명": "절벽 위에서 익스트림 액티비티를 즐기고 인스타 인생샷 남기기!"},
-                "30-40대": {"장소": "정선 아리랑시장 & 레일바イク", "설명": "가족과 함께 시골 장터 체상 구경 후 풍경길 레일바이크 타기"},
+                "30-40대": {"장소": "정선 아리랑시장 & 레일바이크", "설명": "가족과 함께 시골 장터 체상 구경 후 풍경길 레일바이크 타기"},
                 "50대이상": {"장소": "가리왕산 케이블카 & 힐링숲", "설명": "편안하게 정선의 웅장한 산세를 관람하고 소나무 숲길 산책하기"}
             },
             "인원수별_추천": {
@@ -516,121 +458,6 @@ def load_data():
             "맛집목록": [
                 {"이름": "단양마늘원조집", "평점": "★ 4.7 (150)", "주소": "단양읍 중앙로 15", "img": "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=300&q=80"}
             ]
-        },
-        {
-            "id": 6, "지역": "경상북도 영양군", "위도": 36.6667, "경도": 129.1118, "점수": 83.5,
-            "인구": "16,000명", "면적": "815.10㎢", "음식점수": "25개", "관광지수": "45개",
-            "소개": "아시아 최초 밤하늘 보호공원이 위치한 별빛 가득한 오지 로컬 명소.",
-            "대표음식": "산나물비빔밥", "대표음식_설명": "영양의 깨끗한 고산지대에서 채취한 산나물 뷔페식 비빔밥.",
-            "대표음식_img": "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=600&q=80",
-            "특산품": "영양 고추", "특산품_설명": "빛깔이 곱고 매운맛이 적당하며 당도가 높은 명품 고추.",
-            "특산품_img": "https://images.unsplash.com/photo-1588880331179-bc9b93a8cb5e?auto=format&fit=crop&w=600&q=80",
-            "축제": "영양 산나물축제", "축제_설명": "봄철 싱싱한 산나물을 맛보고 경험하는 축제.",
-            "축제_img": "https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=1000&q=80",
-            "메인이미지": "https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=1000&q=80",
-            "나이대별_추천": {
-                "20대": {"장소": "국제밤하늘보호공원 별빛 캠핑", "설명": "은하수를 눈에 담고 야간 별자리 타임랩스 사진 촬영"},
-                "30-40대": {"장소": "외씨버선길 숲길 트레킹", "설명": "청정 오지 자연의 신선함을 마시며 오붓하게 걷는 코스"},
-                "50대이상": {"장소": "지훈시문학관 & 주실마을", "설명": "조지훈 시인의 생가와 한옥 단지에서 문학적 정취 만끽"}
-            },
-            "인원수별_추천": {
-                "1인 (혼행)": {"장소": "영양 반딧불이 천문대", "설명": "스마트폰을 끄고 밤하늘의 쏟아지는 별을 보며 즐기는 멍때리기"},
-                "2인 (커플)": {"장소": "선바위관광지 자작나무 숲", "설명": "하얀 자작나무 사이로 펼쳐진 로맨틱하고 환상적인 길"},
-                "4인이상 (가족)": {"장소": "영양 산나물 체험장", "설명": "아이들과 직접 산나물을 채취하고 건강한 한 끼 만드는 체험"}
-            },
-            "맛집목록": [{"이름": "선바위가든", "평점": "★ 4.5 (62)", "주소": "영양읍 입암면 45", "img": "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=300&q=80"}]
-        },
-        {
-            "id": 7, "지역": "경상북도 청송군", "위도": 36.4356, "경도": 129.0572, "점수": 82.8,
-            "인구": "24,000명", "면적": "842.60㎢", "음식점수": "35개", "관광지수": "65개",
-            "소개": "주왕산 국립공원의 절경과 달기약수탕, 꿀사과가 유명한 힐링 명소.",
-            "대표음식": "달기약수백숙", "대표음식_설명": "탄산 약수로 끓여 닭고기가 부드럽고 국물이 깊은 약선 요리.",
-            "대표음식_img": "https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=600&q=80",
-            "특산품": "청송 사과", "특산품_설명": "해발이 높고 일교차가 크며 즙이 많은 명품 꿀사과.",
-            "특산품_img": "https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?auto=format&fit=crop&w=600&q=80",
-            "축제": "청송 사과축제", "축제_설명": "가을철 사과 수확 기쁨을 나누는 경북 대표 축제.",
-            "축제_img": "https://images.unsplash.com/photo-1533105079780-92b9be482077?auto=format&fit=crop&w=600&q=80",
-            "메인이미지": "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1000&q=80",
-            "나이대별_추천": {
-                "20대": {"장소": "주산지 수중 버드나무 관람", "설명": "물속에 뿌리내린 신비로운 버드나무 사진 명소"},
-                "30-40대": {"장소": "청송 소노벨 솔샘온천", "설명": "야외 노천탕에서 피로를 풀고 가족과 호캉스"},
-                "50대이상": {"장소": "주왕산 용추폭포 무장애길", "설명": "평지처럼 완만한 암봉 계곡길을 거닐며 기암절벽 구경"}
-            },
-            "인원수별_추천": {
-                "1인 (혼행)": {"장소": "송소고택 한옥 마루 체류", "설명": "고즈넉한 고택 툇마루에서 빗소리 들으며 책 읽는 시간"},
-                "2인 (커플)": {"장소": "달기약수탕 시음 & 백숙 데이트", "설명": "신기한 톡 쏘는 약수 맛보고 건강 몸보신 요리 나누기"},
-                "4인이상 (가족)": {"장소": "청송 사과 따기 과수원 체험", "설명": "탐스럽게 익은 사과를 직접 따서 먹는 신나는 과수원 체험"}
-            },
-            "맛집목록": [{"이름": "서울여관식당", "평점": "★ 4.6 (140)", "주소": "청송읍 약수길 18", "img": "https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=300&q=80"}]
-        },
-        {
-            "id": 8, "지역": "충청남도 태안군", "위도": 36.7456, "경도": 126.2981, "점수": 81.9,
-            "인구": "62,000명", "면적": "500.80㎢", "음식점수": "78개", "관광지수": "110개",
-            "소개": "서해안 해안선과 안면도 소나무 숲, 풍부한 해산물이 어우러진 해양 도시.",
-            "대표음식": "게국지", "대표음식_설명": "꽃게와 겉절이 김치를 넣고 시원하게 끓여낸 충남 향토 음식.",
-            "대표음식_img": "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=600&q=80",
-            "특산품": "태안 꽃게", "특산품_설명": "살이 살찌고 알이 찬 서해안 청정 꽃게.",
-            "특산품_img": "https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?auto=format&fit=crop&w=600&q=80",
-            "축제": "태안 튤립꽃축제", "축제_설명": "세계 5대 튤립축제로 꼽히는 화려한 꽃의 향연.",
-            "축제_img": "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&w=600&q=80",
-            "메인이미지": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1000&q=80",
-            "나이대별_추천": {
-                "20대": {"장소": "파도리 해식동굴 포토존", "설명": "파도가 깎아낸 신비로운 동굴 사이로 바다 일몰 촬영"},
-                "30-40대": {"장소": "신두리 해안사구 갯벌", "설명": "한국의 사하라 사막 사구 관람 및 갯벌 갯지렁이/조개잡이"},
-                "50대이상": {"장소": "안면도 자연휴양림 Pine trail", "설명": "울창한 붉은 소나무 숲길을 걸으며 건강 피톤치드 충전"}
-            },
-            "인원수별_추천": {
-                "1인 (혼행)": {"장소": "꽃지해수욕장 일몰 드라이브", "설명": "할미·할아비 바위 사이로 넘어가 노을을 보며 센치해지는 밤"},
-                "2인 (커플)": {"장소": "청산수목원 팜파스 & 핑크뮬리", "설명": "가을 무드가 연출되는 수목원 거닐며 이국적인 샷 완성"},
-                "4인이상 (가족)": {"장소": "몽산포 해수욕장 갯벌 체험", "설명": "맛조개 잡는 재미에 아이 어른 할 것 없이 빠져드는 체험"}
-            },
-            "맛집목록": [{"이름": "딴뚝통나무집", "평점": "★ 4.5 (410)", "주소": "안면읍 승언리 67", "img": "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=300&q=80"}]
-        },
-        {
-            "id": 9, "지역": "전라남도 고흥군", "위도": 34.6114, "경도": 127.2842, "점수": 80.4,
-            "인구": "62,500명", "면적": "807.30㎢", "음식점수": "55개", "관광지수": "70개",
-            "소개": "우주항공의 중심지이자 따뜻한 해양성 기후로 유자와 삼치가 유명한 곳.",
-            "대표음식": "삼치회", "대표음식_설명": "입안에서 부드럽게 녹아내리는 신선한 삼치회.",
-            "대표음식_img": "https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?auto=format&fit=crop&w=600&q=80",
-            "특산품": "고흥 유자", "특산품_설명": "일조량이 풍부하여 향과 맛이 으뜸인 명품 유자.",
-            "특산품_img": "https://images.unsplash.com/photo-1615485290382-441e4d049cb5?auto=format&fit=crop&w=600&q=80",
-            "축제": "고흥 우주항공축제", "축제_설명": "나로우주센터와 함께하는 이색 과학 테마 축제.",
-            "축제_img": "https://images.unsplash.com/photo-1517976487492-5750f3195933?auto=format&fit=crop&w=600&q=80",
-            "메인이미지": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1000&q=80",
-            "나이대별_추천": {
-                "20대": {"장소": "쑥섬 (애도) 고양이 섬 투어", "설명": "정원 속 자유롭게 노니는 고양이들과 인생 사진 남기기"},
-                "30-40대": {"장소": "나로우주센터 우주과학관", "설명": "로켓과 우주선 실물 전시로 아이들의 창의력 상승시키는 코스"},
-                "50대이상": {"장소": "팔영산 힐링 치유의 숲", "설명": "편백나무 숲 아래 피톤치드 마시며 편안히 휴식하기"}
-            },
-            "인원수별_추천": {
-                "1인 (혼행)": {"장소": "남열해돋이해수욕장 멍때리기", "설명": "넓게 펼쳐진 수평선을 바라보며 시원한 바람을 맞는 시간"},
-                "2인 (커플)": {"장소": "고흥 유자공원 & 피크닉", "설명": "노랗게 물든 유자밭 사잇길에서 향긋한 바람 즐기기"},
-                "4인이상 (가족)": {"장소": "거금도 해안도로 드라이브", "설명": "다리를 건너 만나는 시원한 바다 전경과 해산물 파티"}
-            },
-            "맛집목록": [{"이름": "나로도수산식당", "평점": "★ 4.6 (95)", "주소": "동일면 봉영리 12", "img": "https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?auto=format&fit=crop&w=300&q=80"}]
-        },
-        {
-            "id": 10, "지역": "경상북도 울릉군", "위도": 37.4844, "경도": 130.9057, "점수": 79.8,
-            "인구": "8,900명", "면적": "72.90㎢", "음식점수": "40개", "관광지수": "60개",
-            "소개": "동해의 에메랄드빛 보석, 천혜의 화산섬 지형과 독도를 품은 신비로운 섬.",
-            "대표음식": "오징어내장탕", "대표음식_설명": "울릉도 신선한 오징어로 끓여 시원하고 칼칼한 국물 요리.",
-            "대표음식_img": "https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=600&q=80",
-            "특산품": "울릉 명이나물", "특산품_설명": "울릉도 자생 산마늘로 담근 알싸하고 짭조름한 장아찌.",
-            "특산품_img": "https://images.unsplash.com/photo-1518843875459-f738682238a6?auto=format&fit=crop&w=600&q=80",
-            "축제": "울릉도 오징어축제", "축제_설명": "동해안 대표 수산물 오징어를 테마로 한 체험형 축제.",
-            "축제_img": "https://images.unsplash.com/photo-1533105079780-92b9be482077?auto=format&fit=crop&w=600&q=80",
-            "메인이미지": "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1000&q=80",
-            "나이대별_추천": {
-                "20대": {"장소": "삼선암 & 관음도 투어", "설명": "에메랄드빛 바다 스노클링 및 관람 연도교 위 인생 샷"},
-                "30-40대": {"장소": "독도 탐방 & 독도박물관", "설명": "우리 땅 독도를 품에 안고 자녀에게 역사의식 전달"},
-                "50대이상": {"장소": "나리분지 & 신령수 산책", "설명": "화산 분지 야생화 밭을 여유 있게 둘러보고 원시림 산책"}
-            },
-            "인원수별_추천": {
-                "1인 (혼행)": {"장소": "행남해안산책로 도보", "설명": "깎아지른 해안절벽 옆 난간 길을 따라 바다 소리 듣는 코스"},
-                "2인 (커플)": {"장소": "독도전망대 케이블카", "설명": "울릉도 도동항 전경을 높은 곳에서 한눈에 바라는 뷰 스팟"},
-                "4인이상 (가족)": {"장소": "울릉도 섬 한 바퀴 유람선", "설명": "기암괴석 코끼리 바위 등을 선상에서 다 같이 관람하는 코스"}
-            },
-            "맛집목록": [{"이름": "울릉약소마을", "평점": "★ 4.7 (130)", "주소": "울릉읍 도동리 88", "img": "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=300&q=80"}]
         }
     ]
 
@@ -742,334 +569,177 @@ with c4:
         <div class="metric-left">
             <div class="metric-icon" style="background:#423213; color:#fcc419;">🎁</div>
             <div>
-                <div class="metric-label">특산품</div>
-                <div class="metric-value">32개</div>
-                <div class="metric-sub">지역 특산품</div>
+                <div class="metric-label">혜택/쿠폰</div>
+                <div class="metric-value">12개</div>
+                <div class="metric-sub">로컬 제휴 할인</div>
             </div>
         </div>
     </div>
     """, unsafe_allow_html=True)
 
 # =========================================================
-# 6. 지도 및 범례
+# 6. Folium 지도 영역
 # =========================================================
-st.markdown("<h3 style='font-size:18px; font-weight:700; margin-top:25px; margin-bottom:10px; color:#ffffff;'>🗺️ 추천 지역 지도</h3>", unsafe_allow_html=True)
+st.markdown("<br>", unsafe_allow_html=True)
 
-# 현재 선택된 데이터
-curr_data = df[df["id"] == st.session_state.selected_region_id].iloc[0]
+# 지도 중심 구하기
+selected_item = df[df["id"] == st.session_state.selected_region_id].iloc[0]
+map_center = [selected_item["위도"], selected_item["경도"]]
 
-# Vworld 위성 지도 (Satellite)
-m = folium.Map(
-    location=[curr_data["위도"], curr_data["경도"]],
-    zoom_start=8,
-    tiles="https://xdworld.vworld.kr/2d/Satellite/service/{z}/{x}/{y}.jpeg",
-    attr="Vworld Satellite"
-)
+m = folium.Map(location=map_center, zoom_start=8, tiles="CartoDB dark_matter")
 
-# Vworld 지명/도로망 레이어 (Hybrid)
-folium.TileLayer(
-    tiles="https://xdworld.vworld.kr/2d/Hybrid/service/{z}/{x}/{y}.png",
-    attr="Vworld Hybrid",
-    name="Hybrid",
-    overlay=True
-).add_to(m)
-
-# 마커 추가
 for _, row in filtered_df.iterrows():
-    is_sel = (row["id"] == st.session_state.selected_region_id)
-    color = "red" if row["점수"] >= 85 else ("orange" if row["점수"] >= 80 else "blue")
+    is_selected = (row["id"] == st.session_state.selected_region_id)
+    marker_color = "red" if is_selected else "blue"
     
-    popup_html = f"""
-    <div style='width:160px; font-family:sans-serif;'>
-        <b>{row['지역']}</b><br>
-        <span style='color:#e63946; font-size:12px;'>★ 숨은 지역 점수 {row['점수']}점</span><br>
-        <span style='font-size:11px; color:#555;'>대표 음식: {row['대표음식']}</span>
-    </div>
-    """
+    popup_text = f"<b>{row['지역']}</b><br>점수: {row['점수']}점"
     
     folium.Marker(
         location=[row["위도"], row["경도"]],
-        popup=folium.Popup(popup_html, max_width=200),
+        popup=popup_text,
         tooltip=row["지역"],
-        icon=folium.Icon(color="red" if is_sel else color, icon="star" if is_sel else "info-sign")
+        icon=folium.Icon(color=marker_color, icon="info-sign")
     ).add_to(m)
 
-st_folium(m, use_container_width=True, height=450, returned_objects=[])
-
-# 범례 표시
+# 범례
 st.markdown("""
 <div class="legend-container">
-    <div class="legend-item"><div class="legend-dot" style="background:#e63946;"></div> 숨은 점수 90점 이상</div>
-    <div class="legend-item"><div class="legend-dot" style="background:#f76707;"></div> 80~90점</div>
-    <div class="legend-item"><div class="legend-dot" style="background:#2f9e44;"></div> 70~80점</div>
-    <div class="legend-item"><div class="legend-dot" style="background:#1c7ed6;"></div> 60~70점</div>
-    <div class="legend-item"><div class="legend-dot" style="background:#868e96;"></div> 60점 이하</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#ff6b6b;"></div> 선택된 지역</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#339af0;"></div> 추천 지역</div>
 </div>
 """, unsafe_allow_html=True)
 
+map_data = st_folium(m, width="100%", height=400)
+
 # =========================================================
-# 7. 지역 상세 정보 카드 & 길찾기 연동
+# 7. 지역 빠른 선택 버튼 (Quick Selector)
 # =========================================================
-sec_col1, sec_col2 = st.columns([3, 1])
-with sec_col1:
-    st.markdown(f"<div class='section-title'>📍 {curr_data['지역']} 상세 정보</div>", unsafe_allow_html=True)
-with sec_col2:
-    selected_name = st.selectbox(
-        "목록으로 돌아가기",
-        df["지역"].tolist(),
-        index=df["지역"].tolist().index(curr_data["지역"]),
-        label_visibility="collapsed"
-    )
-    new_id = df[df["지역"] == selected_name].iloc[0]["id"]
-    if new_id != st.session_state.selected_region_id:
-        st.session_state.selected_region_id = new_id
+st.markdown("<p style='font-size:13px; font-weight:700; color:#a0a0a0;'>빠른 지역 선택</p>", unsafe_allow_html=True)
+cols = st.columns(len(filtered_df))
+for idx, (_, row) in enumerate(filtered_df.iterrows()):
+    btn_type = "primary" if row["id"] == st.session_state.selected_region_id else "secondary"
+    if cols[idx].button(row["지역"], key=f"region_btn_{row['id']}", type=btn_type, use_container_width=True):
+        st.session_state.selected_region_id = row["id"]
         st.rerun()
 
-# 길찾기 URL 생성
-encoded_region = urllib.parse.quote(curr_data['지역'])
-naver_navi_url = f"https://map.naver.com/v5/directions/-/-/-/nat?e={curr_data['경도']},{curr_data['위도']},{encoded_region},,,ADDRESS_POI"
-kakao_navi_url = f"https://map.kakao.com/link/to/{encoded_region},{curr_data['위도']},{curr_data['경도']}"
+# =========================================================
+# 8. 선택된 지역 상세 정보
+# =========================================================
+st.markdown(f"<div class='section-title'>📍 {selected_item['지역']} 상세 정보</div>", unsafe_allow_html=True)
 
-dc1, dc2, dc3, dc4 = st.columns([1.3, 1, 1, 1])
+col_main, col_sub1, col_sub2, col_sub3 = st.columns([1.2, 1, 1, 1])
 
-with dc1:
+# 메인 지역 카드
+with col_main:
     st.markdown(f"""
     <div class="main-region-card">
-        <span class="badge-score">숨은 점수 {curr_data['점수']}점</span>
-        <img src="{curr_data['메인이미지']}" class="main-region-img">
+        <img src="{selected_item['메인이미지']}" class="main-region-img" />
+        <div class="badge-score">점수 {selected_item['점수']}점</div>
         <div class="main-region-body">
-            <div class="main-region-desc">{curr_data['소개']}</div>
+            <h3 style="margin:0 0 8px 0; color:#fff; font-size:18px;">{selected_item['지역']}</h3>
+            <div class="main-region-desc">{selected_item['소개']}</div>
             <div class="stat-grid">
                 <div>
-                    <div class="stat-item-label">👥 인구</div>
-                    <div class="stat-item-val">{curr_data['인구']}</div>
+                    <div class="stat-item-label">인구</div>
+                    <div class="stat-item-val">{selected_item['인구']}</div>
                 </div>
                 <div>
-                    <div class="stat-item-label">📐 면적</div>
-                    <div class="stat-item-val">{curr_data['면적']}</div>
+                    <div class="stat-item-label">면적</div>
+                    <div class="stat-item-val">{selected_item['면적']}</div>
                 </div>
                 <div>
-                    <div class="stat-item-label">🍚 음식점</div>
-                    <div class="stat-item-val">{curr_data['음식점수']}</div>
+                    <div class="stat-item-label">음식점</div>
+                    <div class="stat-item-val">{selected_item['음식점수']}</div>
                 </div>
                 <div>
-                    <div class="stat-item-label">🏞️ 관광지</div>
-                    <div class="stat-item-val">{curr_data['관광지수']}</div>
+                    <div class="stat-item-label">관광지</div>
+                    <div class="stat-item-val">{selected_item['관광지수']}</div>
                 </div>
-            </div>
-            <div style="margin-top:15px; font-size:12px; font-weight:700; color:#ffffff;">🚗 길찾기</div>
-            <div class="navi-btn-container">
-                <a href="{naver_navi_url}" target="_blank" class="navi-btn-naver">네이버 지도</a>
-                <a href="{kakao_navi_url}" target="_blank" class="navi-btn-kakao">카카오맵</a>
             </div>
         </div>
     </div>
     """, unsafe_allow_html=True)
 
-with dc2:
+# 대표 음식
+with col_sub1:
     st.markdown(f"""
     <div class="sub-info-card">
-        <div class="sub-info-title">대표 음식</div>
-        <img src="{curr_data['대표음식_img']}" class="sub-info-img">
-        <div class="sub-info-name">{curr_data['대표음식']}</div>
-        <div class="sub-info-desc">{curr_data['대표음식_설명']}</div>
-        <a href="#" class="btn-more">더 알아보기</a>
+        <div class="sub-info-title">🍲 대표 음식</div>
+        <img src="{selected_item['대표음식_img']}" class="sub-info-img" />
+        <div class="sub-info-name">{selected_item['대표음식']}</div>
+        <div class="sub-info-desc">{selected_item['대표음식_설명']}</div>
     </div>
     """, unsafe_allow_html=True)
 
-with dc3:
+# 특산품
+with col_sub2:
     st.markdown(f"""
     <div class="sub-info-card">
-        <div class="sub-info-title">주요 특산품</div>
-        <img src="{curr_data['특산품_img']}" class="sub-info-img">
-        <div class="sub-info-name">{curr_data['특산품']}</div>
-        <div class="sub-info-desc">{curr_data['특산품_설명']}</div>
-        <a href="#" class="btn-more">더 알아보기</a>
+        <div class="sub-info-title">🎁 특산품</div>
+        <img src="{selected_item['특산품_img']}" class="sub-info-img" />
+        <div class="sub-info-name">{selected_item['특산품']}</div>
+        <div class="sub-info-desc">{selected_item['특산품_설명']}</div>
     </div>
     """, unsafe_allow_html=True)
 
-with dc4:
+# 축제
+with col_sub3:
     st.markdown(f"""
     <div class="sub-info-card">
-        <div class="sub-info-title">대표 축제</div>
-        <img src="{curr_data['축제_img']}" class="sub-info-img">
-        <div class="sub-info-name">{curr_data['축제']}</div>
-        <div class="sub-info-desc">{curr_data['축제_설명']}</div>
-        <a href="#" class="btn-more">더 알아보기</a>
+        <div class="sub-info-title">🎉 대표 축제</div>
+        <img src="{selected_item['축제_img']}" class="sub-info-img" />
+        <div class="sub-info-name">{selected_item['축제']}</div>
+        <div class="sub-info-desc">{selected_item['축제_설명']}</div>
     </div>
     """, unsafe_allow_html=True)
-
 
 # =========================================================
-# 7.5 [NEW] 나이대별 및 인원수별 맞춤 추천 섹션 
+# 9. 맞춤 추천 코스 (연령대별 / 인원수별) & 맛집 목록
 # =========================================================
-st.markdown("<div style='height:25px;'></div>", unsafe_allow_html=True)
+st.markdown("<div class='section-title'>🎯 맞춤 추천 코스 & 로컬 맛집</div>", unsafe_allow_html=True)
 
-col_age, col_grp = st.columns(2)
+col_rec1, col_rec2, col_food = st.columns([1, 1, 1.2])
 
-with col_age:
-    st.markdown(f"<div class='section-title' style='font-size:16px;'>👴 {curr_data['지역']} 나이대별 추천 여행지</div>", unsafe_allow_html=True)
-    st.markdown("<div style='height:8px;'></div>", unsafe_allow_html=True)
-    
-    age_20 = curr_data["나이대별_추천"]["20대"]
-    age_3040 = curr_data["나이대별_추천"]["30-40대"]
-    age_50 = curr_data["나이대별_추천"]["50대이상"]
-    
-    st.markdown(f"""
-    <div class="sub-info-card">
-        <div style="margin-bottom:12px;">
-            <span class="rec-tag tag-age">20대 추천</span>
-            <div style="font-weight:700; color:#ffffff; font-size:14px;">📍 {age_20['장소']}</div>
-            <div style="font-size:12px; color:#aaaaaa; margin-top:2px;">{age_20['설명']}</div>
-        </div>
-        <div style="border-top:1px solid #2d2d2d; padding-top:10px; margin-bottom:12px;">
-            <span class="rec-tag tag-age">30~40대 추천</span>
-            <div style="font-weight:700; color:#ffffff; font-size:14px;">📍 {age_3040['장소']}</div>
-            <div style="font-size:12px; color:#aaaaaa; margin-top:2px;">{age_3040['설명']}</div>
-        </div>
-        <div style="border-top:1px solid #2d2d2d; padding-top:10px;">
-            <span class="rec-tag tag-age">50대 이상 추천</span>
-            <div style="font-weight:700; color:#ffffff; font-size:14px;">📍 {age_50['장소']}</div>
-            <div style="font-size:12px; color:#aaaaaa; margin-top:2px;">{age_50['설명']}</div>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
-
-with col_grp:
-    st.markdown(f"<div class='section-title' style='font-size:16px;'>👥 {curr_data['지역']} 인원수별 추천 여행지</div>", unsafe_allow_html=True)
-    st.markdown("<div style='height:8px;'></div>", unsafe_allow_html=True)
-    
-    grp_1 = curr_data["인원수별_추천"]["1인 (혼행)"]
-    grp_2 = curr_data["인원수별_추천"]["2인 (커플)"]
-    grp_4 = curr_data["인원수별_추천"]["4인이상 (가족)"]
-    
-    st.markdown(f"""
-    <div class="sub-info-card">
-        <div style="margin-bottom:12px;">
-            <span class="rec-tag tag-group">1인 (혼자 여행)</span>
-            <div style="font-weight:700; color:#ffffff; font-size:14px;">📍 {grp_1['장소']}</div>
-            <div style="font-size:12px; color:#aaaaaa; margin-top:2px;">{grp_1['설명']}</div>
-        </div>
-        <div style="border-top:1px solid #2d2d2d; padding-top:10px; margin-bottom:12px;">
-            <span class="rec-tag tag-group">2인 (커플/친구)</span>
-            <div style="font-weight:700; color:#ffffff; font-size:14px;">📍 {grp_2['장소']}</div>
-            <div style="font-size:12px; color:#aaaaaa; margin-top:2px;">{grp_2['설명']}</div>
-        </div>
-        <div style="border-top:1px solid #2d2d2d; padding-top:10px;">
-            <span class="rec-tag tag-group">4인 이상 (가족 모임)</span>
-            <div style="font-weight:700; color:#ffffff; font-size:14px;">📍 {grp_4['장소']}</div>
-            <div style="font-size:12px; color:#aaaaaa; margin-top:2px;">{grp_4['설명']}</div>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
-
-
-# =========================================================
-# 8. 상세 하단 탭
-# =========================================================
-st.markdown("<div style='height:20px;'></div>", unsafe_allow_html=True)
-
-tab1, tab2, tab3, tab4, tab5 = st.tabs(["🍚 음식&맛집", "🏞️ 관광지", "🎉 축제&행사", "🎁 특산품", "💬 리뷰 (32)"])
-
-with tab1:
-    tc1, tc2 = st.columns([1, 2.5])
-    with tc1:
+with col_rec1:
+    st.markdown("<h4 style='font-size:15px; font-weight:700; color:#fff;'>👤 연령대별 추천</h4>", unsafe_allow_html=True)
+    for age, info in selected_item["나이대별_추천"].items():
         st.markdown(f"""
-        <div class="sub-info-card">
-            <div class="sub-info-title">대표 음식</div>
-            <img src="{curr_data['대표음식_img']}" style="width:100%; height:140px; object-fit:cover; border-radius:8px; margin-bottom:10px;">
-            <div class="sub-info-name">{curr_data['대표음식']}</div>
-            <div class="sub-info-desc">{curr_data['대표음식_설명']}</div>
-            <a href="#" class="btn-more">더 알아보기</a>
+        <div class="rec-card">
+            <span class="rec-tag tag-age">{age}</span>
+            <div style="font-weight:700; color:#fff; font-size:13px;">{info['장소']}</div>
+            <div style="color:#a0a0a0; font-size:11px; margin-top:3px;">{info['설명']}</div>
         </div>
         """, unsafe_allow_html=True)
-    
-    with tc2:
-        st.markdown("<div class='sub-info-title' style='margin-bottom:10px;'>추천 맛집</div>", unsafe_allow_html=True)
-        rc1, rc2, rc3 = st.columns(3)
+
+with col_rec2:
+    st.markdown("<h4 style='font-size:15px; font-weight:700; color:#fff;'>👥 동반 인원수별 추천</h4>", unsafe_allow_html=True)
+    for group, info in selected_item["인원수별_추천"].items():
+        st.markdown(f"""
+        <div class="rec-card">
+            <span class="rec-tag tag-group">{group}</span>
+            <div style="font-weight:700; color:#fff; font-size:13px;">{info['장소']}</div>
+            <div style="color:#a0a0a0; font-size:11px; margin-top:3px;">{info['설명']}</div>
+        </div>
+        """, unsafe_allow_html=True)
+
+with col_food:
+    st.markdown("<h4 style='font-size:15px; font-weight:700; color:#fff;'>🍽️ 추천 맛집</h4>", unsafe_allow_html=True)
+    for store in selected_item["맛집목록"]:
+        query_str = urllib.parse.quote(f"{selected_item['지역']} {store['이름']}")
+        naver_url = f"https://map.naver.com/v5/search/{query_str}"
+        kakao_url = f"https://map.kakao.com/?q={query_str}"
         
-        for idx, res in enumerate(curr_data["맛집목록"]):
-            target_col = [rc1, rc2, rc3][idx % 3]
-            encoded_res_name = urllib.parse.quote(res['이름'])
-            res_naver_url = f"https://map.naver.com/v5/search/{encoded_res_name}"
-            
-            with target_col:
-                st.markdown(f"""
-                <div class="place-card">
-                    <img src="{res['img']}" class="place-img">
-                    <div>
-                        <div class="place-name">{res['이름']}</div>
-                        <div class="place-star">{res['평점']}</div>
-                        <div class="place-addr">📍 {res['주소']}</div>
-                        <a href="{res_naver_url}" target="_blank" style="font-size:11px; color:#339af0; text-decoration:none; display:inline-block; margin-top:4px;">네이버 지도 보기 ></a>
-                    </div>
-                </div>
-                """, unsafe_allow_html=True)
-
-with tab2:
-    st.markdown(f"<h4 style='color:#ffffff;'>🏞️ {curr_data['지역']} 주요 맞춤 관광지</h4>", unsafe_allow_html=True)
-    
-    t2_col1, t2_col2 = st.columns(2)
-    with t2_col1:
         st.markdown(f"""
-        <div class="sub-info-card">
-            <div class="sub-info-title">👨‍👩‍👧‍👦 테마별 관광지 코스</div>
-            <p style="font-size:13px; color:#cccccc;">
-                • <b>20대 선호:</b> {curr_data['나이대별_추천']['20대']['장소']}<br>
-                • <b>3040대 선호:</b> {curr_data['나이대별_추천']['30-40대']['장소']}<br>
-                • <b>50대+ 선호:</b> {curr_data['나이대별_추천']['50대이상']['장소']}
-            </p>
-        </div>
-        """, unsafe_allow_html=True)
-    with t2_col2:
-        st.markdown(f"""
-        <div class="sub-info-card">
-            <div class="sub-info-title">🚗 인원 규모별 동선 추천</div>
-            <p style="font-size:13px; color:#cccccc;">
-                • <b>1인 (혼행):</b> {curr_data['인원수별_추천']['1인 (혼행)']['장소']}<br>
-                • <b>2인 (커플):</b> {curr_data['인원수별_추천']['2인 (커플)']['장소']}<br>
-                • <b>4인+ (가족):</b> {curr_data['인원수별_추천']['4인이상 (가족)']['장소']}
-            </p>
-        </div>
-        """, unsafe_allow_html=True)
-
-with tab3:
-    st.info(f"{curr_data['지역']}의 주요 축제 및 행사 정보 페이지입니다.")
-
-with tab4:
-    st.info(f"{curr_data['지역']}의 주요 특산품 정보 페이지입니다.")
-
-with tab5:
-    st.markdown("<div style='display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;'><span style='font-size:14px; font-weight:700; color:#ffffff;'>실제 방문객 리뷰</span><a href='#' style='font-size:12px; color:#339af0;'>전체 리뷰 보기 ></a></div>", unsafe_allow_html=True)
-    
-    rev_c1, rev_c2, rev_c3, rev_c4 = st.columns(4)
-    
-    reviews = [
-        {"user": "여행매니아", "date": "2024.05.12", "text": "전통시장과 먹거리가 정말 알차서 가족 여행으로 최고였습니다!", "img1": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=300&q=80", "img2": "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=300&q=80"},
-        {"user": "로컬탐험가", "date": "2024.05.08", "text": "조용하고 힐링하기 딱 좋은 곳이에요. 현지인 추천 맛집이 정말 훌륭했습니다.", "img1": "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=300&q=80", "img2": "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=300&q=80"},
-        {"user": "맛따라길따라", "date": "2024.04.29", "text": "지역 특산물 요리가 별미네요. 주말 여행지로 강추합니다!", "img1": "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=300&q=80", "img2": "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=300&q=80"},
-        {"user": "힐링캠퍼", "date": "2024.04.15", "text": "자연 경관이 정말 수려하고 공기가 좋아요. 또 방문하고 싶습니다.", "img1": "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=300&q=80", "img2": "https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=300&q=80"}
-    ]
-    
-    rev_cols = [rev_c1, rev_c2, rev_c3, rev_c4]
-    
-    for idx, rev in enumerate(reviews):
-        with rev_cols[idx]:
-            st.markdown(f"""
-            <div class="review-card">
-                <div class="review-header">
-                    <div class="review-user">
-                        <div class="review-avatar">👤</div>
-                        <div>
-                            <div class="review-username">{rev['user']}</div>
-                            <div class="review-date">{rev['date']}</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="review-text">{rev['text']}</div>
-                <div class="review-imgs">
-                    <img src="{rev['img1']}" class="review-img">
-                    <img src="{rev['img2']}" class="review-img">
+        <div class="place-card">
+            <img src="{store['img']}" class="place-img" />
+            <div style="flex:1;">
+                <div class="place-name">{store['이름']}</div>
+                <div class="place-star">{store['평점']}</div>
+                <div class="place-addr">{store['주소']}</div>
+                <div class="navi-btn-container">
+                    <a href="{naver_url}" target="_blank" class="navi-btn-naver">네이버 지도</a>
+                    <a href="{kakao_url}" target="_blank" class="navi-btn-kakao">카카오 맵</a>
                 </div>
             </div>
-            """, unsafe_allow_html=True)
+        </div>
+        """, unsafe_allow_html=True)
