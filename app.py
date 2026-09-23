@@ -680,8 +680,8 @@ else:
 st.markdown(
     """
     <div class="main-title">
-        <h1>📍 숨은 로컬 발견</h1>
-        <p>데이터로 발견하는 대한민국의 숨은 지역과 로컬 미식 여행</p>
+        <h1>🚗우리끼리 맵</h1>
+        <p>지도로 찾는 숨은 보물! SGIS 기반 맞춤형 여행 코스 추천</p>
     </div>
     """,
     unsafe_allow_html=True,
