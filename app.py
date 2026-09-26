@@ -1960,139 +1960,295 @@ if row is not None:
         # 교통수단 & 예상 소요시간
         # =====================================================
 
-        st.markdown("#### 🚗 교통수단 & 예상 소요시간")
+        with st.expander(
+            "🚗 교통수단 & 예상 소요시간",
+            expanded=True
+        ):
 
-        if departure_location:
-
-            st.caption(
-                f"📍 {departure_location} → {row['지역']}"
-            )
-
-            # 주요 지역 좌표
-            departure_coords = {
-                "서울": (37.5665, 126.9780),
-                "서울특별시": (37.5665, 126.9780),
-                "인천": (37.4563, 126.7052),
-                "인천광역시": (37.4563, 126.7052),
-                "대전": (36.3504, 127.3845),
-                "대전광역시": (36.3504, 127.3845),
-                "대구": (35.8714, 128.6014),
-                "대구광역시": (35.8714, 128.6014),
-                "광주": (35.1595, 126.8526),
-                "광주광역시": (35.1595, 126.8526),
-                "부산": (35.1796, 129.0756),
-                "부산광역시": (35.1796, 129.0756),
-                "울산": (35.5384, 129.3114),
-                "울산광역시": (35.5384, 129.3114),
-                "세종": (36.4800, 127.2890),
-                "세종특별자치시": (36.4800, 127.2890),
-                "제주": (33.4996, 126.5312),
-                "제주특별자치도": (33.4996, 126.5312),
-            }
-
-            departure_coord = None
-
-            for location_name, coord in departure_coords.items():
-                if location_name in departure_location:
-                    departure_coord = coord
-                    break
-
-            if departure_coord:
-
-                from math import radians, sin, cos, sqrt, atan2
-
-                lat1, lon1 = departure_coord
-                lat2 = row["위도"]
-                lon2 = row["경도"]
-
-                R = 6371
-
-                dlat = radians(lat2 - lat1)
-                dlon = radians(lon2 - lon1)
-
-                a = (
-                    sin(dlat / 2) ** 2
-                    + cos(radians(lat1))
-                    * cos(radians(lat2))
-                    * sin(dlon / 2) ** 2
-                )
-
-                c = 2 * atan2(
-                    sqrt(a),
-                    sqrt(1 - a)
-                )
-
-                distance_km = R * c
-                road_distance = distance_km * 1.25
-
-                car_minutes = max(
-                    int((road_distance / 55) * 60),
-                    20
-                )
-
-                bus_minutes = max(
-                    int((road_distance / 45) * 60),
-                    30
-                )
-
-                train_minutes = max(
-                    int((road_distance / 100) * 60),
-                    40
-                )
-
-                flight_minutes = max(
-                    int((road_distance / 550) * 60),
-                    60
-                )
-
-                st.write("")
-
-                transport_col1, transport_col2 = st.columns(2)
-
-                with transport_col1:
-                    st.metric(
-                        "🚗 자가용",
-                        f"약 {car_minutes}분"
-                    )
-
-                with transport_col2:
-                    st.metric(
-                        "🚌 고속버스",
-                        f"약 {bus_minutes}분"
-                    )
-
-                transport_col3, transport_col4 = st.columns(2)
-
-                with transport_col3:
-                    st.metric(
-                        "🚆 기차",
-                        f"약 {train_minutes}분"
-                    )
-
-                with transport_col4:
-                    st.metric(
-                        "✈️ 비행기",
-                        f"약 {flight_minutes}분+"
-                    )
+            if departure_location:
 
                 st.caption(
-                    f"예상 이동거리 약 {road_distance:.0f}km · "
-                    "교통상황과 환승 등에 따라 실제 시간은 달라질 수 있습니다."
+                    f"📍 {departure_location} → {row['지역']}"
                 )
+
+                departure_coords = {
+                    "서울": (37.5665, 126.9780),
+                    "서울특별시": (37.5665, 126.9780),
+                    "인천": (37.4563, 126.7052),
+                    "인천광역시": (37.4563, 126.7052),
+                    "대전": (36.3504, 127.3845),
+                    "대전광역시": (36.3504, 127.3845),
+                    "대구": (35.8714, 128.6014),
+                    "대구광역시": (35.8714, 128.6014),
+                    "광주": (35.1595, 126.8526),
+                    "광주광역시": (35.1595, 126.8526),
+                    "부산": (35.1796, 129.0756),
+                    "부산광역시": (35.1796, 129.0756),
+                    "울산": (35.5384, 129.3114),
+                    "울산광역시": (35.5384, 129.3114),
+                    "세종": (36.4800, 127.2890),
+                    "세종특별자치시": (36.4800, 127.2890),
+                    "제주": (33.4996, 126.5312),
+                    "제주특별자치도": (33.4996, 126.5312),
+                }
+
+                departure_coord = None
+
+                for location_name, coord in departure_coords.items():
+                    if location_name in departure_location:
+                        departure_coord = coord
+                        break
+
+                if departure_coord:
+
+                    from math import radians, sin, cos, sqrt, atan2
+
+                    lat1, lon1 = departure_coord
+                    lat2 = row["위도"]
+                    lon2 = row["경도"]
+
+                    R = 6371
+
+                    dlat = radians(lat2 - lat1)
+                    dlon = radians(lon2 - lon1)
+
+                    a = (
+                        sin(dlat / 2) ** 2
+                        + cos(radians(lat1))
+                        * cos(radians(lat2))
+                        * sin(dlon / 2) ** 2
+                    )
+
+                    c = 2 * atan2(
+                        sqrt(a),
+                        sqrt(1 - a)
+                    )
+
+                    distance_km = R * c
+                    road_distance = distance_km * 1.25
+
+                    car_minutes = max(
+                        int((road_distance / 55) * 60),
+                        20
+                    )
+
+                    bus_minutes = max(
+                        int((road_distance / 45) * 60),
+                        30
+                    )
+
+                    train_minutes = max(
+                        int((road_distance / 100) * 60),
+                        40
+                    )
+
+                    flight_minutes = max(
+                        int((road_distance / 550) * 60),
+                        60
+                    )
+
+                    # -------------------------------------------------
+                    # 교통수단별 시간
+                    # -------------------------------------------------
+
+                    st.markdown("##### ⏱️ 예상 소요시간")
+
+                    time_col1, time_col2 = st.columns(2)
+
+                    with time_col1:
+                        st.metric(
+                            "🚗 자가용",
+                            f"약 {car_minutes}분"
+                        )
+
+                    with time_col2:
+                        st.metric(
+                            "🚌 고속버스",
+                            f"약 {bus_minutes}분"
+                        )
+
+                    time_col3, time_col4 = st.columns(2)
+
+                    with time_col3:
+                        st.metric(
+                            "🚆 기차",
+                            f"약 {train_minutes}분"
+                        )
+
+                    with time_col4:
+                        st.metric(
+                            "✈️ 비행기",
+                            f"약 {flight_minutes}분+"
+                        )
+
+                    st.caption(
+                        f"📏 예상 이동거리 약 {road_distance:.0f}km"
+                    )
+
+                    st.divider()
+
+                    # -------------------------------------------------
+                    # 핵심 이동방법
+                    # -------------------------------------------------
+
+                    st.markdown("##### 🧭 어떻게 가면 될까요?")
+
+                    # 지역별 대표 교통 거점
+                    transport_info = {
+
+                        "강원특별자치도 정선군": {
+                            "bus": "서울 남부터미널 → 정선버스터미널",
+                            "train": "청량리역 → 정선역",
+                            "flight": "김포공항 → 양양공항 → 차량 이동",
+                        },
+
+                        "전라남도 구례군": {
+                            "bus": "서울 센트럴시티 → 구례공영버스터미널",
+                            "train": "용산역 → 구례구역 → 차량 이동",
+                            "flight": "김포공항 → 광주공항 → 차량 이동",
+                        },
+
+                        "경상남도 의령군": {
+                            "bus": "서울 남부터미널 → 의령버스터미널",
+                            "train": "서울역 → 진주역 → 차량 이동",
+                            "flight": "김포공항 → 사천공항 → 차량 이동",
+                        },
+
+                        "전북특별자치도 무주군": {
+                            "bus": "서울 남부터미널 → 무주공용버스터미널",
+                            "train": "대전역 → 영동역 → 차량 이동",
+                            "flight": "김포공항 → 청주공항 → 차량 이동",
+                        },
+
+                        "충청북도 단양군": {
+                            "bus": "동서울터미널 → 단양버스터미널",
+                            "train": "청량리역 → 단양역",
+                            "flight": "김포공항 → 원주공항 → 차량 이동",
+                        },
+
+                        "경상북도 영양군": {
+                            "bus": "동서울터미널 → 영양버스터미널",
+                            "train": "청량리역 → 안동역 → 차량 이동",
+                            "flight": "김포공항 → 대구공항 → 차량 이동",
+                        },
+
+                        "경상북도 청송군": {
+                            "bus": "동서울터미널 → 청송버스터미널",
+                            "train": "청량리역 → 안동역 → 차량 이동",
+                            "flight": "김포공항 → 대구공항 → 차량 이동",
+                        },
+
+                        "충청남도 태안군": {
+                            "bus": "센트럴시티 → 태안버스터미널",
+                            "train": "용산역 → 홍성역 → 차량 이동",
+                            "flight": "김포공항 → 청주공항 → 차량 이동",
+                        },
+
+                        "전라남도 고흥군": {
+                            "bus": "센트럴시티 → 고흥버스터미널",
+                            "train": "용산역 → 순천역 → 차량 이동",
+                            "flight": "김포공항 → 여수공항 → 차량 이동",
+                        },
+
+                        "경상북도 울릉군": {
+                            "bus": "서울 → 포항 이동 → 포항여객선터미널",
+                            "train": "서울역 → 포항역 → 포항여객선터미널",
+                            "flight": "김포공항 → 포항경주공항 → 차량 이동",
+                        },
+                    }
+
+                    info = transport_info.get(
+                        row["지역"],
+                        {
+                            "bus": "출발지 → 해당 지역 버스터미널",
+                            "train": "출발지 → 인근 기차역 → 차량 이동",
+                            "flight": "출발지 → 인근 공항 → 차량 이동",
+                        }
+                    )
+
+                    # -------------------------------------------------
+                    # 자가용
+                    # -------------------------------------------------
+
+                    st.markdown("**🚗 자가용**")
+
+                    st.write(
+                        f"📍 {departure_location} "
+                        f"→ {row['지역']}"
+                    )
+
+                    st.caption(
+                        f"약 {car_minutes}분 · "
+                        f"예상 {road_distance:.0f}km"
+                    )
+
+                    # -------------------------------------------------
+                    # 고속버스
+                    # -------------------------------------------------
+
+                    st.markdown("**🚌 고속버스**")
+
+                    st.write(
+                        f"🚌 {info['bus']}"
+                    )
+
+                    st.caption(
+                        f"터미널 이동 및 환승 시간을 포함하면 "
+                        f"약 {bus_minutes}분 이상 예상"
+                    )
+
+                    # -------------------------------------------------
+                    # 기차
+                    # -------------------------------------------------
+
+                    st.markdown("**🚆 기차**")
+
+                    st.write(
+                        f"🚆 {info['train']}"
+                    )
+
+                    st.caption(
+                        f"역 이동 및 환승을 포함하면 "
+                        f"약 {train_minutes}분 이상 예상"
+                    )
+
+                    # -------------------------------------------------
+                    # 비행기
+                    # -------------------------------------------------
+
+                    st.markdown("**✈️ 비행기**")
+
+                    st.write(
+                        f"✈️ {info['flight']}"
+                    )
+
+                    st.caption(
+                        f"공항 이동·탑승수속 등을 고려하면 "
+                        f"약 {flight_minutes}분 이상 예상"
+                    )
+
+                    st.divider()
+
+                    st.info(
+                        "💡 실제 소요시간은 출발 시간, 교통상황, "
+                        "환승 및 운항 일정에 따라 달라질 수 있습니다."
+                    )
+
+                else:
+
+                    st.info(
+                        "📍 현재는 서울·인천·대전·대구·광주·부산·"
+                        "울산·세종·제주 등 주요 도시를 기준으로 "
+                        "예상 이동시간을 계산할 수 있습니다."
+                    )
 
             else:
 
                 st.info(
-                    "📍 현재는 주요 도시를 기준으로 "
-                    "예상 소요시간을 계산할 수 있습니다."
+                    "📍 사이드바에서 출발 위치를 입력하면 "
+                    "추천 지역까지의 이동방법과 "
+                    "교통수단별 예상 소요시간을 확인할 수 있습니다."
                 )
-
-        else:
-
-            st.info(
-                "📍 사이드바에서 출발 위치를 입력하면 "
-                "추천 지역까지의 교통수단별 예상 소요시간이 표시됩니다."
-            )
         # -------------------------------------------------
         # 추천 일정
         # -------------------------------------------------
