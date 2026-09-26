@@ -32,7 +32,6 @@ defaults = {
     "sort_type": "점수순",
     "keyword": "",
     "selected_region": "강원특별자치도 정선군",
-    "selected_day": 1,
 }
 
 for key, value in defaults.items():
@@ -56,6 +55,10 @@ st.markdown(
         background: #101916;
         color: #f1f5f3;
     }
+
+    /* =========================================================
+       상단 로컬 쉼표 작은 제목
+       ========================================================= */
 
     .top-logo {
         font-size: 22px;
@@ -170,6 +173,7 @@ st.markdown(
         border: 1px solid #527b62;
     }
 
+    [data-testid="stSidebar"] .stSlider,
     [data-testid="stSidebar"] .stSelectbox,
     [data-testid="stSidebar"] .stTextInput {
         background: #20352a;
@@ -218,7 +222,7 @@ st.markdown(
     }
 
     /* =========================================================
-       지도 + 코스
+       지도 + 코스 영역
        ========================================================= */
 
     .map-course-title {
@@ -255,84 +259,48 @@ st.markdown(
         font-size: 13px;
     }
 
-    /* =========================================================
-       일정 카드
-       ========================================================= */
-
-    .day-guide {
-        color: #9eb6a7;
-        font-size: 12px;
-        margin-top: -5px;
-        margin-bottom: 10px;
-    }
-
-    .schedule-card {
+    .course-day {
         background: #20352a;
         border: 1px solid #3a5949;
         border-radius: 14px;
-        padding: 13px 14px;
-        margin-bottom: 9px;
+        padding: 14px;
+        margin-bottom: 10px;
     }
 
-    .schedule-time {
-        color: #8bd3a8;
-        font-size: 11px;
+    .course-day-title {
+        color: #9fe0b6;
         font-weight: 800;
-        margin-bottom: 3px;
-    }
-
-    .schedule-title {
-        color: #ffffff;
-        font-size: 14px;
-        font-weight: 800;
-        line-height: 1.4;
-    }
-
-    .schedule-desc {
-        color: #a9c0b2;
-        font-size: 11px;
-        margin-top: 4px;
-        line-height: 1.45;
-    }
-
-    .course-tip {
-        background: #1b2b24;
-        border: 1px solid #355143;
-        border-radius: 12px;
-        padding: 10px 12px;
-        color: #c5d9cd;
-        font-size: 12px;
-        line-height: 1.5;
+        font-size: 15px;
         margin-bottom: 8px;
     }
 
-    /* =========================================================
-       지도 높이
-       ========================================================= */
-
-    [data-testid="stElementContainer"]:has(iframe[title="streamlit_folium.st_folium"]) {
-        margin-bottom: 0;
+    .course-line {
+        color: #d8e8de;
+        font-size: 13px;
+        line-height: 1.65;
+        margin: 3px 0;
     }
 
-    /* Streamlit 탭 */
-    .stTabs [data-baseweb="tab-list"] {
-        gap: 6px;
-        background: transparent;
-    }
-
-    .stTabs [data-baseweb="tab"] {
-        background: #20352a;
-        border: 1px solid #3a5949;
-        border-radius: 10px;
-        padding: 7px 13px;
+    .course-info {
         color: #a9c0b2;
-        font-weight: 700;
+        font-size: 12px;
+        line-height: 1.6;
+        margin-top: 10px;
     }
 
-    .stTabs [aria-selected="true"] {
-        background: #315d46 !important;
-        color: #ffffff !important;
-        border-color: #527b62 !important;
+    .course-mini-tag {
+        display: inline-block;
+        background: #294c3b;
+        border: 1px solid #47745b;
+        color: #d5eddf;
+        border-radius: 999px;
+        padding: 4px 8px;
+        margin: 2px;
+        font-size: 11px;
+    }
+
+    .nav-button {
+        margin-top: 10px;
     }
     </style>
     """,
@@ -730,7 +698,6 @@ IMAGE_DATA = {
 # 이미지 카드
 # =========================================================
 def render_image_card(title, image_url, description):
-
     safe_title = html.escape(str(title))
     safe_desc = html.escape(str(description))
     safe_url = html.escape(str(image_url))
@@ -755,13 +722,8 @@ def render_image_card(title, image_url, description):
 # 점수 계산
 # =========================================================
 def calculate_hidden_score(row):
-
     hidden_score = 100 - row["관광인지도"]
-
-    population_score = min(
-        abs(row["인구변화율"]) * 5,
-        20
-    )
+    population_score = min(abs(row["인구변화율"]) * 5, 20)
 
     return round(
         hidden_score * 0.4
@@ -773,7 +735,6 @@ def calculate_hidden_score(row):
 
 
 def make_tags(items):
-
     return " ".join(
         f'<span class="tag">{html.escape(str(item))}</span>'
         for item in items
@@ -784,11 +745,7 @@ def make_tags(items):
 # 데이터 생성
 # =========================================================
 df = pd.DataFrame(load_data())
-
-df["숨은지역점수"] = df.apply(
-    calculate_hidden_score,
-    axis=1
-)
+df["숨은지역점수"] = df.apply(calculate_hidden_score, axis=1)
 
 
 # =========================================================
@@ -796,10 +753,15 @@ df["숨은지역점수"] = df.apply(
 # =========================================================
 with st.sidebar:
 
+    # =====================================================
+    # 나만의 로컬 여행 찾기
+    # =====================================================
+
     st.markdown(
         '<div class="filter-heading">🧭 나만의 로컬 여행 찾기</div>',
         unsafe_allow_html=True
     )
+
 
     # =====================================================
     # 로컬 행사 광고
@@ -979,8 +941,11 @@ with st.sidebar:
 
             <div class="ad-container">
 
+                <!-- 행사 1 -->
                 <div class="ad-slide active">
+
                     <div class="ad-card">
+
                         <div class="ad-badge">
                             지금 떠나기 좋은 행사
                         </div>
@@ -1000,11 +965,15 @@ with st.sidebar:
                         <div class="ad-description">
                             정선의 전통문화와 아리랑을 만나보세요.
                         </div>
+
                     </div>
+
                 </div>
 
 
+                <!-- 행사 2 -->
                 <div class="ad-slide">
+
                     <div class="ad-card">
 
                         <div class="ad-badge">
@@ -1028,9 +997,11 @@ with st.sidebar:
                         </div>
 
                     </div>
+
                 </div>
 
 
+                <!-- 행사 3 -->
                 <div class="ad-slide">
 
                     <div class="ad-card">
@@ -1056,9 +1027,11 @@ with st.sidebar:
                         </div>
 
                     </div>
+
                 </div>
 
 
+                <!-- 행사 4 -->
                 <div class="ad-slide">
 
                     <div class="ad-card">
@@ -1084,9 +1057,11 @@ with st.sidebar:
                         </div>
 
                     </div>
+
                 </div>
 
 
+                <!-- 하단 광고 위치 표시 -->
                 <div class="ad-dots">
 
                     <span class="dot active"></span>
@@ -1132,6 +1107,9 @@ with st.sidebar:
                 }
 
 
+                /*
+                 * 3초마다 다음 행사로 변경
+                 */
                 setInterval(
                     showNextSlide,
                     3000
@@ -1147,13 +1125,17 @@ with st.sidebar:
     )
 
 
+    # =====================================================
+    # 설명
+    # =====================================================
+
     st.caption(
         "여행 취향을 선택하면 추천 지역과 코스가 달라집니다."
     )
 
 
     # =====================================================
-    # 필터
+    # 기존 필터
     # =====================================================
 
     st.selectbox(
@@ -1345,9 +1327,7 @@ if st.session_state.food_type != "전체":
         ],
     }
 
-    keys = food_keywords[
-        st.session_state.food_type
-    ]
+    keys = food_keywords[st.session_state.food_type]
 
     filtered_df = filtered_df[
         filtered_df["대표음식"].apply(
@@ -1366,8 +1346,7 @@ if st.session_state.travel_duration != "전체":
 
     filtered_df = filtered_df[
         filtered_df["추천기간"].apply(
-            lambda x:
-                st.session_state.travel_duration in x
+            lambda x: st.session_state.travel_duration in x
         )
     ]
 
@@ -1379,8 +1358,7 @@ if st.session_state.travel_theme != "전체":
 
     filtered_df = filtered_df[
         filtered_df["여행테마"].apply(
-            lambda x:
-                st.session_state.travel_theme in x
+            lambda x: st.session_state.travel_theme in x
         )
     ]
 
@@ -1440,74 +1418,51 @@ with m1:
     st.markdown(
         f"""
         <div class="metric-card">
-            <div class="metric-label">
-                여행 인원
-            </div>
-
+            <div class="metric-label">여행 인원</div>
             <div class="metric-value">
-                {html.escape(
-                    st.session_state.group_size
-                )}
+                {html.escape(st.session_state.group_size)}
             </div>
         </div>
         """,
         unsafe_allow_html=True,
     )
-
 
 with m2:
 
     st.markdown(
         f"""
         <div class="metric-card">
-            <div class="metric-label">
-                선호 나이대
-            </div>
-
+            <div class="metric-label">선호 나이대</div>
             <div class="metric-value">
-                {html.escape(
-                    st.session_state.age_group
-                )}
+                {html.escape(st.session_state.age_group)}
             </div>
         </div>
         """,
         unsafe_allow_html=True,
     )
-
 
 with m3:
 
     st.markdown(
         f"""
         <div class="metric-card">
-            <div class="metric-label">
-                선택 여행 기간
-            </div>
-
+            <div class="metric-label">선택 여행 기간</div>
             <div class="metric-value">
-                {html.escape(
-                    st.session_state.travel_duration
-                )}
+                {html.escape(st.session_state.travel_duration)}
             </div>
         </div>
         """,
         unsafe_allow_html=True,
     )
 
-
 with m4:
 
     st.markdown(
         f"""
         <div class="metric-card">
-            <div class="metric-label">
-                선택 여행 테마
-            </div>
-
+            <div class="metric-label">선택 여행 테마</div>
             <div class="metric-value">
-                {html.escape(
-                    st.session_state.travel_theme
-                )}
+                {html.escape(st.session_state.travel_theme)}
             </div>
         </div>
         """,
@@ -1533,10 +1488,7 @@ if filtered_df.empty:
 # =========================================================
 region_names = filtered_df["지역"].tolist()
 
-if (
-    st.session_state.selected_region
-    not in region_names
-):
+if st.session_state.selected_region not in region_names:
 
     st.session_state.selected_region = region_names[0]
 
@@ -1551,7 +1503,6 @@ selected_region = st.selectbox(
 )
 
 st.session_state.selected_region = selected_region
-
 
 row = filtered_df[
     filtered_df["지역"] == selected_region
@@ -1571,26 +1522,17 @@ duration_days = {
 selected_duration = st.session_state.travel_duration
 
 if selected_duration == "전체":
-
     selected_duration = row["추천기간"][0]
-
 
 days = duration_days.get(
     selected_duration,
     1,
 )
 
+
 theme = st.session_state.travel_theme
 group = st.session_state.group_size
 age = st.session_state.age_group
-
-
-# =========================================================
-# DAY 선택값 보정
-# =========================================================
-if st.session_state.selected_day > days:
-
-    st.session_state.selected_day = 1
 
 
 # =========================================================
@@ -1611,7 +1553,6 @@ elif theme == "맛집·미식":
     first_activity = (
         f"{row['음식점']}에서 대표 음식 즐기기"
     )
-
     second_activity = (
         f"{row['대표음식']} 관련 로컬 먹거리 탐방"
     )
@@ -1621,40 +1562,24 @@ elif theme == "축제·행사":
     first_activity = (
         f"{row['지역행사']} 관련 장소 방문"
     )
-
-    second_activity = (
-        "지역 행사장 주변 산책 및 체험"
-    )
+    second_activity = "지역 행사장 주변 산책 및 체험"
 
 elif theme == "사진 명소":
 
     first_activity = (
         f"{row['관광지']}에서 사진 촬영"
     )
-
-    second_activity = (
-        "노을·전망·자연 풍경 감상"
-    )
+    second_activity = "노을·전망·자연 풍경 감상"
 
 elif theme == "가족 여행":
 
-    first_activity = (
-        "가족 단위로 이동하기 좋은 관광지 방문"
-    )
-
-    second_activity = (
-        "무리 없는 산책과 지역 먹거리 체험"
-    )
+    first_activity = "가족 단위로 이동하기 좋은 관광지 방문"
+    second_activity = "무리 없는 산책과 지역 먹거리 체험"
 
 else:
 
-    first_activity = (
-        f"{row['관광지']} 방문"
-    )
-
-    second_activity = (
-        "주변 자연 경관과 로컬 공간 탐방"
-    )
+    first_activity = f"{row['관광지']} 방문"
+    second_activity = "주변 자연 경관과 로컬 공간 탐방"
 
 
 # =========================================================
@@ -1662,33 +1587,23 @@ else:
 # =========================================================
 if group == "1인 (혼행)":
 
-    group_tip = (
-        "혼자 이동하기 편하도록 주요 명소 중심"
-    )
+    group_tip = "혼자 이동하기 편하도록 주요 명소 중심"
 
 elif group == "2인 (커플/친구)":
 
-    group_tip = (
-        "사진 명소와 여유로운 식사 중심"
-    )
+    group_tip = "사진 명소와 여유로운 식사 중심"
 
 elif group == "3인":
 
-    group_tip = (
-        "관광·식사·휴식의 균형 중심"
-    )
+    group_tip = "관광·식사·휴식의 균형 중심"
 
 elif group == "4인 이상 (가족)":
 
-    group_tip = (
-        "이동 부담을 줄이고 가족 체험 중심"
-    )
+    group_tip = "이동 부담을 줄이고 가족 체험 중심"
 
 else:
 
-    group_tip = (
-        "다양한 여행객이 이용할 수 있는 기본 코스"
-    )
+    group_tip = "다양한 여행객이 이용할 수 있는 기본 코스"
 
 
 # =========================================================
@@ -1704,21 +1619,15 @@ elif age == "20대":
 
 elif age == "30~40대":
 
-    age_tip = (
-        "관광·식사·휴식이 균형 잡힌 구성"
-    )
+    age_tip = "관광·식사·휴식이 균형 잡힌 구성"
 
 elif age == "50대 이상":
 
-    age_tip = (
-        "무리 없는 이동과 자연·문화 중심"
-    )
+    age_tip = "무리 없는 이동과 자연·문화 중심"
 
 else:
 
-    age_tip = (
-        "일반적인 관광·식사·휴식 중심"
-    )
+    age_tip = "일반적인 관광·식사·휴식 중심"
 
 
 # =========================================================
@@ -1733,28 +1642,20 @@ for day in range(1, days + 1):
         daily_plan.append(
             {
                 "day": day,
-
-                "morning_time": "09:30",
-                "morning_title": first_activity,
-                "morning_desc":
-                    "여행지의 대표적인 로컬 명소부터 가볍게 시작",
-
-                "lunch_time": "12:30",
-                "lunch_title":
-                    f"{row['음식점']} / {row['대표음식']}",
-                "lunch_desc":
-                    "지역 대표 먹거리로 점심 식사",
-
-                "afternoon_time": "14:00",
-                "afternoon_title": second_activity,
-                "afternoon_desc":
-                    "지역의 자연·문화·볼거리 탐방",
-
-                "evening_time": "17:30",
-                "evening_title":
-                    f"{row['지역']} 로컬 거리 또는 시장 산책",
-                "evening_desc":
-                    "여유롭게 주변을 둘러보며 하루 마무리",
+                "morning": (
+                    f"09:30 · {first_activity}"
+                ),
+                "lunch": (
+                    f"12:30 · {row['음식점']} / "
+                    f"{row['대표음식']}"
+                ),
+                "afternoon": (
+                    f"14:00 · {second_activity}"
+                ),
+                "evening": (
+                    f"17:30 · {row['지역']} "
+                    f"로컬 거리 또는 시장 산책"
+                ),
             }
         )
 
@@ -1763,30 +1664,21 @@ for day in range(1, days + 1):
         daily_plan.append(
             {
                 "day": day,
-
-                "morning_time": "09:30",
-                "morning_title":
-                    f"{row['특산품']} 알아보기 및 기념품 구입",
-                "morning_desc":
-                    "지역 특산품을 둘러보며 마지막 여행 준비",
-
-                "lunch_time": "12:00",
-                "lunch_title":
-                    f"{row['대표음식']} 중심의 지역 식사",
-                "lunch_desc":
-                    "여행 마지막 로컬 음식 즐기기",
-
-                "afternoon_time": "14:00",
-                "afternoon_title":
-                    f"{row['관광지']} 중 남은 장소 탐방",
-                "afternoon_desc":
-                    "시간에 맞춰 원하는 장소를 선택해 방문",
-
-                "evening_time": "16:30",
-                "evening_title":
-                    "여행 정리 및 귀가",
-                "evening_desc":
-                    "여행 기록을 남기고 귀가",
+                "morning": (
+                    f"09:30 · {row['특산품']} "
+                    f"알아보기 및 기념품 구입"
+                ),
+                "lunch": (
+                    f"12:00 · {row['대표음식']} "
+                    f"중심의 지역 식사"
+                ),
+                "afternoon": (
+                    f"14:00 · {row['관광지']} 중 "
+                    f"방문하지 못한 장소 탐방"
+                ),
+                "evening": (
+                    "16:30 · 여행 정리 및 귀가"
+                ),
             }
         )
 
@@ -1795,30 +1687,22 @@ for day in range(1, days + 1):
         daily_plan.append(
             {
                 "day": day,
-
-                "morning_time": "09:30",
-                "morning_title":
-                    f"{row['관광지']} 주변 산책 및 자유 일정",
-                "morning_desc":
-                    "관광지 주변을 여유롭게 둘러보기",
-
-                "lunch_time": "12:30",
-                "lunch_title":
-                    f"{row['음식점']} 또는 인근 로컬 식당",
-                "lunch_desc":
-                    "지역 음식으로 든든하게 식사",
-
-                "afternoon_time": "14:00",
-                "afternoon_title":
-                    f"{row['지역행사']} 또는 지역 특색 체험",
-                "afternoon_desc":
-                    "지역만의 분위기를 경험하는 시간",
-
-                "evening_time": "17:30",
-                "evening_title":
-                    f"{row['특산품']} 쇼핑 및 휴식",
-                "evening_desc":
-                    "지역 특산품을 둘러보고 휴식",
+                "morning": (
+                    f"09:30 · {row['관광지']} "
+                    f"주변 산책 및 자유 일정"
+                ),
+                "lunch": (
+                    f"12:30 · {row['음식점']} "
+                    f"또는 인근 로컬 식당"
+                ),
+                "afternoon": (
+                    f"14:00 · {row['지역행사']} "
+                    f"또는 지역 특색 체험"
+                ),
+                "evening": (
+                    f"17:30 · {row['특산품']} "
+                    f"쇼핑 및 휴식"
+                ),
             }
         )
 
@@ -1827,16 +1711,9 @@ for day in range(1, days + 1):
 # 지도 + 맞춤 여행 코스
 # =========================================================
 st.markdown(
-    """
-    <div class="map-course-title">
-        🗺️ 숨은 지역 지도
-        &nbsp; + &nbsp;
-        🧭 맞춤 여행 코스
-    </div>
-    """,
+    '<div class="map-course-title">🗺️ 숨은 지역 지도 &nbsp; + &nbsp; 🧭 맞춤 여행 코스</div>',
     unsafe_allow_html=True,
 )
-
 
 map_col, course_col = st.columns(
     [1, 1],
@@ -1845,280 +1722,128 @@ map_col, course_col = st.columns(
 
 
 # =========================================================
-# 지도
+# 왼쪽 : 지도
 # =========================================================
 with map_col:
 
-    st.markdown(
-        """
-        <div class="section-card">
-            <div class="section-card">
-                <h3>🗺️ 숨은 지역 지도</h3>
-
-                <div class="small-muted">
-                    대한민국 곳곳의 숨은 지역과 여행 정보를
-                    한눈에 확인해보세요.
-                </div>
-            </div>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-
-
-    # =====================================================
-    # 대한민국 지도 범위
-    # =====================================================
-
-    korea_bounds = [
-        [33.0, 124.5],
-        [38.7, 132.0],
-    ]
-
-
-    # =====================================================
-    # 지도 생성
-    # =====================================================
+    map_center = [36.2, 127.8]
 
     m = folium.Map(
-        location=[36.3, 127.8],
-
+        location=map_center,
         zoom_start=7,
-
-        min_zoom=6,
-        max_zoom=11,
-
-        min_lat=32.5,
-        max_lat=39.5,
-
-        min_lon=124.0,
-        max_lon=132.5,
-
-        max_bounds=True,
-
-        control_scale=True,
-
         tiles=None,
+        control_scale=True,
     )
-
-
-    # =====================================================
-    # OpenStreetMap
-    # =====================================================
 
     folium.TileLayer(
-        tiles="OpenStreetMap",
-        name="OpenStreetMap",
-        control=True,
+        tiles="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+        name="일반 지도",
+        attr="© OpenStreetMap",
     ).add_to(m)
 
+    folium.TileLayer(
+        tiles="https://xdworld.vworld.kr/2d/Base/service/{z}/{x}/{y}.png",
+        name="VWorld 일반",
+        attr="VWorld",
+        overlay=False,
+    ).add_to(m)
 
-    # =====================================================
-    # 대한민국 전체가 화면에 들어오도록 설정
-    # =====================================================
+    for _, map_row in filtered_df.iterrows():
 
-    m.fit_bounds(
-        korea_bounds,
-        padding=(10, 10)
-    )
+        popup_html = f"""
+        <div style="width:240px">
+            <h4>{html.escape(map_row['지역'])}</h4>
+            <b>추천 점수: {map_row['숨은지역점수']}점</b><br>
+            대표 음식: {html.escape(map_row['대표음식'])}<br>
+            관광지: {html.escape(map_row['관광지'])}
+        </div>
+        """
 
-
-    # =====================================================
-    # 추천 지역
-    # =====================================================
-
-    if show_regions:
-
-        for _, r in filtered_df.iterrows():
-
-            popup_html = f"""
-            <div style="
-                width:230px;
-                font-family:
-                    Arial,
-                    'Noto Sans KR',
-                    sans-serif;
-                padding:5px;
-            ">
-
-                <h4 style="
-                    margin:0 0 10px 0;
-                    color:#315d46;
-                ">
-                    📍 {html.escape(str(r['지역']))}
-                </h4>
-
-                <p style="margin:5px 0;">
-                    ⭐ 숨은지역점수 :
-                    <b>{r['숨은지역점수']}</b>
-                </p>
-
-                <p style="margin:5px 0;">
-                    🍴 대표음식 :
-                    {html.escape(str(r['대표음식']))}
-                </p>
-
-                <p style="margin:5px 0;">
-                    🏞️ 관광지 :
-                    {html.escape(str(r['관광지']))}
-                </p>
-
-            </div>
-            """
-
+        if show_regions:
 
             folium.Marker(
-                location=[
-                    r["위도"],
-                    r["경도"]
-                ],
-
+                [map_row["위도"], map_row["경도"]],
+                tooltip=(
+                    f"{map_row['지역']} · "
+                    f"{map_row['숨은지역점수']}점"
+                ),
                 popup=folium.Popup(
                     popup_html,
-                    max_width=300
+                    max_width=300,
                 ),
-
-                tooltip=(
-                    f"📍 {r['지역']} "
-                    f"· 점수 {r['숨은지역점수']}"
-                ),
-
                 icon=folium.Icon(
                     color="green",
                     icon="map-marker",
-                    prefix="fa",
                 ),
             ).add_to(m)
 
-
-    # =====================================================
-    # 음식점
-    # =====================================================
-
-    if show_food:
-
-        for _, r in filtered_df.iterrows():
+        if show_food:
 
             folium.Marker(
-                location=[
-                    r["위도"] + 0.015,
-                    r["경도"] + 0.015
+                [
+                    map_row["위도"] + 0.018,
+                    map_row["경도"] + 0.012,
                 ],
-
-                tooltip=f"🍴 {r['음식점']}",
-
-                popup=f"""
-                <b>🍴 로컬 음식점</b><br>
-                {html.escape(str(r['음식점']))}<br>
-                대표음식 :
-                {html.escape(str(r['대표음식']))}
-                """,
-
+                tooltip=f"🍴 {map_row['음식점']}",
+                popup=map_row["음식점"],
                 icon=folium.Icon(
                     color="orange",
                     icon="cutlery",
-                    prefix="fa",
                 ),
             ).add_to(m)
 
-
-    # =====================================================
-    # 관광지
-    # =====================================================
-
-    if show_tour:
-
-        for _, r in filtered_df.iterrows():
+        if show_tour:
 
             folium.Marker(
-                location=[
-                    r["위도"] - 0.015,
-                    r["경도"] - 0.015
+                [
+                    map_row["위도"] - 0.018,
+                    map_row["경도"] - 0.012,
                 ],
-
-                tooltip=f"🏞️ {r['관광지']}",
-
-                popup=f"""
-                <b>🏞️ 관광지</b><br>
-                {html.escape(str(r['관광지']))}
-                """,
-
+                tooltip=f"🏞️ {map_row['관광지']}",
+                popup=map_row["관광지"],
                 icon=folium.Icon(
                     color="blue",
                     icon="camera",
-                    prefix="fa",
                 ),
             ).add_to(m)
 
-
-    # =====================================================
-    # 지역 행사
-    # =====================================================
-
-    if show_events:
-
-        for _, r in filtered_df.iterrows():
+        if show_events:
 
             folium.Marker(
-                location=[
-                    r["위도"] + 0.025,
-                    r["경도"] - 0.015
+                [
+                    map_row["위도"] + 0.012,
+                    map_row["경도"] - 0.018,
                 ],
-
-                tooltip=f"🎉 {r['지역행사']}",
-
-                popup=f"""
-                <b>🎉 지역 행사</b><br>
-                {html.escape(str(r['지역행사']))}
-                """,
-
-                icon=folium.Icon(
-                    color="red",
-                    icon="calendar",
-                    prefix="fa",
-                ),
-            ).add_to(m)
-
-
-    # =====================================================
-    # 특산품
-    # =====================================================
-
-    if show_specialties:
-
-        for _, r in filtered_df.iterrows():
-
-            folium.Marker(
-                location=[
-                    r["위도"] - 0.025,
-                    r["경도"] + 0.015
-                ],
-
-                tooltip=f"🛍️ {r['특산품']}",
-
-                popup=f"""
-                <b>🛍️ 지역 특산품</b><br>
-                {html.escape(str(r['특산품']))}
-                """,
-
+                tooltip=f"🎉 {map_row['지역행사']}",
+                popup=map_row["지역행사"],
                 icon=folium.Icon(
                     color="purple",
-                    icon="shopping-bag",
-                    prefix="fa",
+                    icon="star",
                 ),
             ).add_to(m)
 
+        if show_specialties:
 
-    # =====================================================
-    # 지도 표시
-    # =====================================================
+            folium.Marker(
+                [
+                    map_row["위도"] - 0.012,
+                    map_row["경도"] + 0.018,
+                ],
+                tooltip=f"🎁 {map_row['특산품']}",
+                popup=map_row["특산품"],
+                icon=folium.Icon(
+                    color="red",
+                    icon="shopping-basket",
+                ),
+            ).add_to(m)
+
+    folium.LayerControl().add_to(m)
 
     st_folium(
         m,
-        width=None,
-        height=900,
-        returned_objects=[],
         use_container_width=True,
+        height=500,
+        returned_objects=[],
     )
 
 
@@ -2127,18 +1852,13 @@ with map_col:
 # =========================================================
 with course_col:
 
-    st.subheader(
-        "🧭 맞춤 여행 코스 만들기"
-    )
+    st.subheader("🧭 맞춤 여행 코스 만들기")
 
     st.caption(
-        f"{row['지역']} · "
-        "선택한 여행 조건을 기준으로 구성된 추천 코스"
+        f"{row['지역']} · 선택한 여행 조건을 기준으로 구성된 추천 코스"
     )
 
-
     tag1, tag2 = st.columns(2)
-
 
     with tag1:
 
@@ -2146,16 +1866,13 @@ with course_col:
             f"👤 **여행 인원**  \n{group}"
         )
 
-
     with tag2:
 
         st.markdown(
             f"🎂 **선호 나이대**  \n{age}"
         )
 
-
     tag3, tag4 = st.columns(2)
-
 
     with tag3:
 
@@ -2163,199 +1880,55 @@ with course_col:
             f"📅 **여행 기간**  \n{selected_duration}"
         )
 
-
     with tag4:
 
         st.markdown(
             f"🎯 **여행 테마**  \n{theme}"
         )
 
-
     st.divider()
 
+    st.markdown("**👥 여행자 맞춤 포인트**")
 
-    # =====================================================
-    # 맞춤 포인트
-    # =====================================================
+    st.info(age_tip)
 
-    st.markdown(
-        "**👥 여행자 맞춤 포인트**"
-    )
+    st.markdown("**🧩 코스 구성 방식**")
 
-
-    st.markdown(
-        f"""
-        <div class="course-tip">
-            🎂 <b>나이대</b>
-            · {html.escape(age_tip)}
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-
-
-    st.markdown(
-        f"""
-        <div class="course-tip">
-            👥 <b>여행 인원</b>
-            · {html.escape(group_tip)}
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-
-
-    # =====================================================
-    # 추천 일정
-    # =====================================================
+    st.info(group_tip)
 
     st.markdown("### 📅 추천 일정")
 
+    for plan in daily_plan:
 
-    st.markdown(
-        """
-        <div class="day-guide">
-            DAY를 선택하면 해당 날짜의 일정만 표시됩니다.
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
+        with st.container(border=True):
 
-
-    # =====================================================
-    # DAY 탭
-    # =====================================================
-
-    day_labels = [
-        f"DAY {i}"
-        for i in range(1, days + 1)
-    ]
-
-
-    day_tabs = st.tabs(
-        day_labels
-    )
-
-
-    for index, day_tab in enumerate(day_tabs):
-
-        with day_tab:
-
-            plan = daily_plan[index]
-
-
-            # 오전
             st.markdown(
-                f"""
-                <div class="schedule-card">
-
-                    <div class="schedule-time">
-                        🌅 {plan['morning_time']} · 오전
-                    </div>
-
-                    <div class="schedule-title">
-                        {html.escape(
-                            plan['morning_title']
-                        )}
-                    </div>
-
-                    <div class="schedule-desc">
-                        {html.escape(
-                            plan['morning_desc']
-                        )}
-                    </div>
-
-                </div>
-                """,
-                unsafe_allow_html=True,
+                f"#### 📅 {plan['day']}일 차"
             )
 
-
-            # 점심
             st.markdown(
-                f"""
-                <div class="schedule-card">
-
-                    <div class="schedule-time">
-                        🍴 {plan['lunch_time']} · 점심
-                    </div>
-
-                    <div class="schedule-title">
-                        {html.escape(
-                            plan['lunch_title']
-                        )}
-                    </div>
-
-                    <div class="schedule-desc">
-                        {html.escape(
-                            plan['lunch_desc']
-                        )}
-                    </div>
-
-                </div>
-                """,
-                unsafe_allow_html=True,
+                f"🌅 **오전**  \n"
+                f"{html.escape(plan['morning'].split('·', 1)[-1].strip())}"
             )
 
-
-            # 오후
             st.markdown(
-                f"""
-                <div class="schedule-card">
-
-                    <div class="schedule-time">
-                        🏞️ {plan['afternoon_time']} · 오후
-                    </div>
-
-                    <div class="schedule-title">
-                        {html.escape(
-                            plan['afternoon_title']
-                        )}
-                    </div>
-
-                    <div class="schedule-desc">
-                        {html.escape(
-                            plan['afternoon_desc']
-                        )}
-                    </div>
-
-                </div>
-                """,
-                unsafe_allow_html=True,
+                f"🍴 **점심**  \n"
+                f"{html.escape(plan['lunch'].split('·', 1)[-1].strip())}"
             )
 
-
-            # 저녁
             st.markdown(
-                f"""
-                <div class="schedule-card">
-
-                    <div class="schedule-time">
-                        🌙 {plan['evening_time']} · 저녁
-                    </div>
-
-                    <div class="schedule-title">
-                        {html.escape(
-                            plan['evening_title']
-                        )}
-                    </div>
-
-                    <div class="schedule-desc">
-                        {html.escape(
-                            plan['evening_desc']
-                        )}
-                    </div>
-
-                </div>
-                """,
-                unsafe_allow_html=True,
+                f"🏞️ **오후**  \n"
+                f"{html.escape(plan['afternoon'].split('·', 1)[-1].strip())}"
             )
 
+            st.markdown(
+                f"🌙 **저녁**  \n"
+                f"{html.escape(plan['evening'].split('·', 1)[-1].strip())}"
+            )
 
     st.caption(
         "※ 예시 데이터 기반 추천 코스입니다. "
-        "실제 이동시간·영업시간·날씨·행사 일정은 "
-        "방문 전에 확인하세요."
+        "실제 이동시간·영업시간·날씨·행사 일정은 방문 전에 확인하세요."
     )
 
 
@@ -2366,31 +1939,23 @@ query = urllib.parse.quote(
     f"{row['지역']} {row['관광지']}"
 )
 
-
 st.markdown("### 🚗 길찾기")
 
-
 nav1, nav2 = st.columns(2)
-
 
 with nav1:
 
     st.link_button(
         "🗺️ 네이버 지도에서 길찾기",
-
         f"https://map.naver.com/p/search/{query}",
-
         use_container_width=True,
     )
-
 
 with nav2:
 
     st.link_button(
         "📍 카카오맵에서 검색",
-
         f"https://map.kakao.com/?q={query}",
-
         use_container_width=True,
     )
 
@@ -2400,11 +1965,9 @@ with nav2:
 # =========================================================
 st.subheader("📍 추천 지역")
 
-
 st.caption(
     "현재 맞춤 여행 코스로 선택한 지역입니다."
 )
-
 
 with st.container(border=True):
 
@@ -2414,66 +1977,49 @@ with st.container(border=True):
 
     st.markdown("---")
 
-
     info_col1, info_col2 = st.columns(2)
-
 
     with info_col1:
 
         st.markdown(
             f"""
-            **🍚 대표 음식**
-
+            **🍚 대표 음식**  
             {row['대표음식']}
 
-            **🎁 지역 특산품**
-
+            **🎁 지역 특산품**  
             {row['특산품']}
 
-            **🎉 지역 행사**
-
+            **🎉 지역 행사**  
             {row['지역행사']}
             """
         )
-
 
     with info_col2:
 
         st.markdown(
             f"""
-            **📸 주요 관광지**
-
+            **📸 주요 관광지**  
             {row['관광지']}
 
-            **🌿 관광 유형**
-
+            **🌿 관광 유형**  
             {row['관광유형']}
 
-            **📅 추천 기간**
-
+            **📅 추천 기간**  
             {row['추천기간']}
             """
         )
 
-
     st.markdown("---")
 
-
     st.markdown("### 💡 지역 소개")
-
 
     st.write(
         row["소개"]
     )
 
-
-    st.markdown(
-        "### 🧭 맞춤 여행 조건"
-    )
-
+    st.markdown("### 🧭 맞춤 여행 조건")
 
     condition_col1, condition_col2, condition_col3, condition_col4 = st.columns(4)
-
 
     with condition_col1:
 
@@ -2481,20 +2027,17 @@ with st.container(border=True):
             f"👤 **여행 인원**\n\n{group}"
         )
 
-
     with condition_col2:
 
         st.info(
             f"🎂 **선호 나이대**\n\n{age}"
         )
 
-
     with condition_col3:
 
         st.info(
             f"📅 **여행 기간**\n\n{selected_duration}"
         )
-
 
     with condition_col4:
 
@@ -2507,7 +2050,6 @@ with st.container(border=True):
 # 맞춤 추천
 # =========================================================
 st.markdown("### 🎯 맞춤 추천")
-
 
 recommendation_parts = []
 
@@ -2529,9 +2071,7 @@ if st.session_state.group_size != "전체":
 
     group_key = st.session_state.group_size
 
-    group_text = row[
-        "인원수별_추천"
-    ].get(
+    group_text = row["인원수별_추천"].get(
         group_key,
         "기본 추천 코스",
     )
@@ -2545,8 +2085,7 @@ if st.session_state.travel_duration != "전체":
 
     recommendation_parts.append(
         f"**여행 기간:** "
-        f"{st.session_state.travel_duration}"
-        f"에 적합한 지역"
+        f"{st.session_state.travel_duration}에 적합한 지역"
     )
 
 
@@ -2554,8 +2093,7 @@ if st.session_state.travel_theme != "전체":
 
     recommendation_parts.append(
         f"**여행 테마:** "
-        f"{st.session_state.travel_theme}"
-        f" 중심 추천"
+        f"{st.session_state.travel_theme} 중심 추천"
     )
 
 
@@ -2578,16 +2116,12 @@ else:
 # =========================================================
 # 지역 사진
 # =========================================================
-st.markdown(
-    "## 📸 지역 사진 미리보기"
-)
-
+st.markdown("## 📸 지역 사진 미리보기")
 
 region_images = IMAGE_DATA.get(
     row["지역"],
     {},
 )
-
 
 photo1, photo2, photo3 = st.columns(3)
 
@@ -2596,10 +2130,7 @@ with photo1:
 
     render_image_card(
         "🏞️ 여행지",
-        region_images.get(
-            "여행지",
-            ""
-        ),
+        region_images.get("여행지", ""),
         row["관광지"],
     )
 
@@ -2608,10 +2139,7 @@ with photo2:
 
     render_image_card(
         "👀 구경거리",
-        region_images.get(
-            "구경거리",
-            ""
-        ),
+        region_images.get("구경거리", ""),
         row["지역행사"],
     )
 
@@ -2620,12 +2148,8 @@ with photo3:
 
     render_image_card(
         "🍴 먹거리",
-        region_images.get(
-            "먹거리",
-            ""
-        ),
-        f"{row['대표음식']} · "
-        f"{row['음식점']}",
+        region_images.get("먹거리", ""),
+        f"{row['대표음식']} · {row['음식점']}",
     )
 
 
@@ -2645,9 +2169,7 @@ tab1, tab2, tab3, tab4, tab5 = st.tabs(
 
 with tab1:
 
-    st.markdown(
-        "### 대표 음식"
-    )
+    st.markdown("### 대표 음식")
 
     st.write(
         row["대표음식"]
@@ -2664,42 +2186,30 @@ with tab1:
 
 with tab2:
 
-    st.markdown(
-        "### 추천 관광지"
-    )
+    st.markdown("### 추천 관광지")
 
     st.write(
         row["관광지"]
     )
 
-    st.markdown(
-        "**관광 유형**"
-    )
+    st.markdown("**관광 유형**")
 
     st.markdown(
-        make_tags(
-            row["관광유형"]
-        ),
+        make_tags(row["관광유형"]),
         unsafe_allow_html=True,
     )
 
-    st.markdown(
-        "**랜드마크 유형**"
-    )
+    st.markdown("**랜드마크 유형**")
 
     st.markdown(
-        make_tags(
-            row["랜드마크유형"]
-        ),
+        make_tags(row["랜드마크유형"]),
         unsafe_allow_html=True,
     )
 
 
 with tab3:
 
-    st.markdown(
-        "### 지역 행사"
-    )
+    st.markdown("### 지역 행사")
 
     st.write(
         row["지역행사"]
@@ -2712,9 +2222,7 @@ with tab3:
 
 with tab4:
 
-    st.markdown(
-        "### 지역 특산품"
-    )
+    st.markdown("### 지역 특산품")
 
     st.write(
         row["특산품"]
@@ -2723,17 +2231,13 @@ with tab4:
 
 with tab5:
 
-    st.markdown(
-        "### 로컬 리뷰 예시"
-    )
-
+    st.markdown("### 로컬 리뷰 예시")
 
     reviews = [
         f"{row['지역']}의 자연 풍경이 인상적이었어요.",
         f"{row['대표음식']}을 먹어 보니 지역 특색이 잘 느껴졌습니다.",
         "유명 관광지보다 여유롭게 여행하기 좋았습니다.",
     ]
-
 
     for review in reviews:
 
@@ -2746,7 +2250,6 @@ with tab5:
 # 하단 안내
 # =========================================================
 st.markdown("---")
-
 
 st.caption(
     "※ 본 서비스는 SGIS 기반 지역 탐색을 보여주기 위한 "
