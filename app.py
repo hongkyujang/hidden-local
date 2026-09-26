@@ -1739,130 +1739,218 @@ map_col, course_col = st.columns(
 
 
 # =========================================================
-# 왼쪽 : 지도
+# 지도
 # =========================================================
+
 with map_col:
 
-    map_center = [36.2, 127.8]
-
-    m = folium.Map(
-        location=map_center,
-        zoom_start=7,
-        tiles=None,
-        control_scale=True,
+    st.markdown(
+        """
+        <div class="section-card">
+            <div class="section-title">🗺️ 숨은 지역 지도</div>
+            <div class="section-desc">
+                대한민국 곳곳의 숨은 지역과 여행 정보를 한눈에 확인해보세요.
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
     )
+
+    # 대한민국 전체 영역
+    korea_bounds = [
+        [33.0, 124.5],   # 남서쪽
+        [38.7, 132.0],   # 북동쪽
+    ]
+
+    # 대한민국 중심
+    m = folium.Map(
+        location=[36.3, 127.8],
+        zoom_start=7,
+        min_zoom=6,
+        max_zoom=11,
+        min_lat=32.5,
+        max_lat=39.5,
+        min_lon=124.0,
+        max_lon=132.5,
+        max_bounds=True,
+        control_scale=True,
+        tiles="OpenStreetMap",
+    )
+
+    # 대한민국 전체가 처음부터 보이도록 설정
+    m.fit_bounds(
+        korea_bounds,
+        padding=(10, 10)
+    )
+
+    # -----------------------------------------------------
+    # 지도 타일
+    # -----------------------------------------------------
 
     folium.TileLayer(
         tiles="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-        name="일반 지도",
-        attr="© OpenStreetMap",
+        name="OpenStreetMap",
+        attr="© OpenStreetMap contributors",
+        control=True,
     ).add_to(m)
 
-    folium.TileLayer(
-        tiles="https://xdworld.vworld.kr/2d/Base/service/{z}/{x}/{y}.png",
-        name="VWorld 일반",
-        attr="VWorld",
-        overlay=False,
-    ).add_to(m)
+    # -----------------------------------------------------
+    # 추천 지역
+    # -----------------------------------------------------
 
-    for _, map_row in filtered_df.iterrows():
+    if show_recommended:
+        for _, r in filtered_df.iterrows():
 
-        popup_html = f"""
-        <div style="width:240px">
-            <h4>{html.escape(map_row['지역'])}</h4>
-            <b>추천 점수: {map_row['숨은지역점수']}점</b><br>
-            대표 음식: {html.escape(map_row['대표음식'])}<br>
-            관광지: {html.escape(map_row['관광지'])}
-        </div>
-        """
+            popup_html = f"""
+            <div style="
+                width:220px;
+                font-family:Arial, sans-serif;
+                padding:5px;
+            ">
+                <h4 style="margin-bottom:8px;">
+                    📍 {html.escape(str(r['지역']))}
+                </h4>
 
-        if show_regions:
+                <p style="margin:4px 0;">
+                    ⭐ 추천점수 : <b>{r['추천점수']}</b>
+                </p>
+
+                <p style="margin:4px 0;">
+                    🍴 대표음식 : {html.escape(str(r['대표음식']))}
+                </p>
+
+                <p style="margin:4px 0;">
+                    🏞️ 관광지 : {html.escape(str(r['관광지']))}
+                </p>
+            </div>
+            """
 
             folium.Marker(
-                [map_row["위도"], map_row["경도"]],
-                tooltip=(
-                    f"{map_row['지역']} · "
-                    f"{map_row['숨은지역점수']}점"
-                ),
+                location=[r["위도"], r["경도"]],
                 popup=folium.Popup(
                     popup_html,
-                    max_width=300,
+                    max_width=300
                 ),
+                tooltip=f"📍 {r['지역']}",
                 icon=folium.Icon(
                     color="green",
                     icon="map-marker",
+                    prefix="fa",
                 ),
             ).add_to(m)
 
-        if show_food:
+    # -----------------------------------------------------
+    # 음식점
+    # -----------------------------------------------------
+
+    if show_food:
+
+        for _, r in filtered_df.iterrows():
 
             folium.Marker(
-                [
-                    map_row["위도"] + 0.018,
-                    map_row["경도"] + 0.012,
+                location=[
+                    r["위도"] + 0.015,
+                    r["경도"] + 0.015
                 ],
-                tooltip=f"🍴 {map_row['음식점']}",
-                popup=map_row["음식점"],
+                tooltip=f"🍴 {r['음식점']}",
+                popup=f"""
+                <b>🍴 로컬 음식점</b><br>
+                {html.escape(str(r['음식점']))}<br>
+                대표음식 : {html.escape(str(r['대표음식']))}
+                """,
                 icon=folium.Icon(
                     color="orange",
                     icon="cutlery",
+                    prefix="fa",
                 ),
             ).add_to(m)
 
-        if show_tour:
+    # -----------------------------------------------------
+    # 관광지
+    # -----------------------------------------------------
+
+    if show_tour:
+
+        for _, r in filtered_df.iterrows():
 
             folium.Marker(
-                [
-                    map_row["위도"] - 0.018,
-                    map_row["경도"] - 0.012,
+                location=[
+                    r["위도"] - 0.015,
+                    r["경도"] - 0.015
                 ],
-                tooltip=f"🏞️ {map_row['관광지']}",
-                popup=map_row["관광지"],
+                tooltip=f"🏞️ {r['관광지']}",
+                popup=f"""
+                <b>🏞️ 관광지</b><br>
+                {html.escape(str(r['관광지']))}
+                """,
                 icon=folium.Icon(
                     color="blue",
                     icon="camera",
+                    prefix="fa",
                 ),
             ).add_to(m)
 
-        if show_events:
+    # -----------------------------------------------------
+    # 지역 행사
+    # -----------------------------------------------------
+
+    if show_event:
+
+        for _, r in filtered_df.iterrows():
 
             folium.Marker(
-                [
-                    map_row["위도"] + 0.012,
-                    map_row["경도"] - 0.018,
+                location=[
+                    r["위도"] + 0.025,
+                    r["경도"] - 0.015
                 ],
-                tooltip=f"🎉 {map_row['지역행사']}",
-                popup=map_row["지역행사"],
-                icon=folium.Icon(
-                    color="purple",
-                    icon="star",
-                ),
-            ).add_to(m)
-
-        if show_specialties:
-
-            folium.Marker(
-                [
-                    map_row["위도"] - 0.012,
-                    map_row["경도"] + 0.018,
-                ],
-                tooltip=f"🎁 {map_row['특산품']}",
-                popup=map_row["특산품"],
+                tooltip=f"🎉 {r['지역행사']}",
+                popup=f"""
+                <b>🎉 지역 행사</b><br>
+                {html.escape(str(r['지역행사']))}
+                """,
                 icon=folium.Icon(
                     color="red",
-                    icon="shopping-basket",
+                    icon="calendar",
+                    prefix="fa",
                 ),
             ).add_to(m)
 
-    folium.LayerControl().add_to(m)
+    # -----------------------------------------------------
+    # 특산품
+    # -----------------------------------------------------
+
+    if show_specialty:
+
+        for _, r in filtered_df.iterrows():
+
+            folium.Marker(
+                location=[
+                    r["위도"] - 0.025,
+                    r["경도"] + 0.015
+                ],
+                tooltip=f"🛍️ {r['특산품']}",
+                popup=f"""
+                <b>🛍️ 지역 특산품</b><br>
+                {html.escape(str(r['특산품']))}
+                """,
+                icon=folium.Icon(
+                    color="purple",
+                    icon="shopping-bag",
+                    prefix="fa",
+                ),
+            ).add_to(m)
+
+    # -----------------------------------------------------
+    # 지도 표시
+    # -----------------------------------------------------
 
     st_folium(
         m,
-        use_container_width=True,
-        height=500,
+        width=None,
+        height=900,
         returned_objects=[],
+        use_container_width=True,
     )
-
 
 # =========================================================
 # 오른쪽 : 맞춤 여행 코스
