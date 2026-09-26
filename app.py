@@ -1960,7 +1960,7 @@ if row is not None:
 
 
 # =========================================================
-# 추천 지역
+# 가장 추천하는 지역 1곳
 # =========================================================
 
 if len(preference_df) > 0:
@@ -1968,88 +1968,52 @@ if len(preference_df) > 0:
     st.markdown("### 📍 지금 취향에 맞는 추천 지역")
 
     st.caption(
-        "사이드바에서 선택한 여행 취향과 일치하는 지역입니다."
+        "선택한 여행 취향을 기준으로 가장 높은 추천점수를 받은 지역입니다."
     )
 
-    recommend_df = preference_df.sort_values(
+    # 추천점수가 가장 높은 지역 1곳 선택
+    best_region = preference_df.sort_values(
         "추천점수",
         ascending=False
-    ).head(6)
+    ).iloc[0]
 
-    recommend_cols = st.columns(3)
+    col1, col2 = st.columns([1, 2])
 
-    for i, (_, r) in enumerate(recommend_df.iterrows()):
+    with col1:
+        st.metric(
+            "🏆 로컬 추천점수",
+            f"{best_region['추천점수']}점"
+        )
 
-        with recommend_cols[i % 3]:
+    with col2:
+        st.markdown(
+            f"## 📍 {best_region['지역']}"
+        )
 
-            st.markdown(
-                f"#### 📍 {r['지역']}"
-            )
+        st.write(
+            f"**🍴 대표 음식:** {best_region['대표음식']}"
+        )
 
-            st.metric(
-                "로컬 추천점수",
-                f"{r['추천점수']}점"
-            )
+        st.write(
+            f"**🏞️ 주요 관광지:** {best_region['관광지']}"
+        )
 
-            st.markdown(
-                f"""
-                **🍴 대표 음식**  
-                {r['대표음식']}
+        st.write(
+            f"**🎁 특산품:** {best_region['특산품']}"
+        )
 
-                **🏞️ 주요 관광지**  
-                {r['관광지']}
+        st.write(
+            f"**🎨 여행 유형:** {best_region['관광유형']}"
+        )
 
-                **🎁 특산품**  
-                {r['특산품']}
+else:
 
-                **🎨 여행 유형**  
-                {r['관광유형']}
-                """
-            )
+    st.markdown("### 📍 지금 취향에 맞는 추천 지역")
 
-            st.divider()
-
-# =========================================================
-# 선택 지역 사진
-# =========================================================
-
-if row is not None:
-
-    st.markdown(
-        f"### 📸 {row['지역']} 사진 미리보기"
+    st.info(
+        "현재 선택한 여행 취향에 맞는 추천 지역이 없습니다. "
+        "사이드바의 조건을 조금 완화해보세요."
     )
-
-    images = IMAGE_DATA.get(
-        row["지역"],
-        {},
-    )
-
-    photo1, photo2, photo3 = st.columns(3)
-
-    with photo1:
-
-        render_image_card(
-            "🏞️ 여행지",
-            images.get("여행지", ""),
-            row["관광지"],
-        )
-
-    with photo2:
-
-        render_image_card(
-            "🍴 먹거리",
-            images.get("먹거리", ""),
-            f"{row['대표음식']} · {row['음식점']}",
-        )
-
-    with photo3:
-
-        render_image_card(
-            "👀 구경거리",
-            images.get("구경거리", ""),
-            row["지역행사"],
-        )
-
 
 # =========================================================
 # 상세 정보
