@@ -1398,99 +1398,87 @@ with map_col:
 
 
 # =========================================================
+# =========================================================
 # 오른쪽 : 맞춤 여행 코스
 # =========================================================
 with course_col:
 
-    st.markdown(
-        f"""
-        <div class="course-box">
+    st.subheader("🧭 맞춤 여행 코스 만들기")
 
-            <div class="course-header">
-
-                <div class="course-header-title">
-                    🧭 맞춤 여행 코스 만들기
-                </div>
-
-                <div class="course-header-desc">
-                    선택한 여행 조건을 바탕으로
-                    {html.escape(row['지역'])} 코스를 구성했습니다.
-                </div>
-
-            </div>
-
-            <div>
-                <span class="course-mini-tag">
-                    👤 {html.escape(group)}
-                </span>
-
-                <span class="course-mini-tag">
-                    🎂 {html.escape(age)}
-                </span>
-
-                <span class="course-mini-tag">
-                    📅 {html.escape(selected_duration)}
-                </span>
-
-                <span class="course-mini-tag">
-                    🎯 {html.escape(theme)}
-                </span>
-            </div>
-
-            <div class="course-info">
-                <b>여행자 특성</b><br>
-                {html.escape(age_tip)}
-                <br><br>
-
-                <b>코스 구성</b><br>
-                {html.escape(group_tip)}
-            </div>
-
-        </div>
-        """,
-        unsafe_allow_html=True,
+    st.caption(
+        f"{row['지역']} · 선택한 여행 조건을 기준으로 구성된 추천 코스"
     )
+
+    # 선택 조건
+    tag1, tag2 = st.columns(2)
+
+    with tag1:
+        st.markdown(
+            f"👤 **여행 인원**  \n{group}"
+        )
+
+    with tag2:
+        st.markdown(
+            f"🎂 **선호 나이대**  \n{age}"
+        )
+
+    tag3, tag4 = st.columns(2)
+
+    with tag3:
+        st.markdown(
+            f"📅 **여행 기간**  \n{selected_duration}"
+        )
+
+    with tag4:
+        st.markdown(
+            f"🎯 **여행 테마**  \n{theme}"
+        )
+
+    st.divider()
+
+    # 여행자 특성
+    st.markdown("**👥 여행자 맞춤 포인트**")
+
+    st.info(age_tip)
+
+    st.markdown("**🧩 코스 구성 방식**")
+
+    st.info(group_tip)
+
+    st.markdown("### 📅 추천 일정")
 
     # 일정 표시
     for plan in daily_plan:
 
-        st.markdown(
-            f"""
-            <div class="course-day">
+        with st.container(border=True):
 
-                <div class="course-day-title">
-                    📅 {plan['day']}일 차
-                </div>
+            st.markdown(
+                f"#### 📅 {plan['day']}일 차"
+            )
 
-                <div class="course-line">
-                    🌅 <b>오전</b> ·
-                    {html.escape(plan['morning'].split("·", 1)[-1].strip())}
-                </div>
+            st.markdown(
+                f"🌅 **오전**  \n"
+                f"{html.escape(plan['morning'].split('·', 1)[-1].strip())}"
+            )
 
-                <div class="course-line">
-                    🍴 <b>점심</b> ·
-                    {html.escape(plan['lunch'].split("·", 1)[-1].strip())}
-                </div>
+            st.markdown(
+                f"🍴 **점심**  \n"
+                f"{html.escape(plan['lunch'].split('·', 1)[-1].strip())}"
+            )
 
-                <div class="course-line">
-                    🏞️ <b>오후</b> ·
-                    {html.escape(plan['afternoon'].split("·", 1)[-1].strip())}
-                </div>
+            st.markdown(
+                f"🏞️ **오후**  \n"
+                f"{html.escape(plan['afternoon'].split('·', 1)[-1].strip())}"
+            )
 
-                <div class="course-line">
-                    🌙 <b>저녁</b> ·
-                    {html.escape(plan['evening'].split("·", 1)[-1].strip())}
-                </div>
+            st.markdown(
+                f"🌙 **저녁**  \n"
+                f"{html.escape(plan['evening'].split('·', 1)[-1].strip())}"
+            )
 
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
-
-    st.info(
-        "예시 데이터 기반 추천 코스입니다. "
-        "실제 이동시간·영업시간·날씨·행사 일정은 "
-        "방문 전에 확인하세요."
+    st.caption(
+        "※ 예시 데이터 기반 추천 코스입니다. "
+        "실제 이동시간·영업시간·날씨·행사 일정은 방문 전에 확인하세요."
     )
 
 
