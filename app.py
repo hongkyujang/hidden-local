@@ -21,6 +21,26 @@ st.set_page_config(
 
 
 # =========================================================
+# 세션 상태 기본값
+# =========================================================
+defaults = {
+    "min_score": 60,
+    "age_group": "전체",
+    "group_size": "전체",
+    "travel_duration": "전체",
+    "travel_theme": "전체",
+    "food_type": "전체",
+    "sort_type": "점수순",
+    "keyword": "",
+    "selected_region": "강원특별자치도 정선군",
+}
+
+for key, value in defaults.items():
+    if key not in st.session_state:
+        st.session_state[key] = value
+
+
+# =========================================================
 # 스타일
 # =========================================================
 st.markdown(
@@ -36,26 +56,24 @@ st.markdown(
         background: #101916;
         color: #f1f5f3;
     }
-    # =========================================================
-
 
     /* =========================================================
-   상단 로컬 쉼표 작은 제목
-   ========================================================= */
+       상단 로컬 쉼표 작은 제목
+       ========================================================= */
 
-.top-logo {
-    font-size: 22px;
-    font-weight: 800;
-    color: #dceee3;
-    margin-top: 5px;
-    margin-bottom: 18px;
-    text-align: left;
-    letter-spacing: -0.5px;
-}
+    .top-logo {
+        font-size: 22px;
+        font-weight: 800;
+        color: #dceee3;
+        margin-top: 5px;
+        margin-bottom: 18px;
+        text-align: left;
+        letter-spacing: -0.5px;
+    }
 
-.top-logo span {
-    margin-left: 4px;
-}
+    .top-logo span {
+        margin-left: 4px;
+    }
 
     [data-testid="stSidebar"] {
         background: #17251f;
@@ -204,7 +222,10 @@ st.markdown(
         margin-top: 6px;
     }
 
-    /* 지도 + 코스 영역 */
+    /* =========================================================
+       지도 + 코스 영역
+       ========================================================= */
+
     .map-course-title {
         color: #dceee3;
         font-size: 23px;
@@ -721,27 +742,11 @@ def make_tags(items):
     )
 
 
+# =========================================================
+# 데이터 생성
+# =========================================================
 df = pd.DataFrame(load_data())
 df["숨은지역점수"] = df.apply(calculate_hidden_score, axis=1)
-
-
-# =========================================================
-# 세션 상태
-# =========================================================
-defaults = {
-    "age_group": "전체",
-    "group_size": "전체",
-    "travel_duration": "전체",
-    "travel_theme": "전체",
-    "food_type": "전체",
-    "sort_type": "점수순",
-    "keyword": "",
-    "selected_region": "강원특별자치도 정선군",
-}
-
-for key, value in defaults.items():
-    if key not in st.session_state:
-        st.session_state[key] = value
 
 
 # =========================================================
@@ -1259,12 +1264,24 @@ with st.sidebar:
 
         st.rerun()
 
+
 # =========================================================
 # 필터 적용
 # =========================================================
 filtered_df = df.copy()
 
 
+# =========================================================
+# 최소 추천 점수 필터
+# =========================================================
+filtered_df = filtered_df[
+    filtered_df["숨은지역점수"] >= st.session_state.min_score
+]
+
+
+# =========================================================
+# 키워드 검색
+# =========================================================
 if st.session_state.keyword.strip():
 
     keyword = st.session_state.keyword.strip().lower()
@@ -1287,10 +1304,20 @@ if st.session_state.keyword.strip():
     ]
 
 
+# =========================================================
+# 음식 필터
+# =========================================================
 if st.session_state.food_type != "전체":
 
     food_keywords = {
-        "한식": ["밥", "국", "정식", "비빔", "떡", "백숙"],
+        "한식": [
+            "밥",
+            "국",
+            "정식",
+            "비빔",
+            "떡",
+            "백숙"
+        ],
         "해산물": [
             "해산물",
             "오징어",
@@ -1329,6 +1356,9 @@ if st.session_state.food_type != "전체":
     ]
 
 
+# =========================================================
+# 여행 기간 필터
+# =========================================================
 if st.session_state.travel_duration != "전체":
 
     filtered_df = filtered_df[
@@ -1338,6 +1368,9 @@ if st.session_state.travel_duration != "전체":
     ]
 
 
+# =========================================================
+# 여행 테마 필터
+# =========================================================
 if st.session_state.travel_theme != "전체":
 
     filtered_df = filtered_df[
@@ -1347,6 +1380,9 @@ if st.session_state.travel_theme != "전체":
     ]
 
 
+# =========================================================
+# 정렬
+# =========================================================
 if st.session_state.sort_type == "점수순":
 
     filtered_df = filtered_df.sort_values(
@@ -1377,9 +1413,8 @@ else:
 
 
 # =========================================================
-# 상단 로고 / 제목
+# 상단 로고
 # =========================================================
-
 st.markdown(
     """
     <div class="top-logo">
@@ -1396,6 +1431,7 @@ st.markdown(
 m1, m2, m3, m4 = st.columns(4)
 
 with m1:
+
     st.markdown(
         f"""
         <div class="metric-card">
@@ -1409,6 +1445,7 @@ with m1:
     )
 
 with m2:
+
     st.markdown(
         f"""
         <div class="metric-card">
@@ -1422,6 +1459,7 @@ with m2:
     )
 
 with m3:
+
     st.markdown(
         f"""
         <div class="metric-card">
@@ -1435,6 +1473,7 @@ with m3:
     )
 
 with m4:
+
     st.markdown(
         f"""
         <div class="metric-card">
@@ -1467,6 +1506,7 @@ if filtered_df.empty:
 region_names = filtered_df["지역"].tolist()
 
 if st.session_state.selected_region not in region_names:
+
     st.session_state.selected_region = region_names[0]
 
 
@@ -1686,7 +1726,6 @@ for day in range(1, days + 1):
 
 # =========================================================
 # 지도 + 맞춤 여행 코스
-# 핵심 변경 부분
 # =========================================================
 st.markdown(
     '<div class="map-course-title">🗺️ 숨은 지역 지도 &nbsp; + &nbsp; 🧭 맞춤 여행 코스</div>',
@@ -1826,7 +1865,6 @@ with map_col:
 
 
 # =========================================================
-# =========================================================
 # 오른쪽 : 맞춤 여행 코스
 # =========================================================
 with course_col:
@@ -1837,15 +1875,16 @@ with course_col:
         f"{row['지역']} · 선택한 여행 조건을 기준으로 구성된 추천 코스"
     )
 
-    # 선택 조건
     tag1, tag2 = st.columns(2)
 
     with tag1:
+
         st.markdown(
             f"👤 **여행 인원**  \n{group}"
         )
 
     with tag2:
+
         st.markdown(
             f"🎂 **선호 나이대**  \n{age}"
         )
@@ -1853,18 +1892,19 @@ with course_col:
     tag3, tag4 = st.columns(2)
 
     with tag3:
+
         st.markdown(
             f"📅 **여행 기간**  \n{selected_duration}"
         )
 
     with tag4:
+
         st.markdown(
             f"🎯 **여행 테마**  \n{theme}"
         )
 
     st.divider()
 
-    # 여행자 특성
     st.markdown("**👥 여행자 맞춤 포인트**")
 
     st.info(age_tip)
@@ -1875,7 +1915,6 @@ with course_col:
 
     st.markdown("### 📅 추천 일정")
 
-    # 일정 표시
     for plan in daily_plan:
 
         with st.container(border=True):
@@ -1939,26 +1978,26 @@ with nav2:
 
 
 # =========================================================
-# =========================================================
-# =========================================================
-# =========================================================
 # 추천 지역
 # =========================================================
-
 st.subheader("📍 추천 지역")
-st.caption("현재 맞춤 여행 코스로 선택한 지역입니다.")
+
+st.caption(
+    "현재 맞춤 여행 코스로 선택한 지역입니다."
+)
 
 with st.container(border=True):
 
-    # 지역명
-    st.markdown(f"## 📍 {row['지역']}")
+    st.markdown(
+        f"## 📍 {row['지역']}"
+    )
 
     st.markdown("---")
 
-    # 지역 기본 정보
     info_col1, info_col2 = st.columns(2)
 
     with info_col1:
+
         st.markdown(
             f"""
             **🍚 대표 음식**  
@@ -1973,6 +2012,7 @@ with st.container(border=True):
         )
 
     with info_col2:
+
         st.markdown(
             f"""
             **📸 주요 관광지**  
@@ -1988,34 +2028,40 @@ with st.container(border=True):
 
     st.markdown("---")
 
-    # 지역 소개
     st.markdown("### 💡 지역 소개")
-    st.write(row["소개"])
 
-    # 현재 맞춤 여행 조건
+    st.write(
+        row["소개"]
+    )
+
     st.markdown("### 🧭 맞춤 여행 조건")
 
     condition_col1, condition_col2, condition_col3, condition_col4 = st.columns(4)
 
     with condition_col1:
+
         st.info(
             f"👤 **여행 인원**\n\n{group}"
         )
 
     with condition_col2:
+
         st.info(
             f"🎂 **선호 나이대**\n\n{age}"
         )
 
     with condition_col3:
+
         st.info(
             f"📅 **여행 기간**\n\n{selected_duration}"
         )
 
     with condition_col4:
+
         st.info(
             f"🎯 **여행 테마**\n\n{theme}"
         )
+
 
 # =========================================================
 # 맞춤 추천
@@ -2031,7 +2077,10 @@ if st.session_state.age_group != "전체":
 
     recommendation_parts.append(
         f"**나이대 추천:** "
-        f"{row['나이대별_추천'].get(age_key, '체험·관광 중심의 기본 추천')}"
+        f"{row['나이대별_추천'].get(
+            age_key,
+            '체험·관광 중심의 기본 추천'
+        )}"
     )
 
 
@@ -2068,7 +2117,10 @@ if st.session_state.travel_theme != "전체":
 if recommendation_parts:
 
     for item in recommendation_parts:
-        st.markdown(f"- {item}")
+
+        st.markdown(
+            f"- {item}"
+        )
 
 else:
 
