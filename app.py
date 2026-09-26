@@ -1513,39 +1513,21 @@ with nav2:
 # =========================================================
 # =========================================================
 # =========================================================
+# =========================================================
 # 추천 지역
 # =========================================================
 
 st.subheader("📍 추천 지역")
 st.caption("현재 맞춤 여행 코스로 선택한 지역입니다.")
 
-recommend_score = calculate_hidden_score(row)
-
 with st.container(border=True):
+
+    # 지역명
     st.markdown(f"## 📍 {row['지역']}")
-    
-    score_col, food_col, tour_col = st.columns(3)
-
-    with score_col:
-        st.metric(
-            "추천 점수",
-            f"{recommend_score}점"
-        )
-
-    with food_col:
-        st.metric(
-            "음식 점수",
-            f"{row['음식점수']}점"
-        )
-
-    with tour_col:
-        st.metric(
-            "관광 인지도",
-            f"{row['관광인지도']}점"
-        )
 
     st.markdown("---")
 
+    # 지역 기본 정보
     info_col1, info_col2 = st.columns(2)
 
     with info_col1:
@@ -1578,24 +1560,34 @@ with st.container(border=True):
 
     st.markdown("---")
 
+    # 지역 소개
     st.markdown("### 💡 지역 소개")
     st.write(row["소개"])
 
-    st.markdown("### 🧭 현재 맞춤 여행 조건")
+    # 현재 맞춤 여행 조건
+    st.markdown("### 🧭 맞춤 여행 조건")
 
     condition_col1, condition_col2, condition_col3, condition_col4 = st.columns(4)
 
     with condition_col1:
-        st.info(f"👤 **여행 인원**\n\n{group}")
+        st.info(
+            f"👤 **여행 인원**\n\n{group}"
+        )
 
     with condition_col2:
-        st.info(f"🎂 **선호 나이대**\n\n{age}")
+        st.info(
+            f"🎂 **선호 나이대**\n\n{age}"
+        )
 
     with condition_col3:
-        st.info(f"📅 **여행 기간**\n\n{selected_duration}")
+        st.info(
+            f"📅 **여행 기간**\n\n{selected_duration}"
+        )
 
     with condition_col4:
-        st.info(f"🎯 **여행 테마**\n\n{theme}")
+        st.info(
+            f"🎯 **여행 테마**\n\n{theme}"
+        )
 
 # =========================================================
 # 상세 지표
