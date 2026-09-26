@@ -35,6 +35,129 @@ st.markdown(
         background: #101916;
         color: #f1f5f3;
     }
+    # =========================================================
+# 사이드바 - 로컬 행사 홍보 광고
+# =========================================================
+
+st.markdown(
+    """
+    <div class="event-ad-wrapper">
+
+        <!-- 광고 1 -->
+        <div class="event-ad-slide">
+            <div class="event-ad-card">
+
+                <div class="event-ad-badge">
+                    🔥 지금 떠나기 좋은 행사
+                </div>
+
+                <div class="event-ad-title">
+                    🎵 정선 아리랑제
+                </div>
+
+                <div class="event-ad-region">
+                    📍 강원특별자치도 정선군
+                </div>
+
+                <div class="event-ad-date">
+                    📅 2026.09.26 ~ 2026.09.30
+                </div>
+
+                <div class="event-ad-desc">
+                    정선의 전통문화와 아리랑을 만나보세요.
+                </div>
+
+            </div>
+        </div>
+
+
+        <!-- 광고 2 -->
+        <div class="event-ad-slide">
+            <div class="event-ad-card">
+
+                <div class="event-ad-badge">
+                    🌿 가을 로컬 여행
+                </div>
+
+                <div class="event-ad-title">
+                    🏞️ 단양 로컬 풍경전
+                </div>
+
+                <div class="event-ad-region">
+                    📍 충청북도 단양군
+                </div>
+
+                <div class="event-ad-date">
+                    📅 2026.09.25 ~ 2026.10.05
+                </div>
+
+                <div class="event-ad-desc">
+                    단양의 숨은 풍경과 가을 여행지를 만나보세요.
+                </div>
+
+            </div>
+        </div>
+
+
+        <!-- 광고 3 -->
+        <div class="event-ad-slide">
+            <div class="event-ad-card">
+
+                <div class="event-ad-badge">
+                    🍚 로컬 미식 여행
+                </div>
+
+                <div class="event-ad-title">
+                    🍊 구례 가을 로컬마켓
+                </div>
+
+                <div class="event-ad-region">
+                    📍 전라남도 구례군
+                </div>
+
+                <div class="event-ad-date">
+                    📅 2026.09.27 ~ 2026.10.04
+                </div>
+
+                <div class="event-ad-desc">
+                    구례의 특산품과 지역 먹거리를 만나보세요.
+                </div>
+
+            </div>
+        </div>
+
+
+        <!-- 광고 4 -->
+        <div class="event-ad-slide">
+            <div class="event-ad-card">
+
+                <div class="event-ad-badge">
+                    🍂 지금 떠나기 좋은 곳
+                </div>
+
+                <div class="event-ad-title">
+                    🍎 청송 가을 산책길
+                </div>
+
+                <div class="event-ad-region">
+                    📍 경상북도 청송군
+                </div>
+
+                <div class="event-ad-date">
+                    📅 2026.09.26 ~ 2026.10.11
+                </div>
+
+                <div class="event-ad-desc">
+                    청송의 자연과 가을 풍경을 천천히 즐겨보세요.
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
 
     /* =========================================================
    상단 로컬 쉼표 작은 제목
@@ -750,6 +873,130 @@ with st.sidebar:
         '<div class="filter-heading">🧭 나만의 로컬 여행 찾기</div>',
         unsafe_allow_html=True,
     )
+
+    # =========================================================
+# 사이드바 - 로컬 행사 홍보 광고
+# =========================================================
+
+st.markdown(
+    """
+    <div class="event-ad-wrapper">
+
+        <!-- 광고 1 -->
+        <div class="event-ad-slide">
+            <div class="event-ad-card">
+
+                <div class="event-ad-badge">
+                    🔥 지금 떠나기 좋은 행사
+                </div>
+
+                <div class="event-ad-title">
+                    🎵 정선 아리랑제
+                </div>
+
+                <div class="event-ad-region">
+                    📍 강원특별자치도 정선군
+                </div>
+
+                <div class="event-ad-date">
+                    📅 2026.09.26 ~ 2026.09.30
+                </div>
+
+                <div class="event-ad-desc">
+                    정선의 전통문화와 아리랑을 만나보세요.
+                </div>
+
+            </div>
+        </div>
+
+
+        <!-- 광고 2 -->
+        <div class="event-ad-slide">
+            <div class="event-ad-card">
+
+                <div class="event-ad-badge">
+                    🌿 가을 로컬 여행
+                </div>
+
+                <div class="event-ad-title">
+                    🏞️ 단양 로컬 풍경전
+                </div>
+
+                <div class="event-ad-region">
+                    📍 충청북도 단양군
+                </div>
+
+                <div class="event-ad-date">
+                    📅 2026.09.25 ~ 2026.10.05
+                </div>
+
+                <div class="event-ad-desc">
+                    단양의 숨은 풍경과 가을 여행지를 만나보세요.
+                </div>
+
+            </div>
+        </div>
+
+
+        <!-- 광고 3 -->
+        <div class="event-ad-slide">
+            <div class="event-ad-card">
+
+                <div class="event-ad-badge">
+                    🍚 로컬 미식 여행
+                </div>
+
+                <div class="event-ad-title">
+                    🍊 구례 가을 로컬마켓
+                </div>
+
+                <div class="event-ad-region">
+                    📍 전라남도 구례군
+                </div>
+
+                <div class="event-ad-date">
+                    📅 2026.09.27 ~ 2026.10.04
+                </div>
+
+                <div class="event-ad-desc">
+                    구례의 특산품과 지역 먹거리를 만나보세요.
+                </div>
+
+            </div>
+        </div>
+
+
+        <!-- 광고 4 -->
+        <div class="event-ad-slide">
+            <div class="event-ad-card">
+
+                <div class="event-ad-badge">
+                    🍂 지금 떠나기 좋은 곳
+                </div>
+
+                <div class="event-ad-title">
+                    🍎 청송 가을 산책길
+                </div>
+
+                <div class="event-ad-region">
+                    📍 경상북도 청송군
+                </div>
+
+                <div class="event-ad-date">
+                    📅 2026.09.26 ~ 2026.10.11
+                </div>
+
+                <div class="event-ad-desc">
+                    청송의 자연과 가을 풍경을 천천히 즐겨보세요.
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
 
     st.caption(
         "여행 취향을 선택하면 추천 지역과 코스가 달라집니다."
