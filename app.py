@@ -778,7 +778,7 @@ for _, row in filtered_df.iterrows():
         ).add_to(m)
 
 folium.LayerControl().add_to(m)
-st_folium(m, use_container_width=True, height=520, returned_objects=[])
+st_folium(m, use_container_width=True, height=300, returned_objects=[])
 
 
 # =========================================================
