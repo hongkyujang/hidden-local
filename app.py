@@ -1167,14 +1167,30 @@ else:
 # =========================================================
 
 if len(filtered_df) > 0:
+
     selected_region = st.session_state.get(
         "selected_region",
         filtered_df["지역"].iloc[0]
     )
+
+    st.session_state.selected_region = selected_region
+
+    selected_rows = filtered_df[
+        filtered_df["지역"] == selected_region
+    ]
+
+    if len(selected_rows) > 0:
+        row = selected_rows.iloc[0]
+    else:
+        row = filtered_df.iloc[0]
+
 else:
     selected_region = ""
+    st.session_state.selected_region = ""
+    row = None
 
-st.session_state.selected_region = selected_region
+
+if row is not None:
 
 # =========================================================
 # 맞춤 여행 코스 계산
