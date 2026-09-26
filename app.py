@@ -682,13 +682,12 @@ st.markdown(
 m1, m2, m3, m4 = st.columns(4)
 with m1:
     st.markdown(
-        f'<div class="metric-card"><div class="metric-label">검색 지역 수</div><div class="metric-value">{len(filtered_df)}곳</div></div>',
+        f'<div class="metric-card"><div class="metric-label">여행 인원</div><div class="metric-value">{html.escape(st.session_state.group_size)}</div></div>',
         unsafe_allow_html=True,
     )
 with m2:
-    avg_score = round(filtered_df["숨은지역점수"].mean(), 1) if len(filtered_df) else 0
     st.markdown(
-        f'<div class="metric-card"><div class="metric-label">평균 추천 점수</div><div class="metric-value">{avg_score}점</div></div>',
+        f'<div class="metric-card"><div class="metric-label">선호 나이대</div><div class="metric-value">{html.escape(st.session_state.age_group)}</div></div>',
         unsafe_allow_html=True,
     )
 with m3:
