@@ -2738,134 +2738,48 @@ if recommended_region is not None:
                 unsafe_allow_html=True
             )
 
-    # -----------------------------------------------------
+        # -----------------------------------------------------
     # 오른쪽 : 추천 이유 배너
     # -----------------------------------------------------
 
     with reason_col:
 
-        selected_theme = st.session_state.travel_theme
-        selected_age = st.session_state.age_group
-        selected_group = st.session_state.group_size
+        with st.container(border=True):
 
-        if selected_theme != "전체":
-            theme_text = selected_theme
-        else:
-            theme_text = travel_type
+            selected_theme = st.session_state.travel_theme
 
-        age_text = (
-            selected_age
-            if selected_age != "전체"
-            else "전체"
-        )
+            if selected_theme != "전체":
+                theme_text = selected_theme
+            else:
+                theme_text = travel_type
 
-        group_text = (
-            selected_group
-            if selected_group != "전체"
-            else "전체"
-        )
+            st.markdown("### 💡 왜 이 지역을 추천했을까?")
 
-        st.markdown(
-            f"""
-            <div style="
-                height:340px;
-                box-sizing:border-box;
-                padding:22px;
-                border-radius:16px;
-                border:1px solid #34443c;
-                background:#17251f;
-                color:#f1f5f3;
-                overflow:hidden;
-            ">
+            st.caption(
+                "선택한 여행 취향과 지역의 특징을 바탕으로 추천한 지역입니다."
+            )
 
-                <div style="
-                    font-size:23px;
-                    font-weight:700;
-                    margin-bottom:12px;
-                ">
-                    💡 왜 이 지역을 추천했을까?
-                </div>
+            st.divider()
 
-                <div style="
-                    font-size:14px;
-                    color:#aebdb5;
-                    line-height:1.6;
-                    margin-bottom:18px;
-                ">
-                    선택한 여행 취향과 지역의 특징을
-                    바탕으로 추천한 지역입니다.
-                </div>
+            st.markdown("#### 🧭 여행 취향")
 
-                <div style="
-                    border-top:1px solid #34443c;
-                    padding-top:14px;
-                    margin-bottom:14px;
-                ">
-                    <div style="
-                        font-size:16px;
-                        font-weight:700;
-                        margin-bottom:7px;
-                    ">
-                        🧭 여행 취향
-                    </div>
-                    <div style="
-                        font-size:14px;
-                        line-height:1.6;
-                    ">
-                        {html.escape(theme_text)} 테마에 어울리는 여행지
-                    </div>
-                    <div style="
-                        font-size:12px;
-                        color:#aebdb5;
-                        margin-top:5px;
-                    ">
-                        여행 기간 · {html.escape(duration)}
-                    </div>
-                </div>
+            st.write(
+                f"**{theme_text}** 테마에 어울리는 여행지입니다."
+            )
 
-                <div style="
-                    border-top:1px solid #34443c;
-                    padding-top:14px;
-                    margin-bottom:14px;
-                ">
-                    <div style="
-                        font-size:16px;
-                        font-weight:700;
-                        margin-bottom:7px;
-                    ">
-                        🍴 대표 먹거리
-                    </div>
-                    <div style="
-                        font-size:14px;
-                        line-height:1.6;
-                    ">
-                        {html.escape(food)}
-                    </div>
-                </div>
+            st.caption(f"여행 기간 · {duration}")
 
-                <div style="
-                    border-top:1px solid #34443c;
-                    padding-top:14px;
-                ">
-                    <div style="
-                        font-size:16px;
-                        font-weight:700;
-                        margin-bottom:7px;
-                    ">
-                        🏞️ 대표 볼거리
-                    </div>
-                    <div style="
-                        font-size:14px;
-                        line-height:1.6;
-                    ">
-                        {html.escape(tourist)}
-                    </div>
-                </div>
+            st.divider()
 
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
+            st.markdown("#### 🍴 대표 먹거리")
+
+            st.write(f"**{food}**")
+
+            st.divider()
+
+            st.markdown("#### 🏞️ 대표 볼거리")
+
+            st.write(f"**{tourist}**")
     # -----------------------------------------------------
     # 지역 이름
     # -----------------------------------------------------
