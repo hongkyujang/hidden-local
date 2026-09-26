@@ -2671,17 +2671,31 @@ if recommended_region is not None:
             f"**{region_name}**을(를) 추천합니다."
         )
 
-    # -----------------------------------------------------
+        # -----------------------------------------------------
     # 사진 + 추천 이유 좌우 배치
     # -----------------------------------------------------
 
-    photo_col, reason_col = st.columns([1, 1], gap="medium")
+    photo_col, reason_col = st.columns(
+        [1, 1],
+        gap="medium"
+    )
+
+    # -----------------------------------------------------
+    # 왼쪽 : 지역 사진 배너
+    # -----------------------------------------------------
 
     with photo_col:
+
         with st.container(border=True):
 
-            region_images = IMAGE_DATA.get(region_name, {})
-            region_image = region_images.get("여행지")
+            region_images = IMAGE_DATA.get(
+                region_name,
+                {}
+            )
+
+            region_image = region_images.get(
+                "여행지"
+            )
 
             if region_image:
                 st.image(
@@ -2691,70 +2705,86 @@ if recommended_region is not None:
             else:
                 st.info("📷 지역 사진 준비 중")
 
+    # -----------------------------------------------------
+    # 오른쪽 : 추천 이유 배너
+    # 펼치기/접기 기능 제거
+    # -----------------------------------------------------
+
     with reason_col:
+
         with st.container(border=True):
 
-            st.markdown("### 💡 왜 이 지역을 추천했을까?")
+            st.markdown(
+                "### 💡 왜 이 지역을 추천했을까?"
+            )
 
-            with st.expander("추천 이유 자세히 보기", expanded=True):
+            st.caption(
+                "선택한 여행 조건과 지역의 특징을 바탕으로 "
+                "추천 이유를 자세히 안내합니다."
+            )
 
-                selected_theme = st.session_state.travel_theme
-                selected_age = st.session_state.age_group
-                selected_group = st.session_state.group_size
+            st.divider()
 
-                st.markdown("#### 🧭 여행 취향")
+            # 여행 취향
+            st.markdown("#### 🧭 여행 취향")
 
-                if selected_theme != "전체":
-                    st.write(
-                        f"선택한 **{selected_theme}** 테마에 "
-                        f"잘 어울리는 지역입니다."
-                    )
-                else:
-                    st.write(
-                        f"이 지역은 **{travel_type}** 여행을 "
-                        "즐기기에 적합한 특징을 가지고 있습니다."
-                    )
+            selected_theme = st.session_state.travel_theme
+            selected_age = st.session_state.age_group
+            selected_group = st.session_state.group_size
 
-                st.caption(f"추천 여행 기간 · {duration}")
-
-                if selected_age != "전체":
-                    st.write(
-                        f"👥 **{selected_age}** 여행자의 취향을 "
-                        "고려한 지역입니다."
-                    )
-
-                if selected_group != "전체":
-                    st.write(
-                        f"🧑‍🤝‍🧑 **{selected_group}** 여행에 "
-                        "맞춰 둘러보기 좋은 지역입니다."
-                    )
-
-                st.markdown("---")
-
-                st.markdown("#### 🌿 지역의 매력")
-
+            if selected_theme != "전체":
                 st.write(
-                    f"{region_name}은(는) {travel_type} 특색과 "
-                    f"{landmark_type} 볼거리를 함께 경험할 수 있는 "
-                    "지역입니다."
+                    f"**{selected_theme}** 테마를 중심으로 "
+                    "여행하기 좋은 지역입니다."
+                )
+            else:
+                st.write(
+                    f"**{travel_type}** 특색을 즐기며 "
+                    "지역의 다양한 매력을 경험할 수 있습니다."
                 )
 
-                st.write(
-                    f"대표 먹거리인 **{food}**와 "
-                    f"지역 특산품 **{specialty}**을(를) "
-                    "함께 즐길 수 있습니다."
+            if selected_age != "전체":
+                st.caption(
+                    f"👥 선호 나이대 · {selected_age}"
                 )
 
-                st.markdown("---")
-
-                st.markdown("#### 🗓️ 여행 계획")
-
-                st.write(
-                    f"추천 여행 기간은 **{duration}**이며, "
-                    "먹거리와 주요 관광지를 함께 둘러보는 "
-                    "일정을 계획할 수 있습니다."
+            if selected_group != "전체":
+                st.caption(
+                    f"🧑‍🤝‍🧑 여행 인원 · {selected_group}"
                 )
 
+            st.divider()
+
+            # 지역의 매력
+            st.markdown("#### 🌿 지역의 매력")
+
+            st.write(
+                f"**{region_name}**은(는) "
+                f"{travel_type} 특색과 "
+                f"{landmark_type} 볼거리를 함께 "
+                "경험할 수 있는 지역입니다."
+            )
+
+            st.write(
+                f"대표 먹거리 **{food}**와 "
+                f"지역 특산품 **{specialty}**을(를) "
+                "통해 로컬 문화를 즐길 수 있습니다."
+            )
+
+            st.divider()
+
+            # 여행 계획
+            st.markdown("#### 🗓️ 여행 계획")
+
+            st.write(
+                f"추천 여행 기간은 **{duration}**입니다."
+            )
+
+            st.write(
+                f"대표 관광지인 **{tourist}**를 둘러보고, "
+                f"**{food}**을(를) 맛보는 코스로 "
+                "여행 일정을 구성해 보세요."
+            )
     # -----------------------------------------------------
     # 지역 이름
     # -----------------------------------------------------
