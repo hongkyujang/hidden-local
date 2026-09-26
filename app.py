@@ -1956,185 +1956,218 @@ if row is not None:
 
         st.divider()
 
-# =====================================================
-# 교통수단 & 예상 소요시간
-# =====================================================
+                # =====================================================
+        # 교통수단 & 예상 소요시간
+        # =====================================================
 
-st.markdown("#### 🚗 교통수단 & 예상 소요시간")
+        st.markdown("#### 🚗 교통수단 & 예상 소요시간")
 
-st.caption(
-    f"{departure_location if departure_location else '출발지 미입력'} "
-    f"→ {row['지역']}"
-)
+        if departure_location:
 
-# 지역 간 거리 기반 예상시간
-# 실제 교통상황에 따라 달라질 수 있으며 참고용으로 표시
-distance_km = 0
+            st.caption(
+                f"{departure_location} → {row['지역']}"
+            )
 
-if departure_location:
-    departure_text = departure_location.strip()
+            # 주요 출발지 좌표
+            departure_coords = {
+                "서울": (37.5665, 126.9780),
+                "서울특별시": (37.5665, 126.9780),
+                "인천": (37.4563, 126.7052),
+                "인천광역시": (37.4563, 126.7052),
+                "대전": (36.3504, 127.3845),
+                "대전광역시": (36.3504, 127.3845),
+                "대구": (35.8714, 128.6014),
+                "대구광역시": (35.8714, 128.6014),
+                "광주": (35.1595, 126.8526),
+                "광주광역시": (35.1595, 126.8526),
+                "부산": (35.1796, 129.0756),
+                "부산광역시": (35.1796, 129.0756),
+                "울산": (35.5384, 129.3114),
+                "울산광역시": (35.5384, 129.3114),
+                "세종": (36.4800, 127.2890),
+                "세종특별자치시": (36.4800, 127.2890),
+                "제주": (33.4996, 126.5312),
+                "제주특별자치도": (33.4996, 126.5312),
+            }
 
-    # 주요 지역별 대략적인 좌표
-    departure_coords = {
-        "서울": (37.5665, 126.9780),
-        "서울특별시": (37.5665, 126.9780),
-        "인천": (37.4563, 126.7052),
-        "인천광역시": (37.4563, 126.7052),
-        "대전": (36.3504, 127.3845),
-        "대전광역시": (36.3504, 127.3845),
-        "대구": (35.8714, 128.6014),
-        "대구광역시": (35.8714, 128.6014),
-        "광주": (35.1595, 126.8526),
-        "광주광역시": (35.1595, 126.8526),
-        "부산": (35.1796, 129.0756),
-        "부산광역시": (35.1796, 129.0756),
-        "울산": (35.5384, 129.3114),
-        "울산광역시": (35.5384, 129.3114),
-        "세종": (36.4800, 127.2890),
-        "세종특별자치시": (36.4800, 127.2890),
-        "제주": (33.4996, 126.5312),
-        "제주특별자치도": (33.4996, 126.5312),
-    }
+            departure_coord = None
 
-    departure_coord = None
+            for location_name, coord in departure_coords.items():
+                if location_name in departure_location:
+                    departure_coord = coord
+                    break
 
-    for location_name, coord in departure_coords.items():
-        if location_name in departure_text:
-            departure_coord = coord
-            break
+            if departure_coord:
 
-    if departure_coord:
-        from math import radians, sin, cos, sqrt, atan2
+                from math import radians, sin, cos, sqrt, atan2
 
-        lat1, lon1 = departure_coord
-        lat2 = row["위도"]
-        lon2 = row["경도"]
+                lat1, lon1 = departure_coord
+                lat2 = row["위도"]
+                lon2 = row["경도"]
 
-        R = 6371
+                R = 6371
 
-        dlat = radians(lat2 - lat1)
-        dlon = radians(lon2 - lon1)
+                dlat = radians(lat2 - lat1)
+                dlon = radians(lon2 - lon1)
 
-        a = (
-            sin(dlat / 2) ** 2
-            + cos(radians(lat1))
-            * cos(radians(lat2))
-            * sin(dlon / 2) ** 2
-        )
+                a = (
+                    sin(dlat / 2) ** 2
+                    + cos(radians(lat1))
+                    * cos(radians(lat2))
+                    * sin(dlon / 2) ** 2
+                )
 
-        c = 2 * atan2(sqrt(a), sqrt(1 - a))
+                c = 2 * atan2(
+                    sqrt(a),
+                    sqrt(1 - a)
+                )
 
-        distance_km = R * c
+                distance_km = R * c
+                road_distance = distance_km * 1.25
 
-# 출발지를 인식하지 못했을 경우
-if distance_km > 0:
+                # 교통수단별 예상시간
+                car_minutes = max(
+                    int((road_distance / 55) * 60),
+                    20
+                )
 
-    # 실제 이동거리는 직선거리보다 길기 때문에 보정
-    road_distance = distance_km * 1.25
+                bus_minutes = max(
+                    int((road_distance / 45) * 60),
+                    30
+                )
 
-    # 교통수단별 평균적인 이동속도를 기준으로 계산
-    car_minutes = int((road_distance / 55) * 60)
-    bus_minutes = int((road_distance / 45) * 60)
-    train_minutes = int((road_distance / 100) * 60)
-    flight_minutes = int((road_distance / 550) * 60)
+                train_minutes = max(
+                    int((road_distance / 100) * 60),
+                    40
+                )
 
-    # 너무 짧거나 긴 시간 방지
-    car_minutes = max(car_minutes, 20)
-    bus_minutes = max(bus_minutes, 30)
-    train_minutes = max(train_minutes, 40)
-    flight_minutes = max(flight_minutes, 60)
+                flight_minutes = max(
+                    int((road_distance / 550) * 60),
+                    60
+                )
 
-    transport_col1, transport_col2 = st.columns(2)
+                transport_col1, transport_col2 = st.columns(2)
 
-    with transport_col1:
-        st.markdown(
-            f"""
-            <div class="section-card">
-                <div style="font-size:22px; margin-bottom:8px;">🚗</div>
-                <div style="font-size:17px; font-weight:700;">
-                    자가용
-                </div>
-                <div style="font-size:15px; margin-top:6px;">
-                    약 <b>{car_minutes}분</b>
-                </div>
-                <div style="font-size:12px; opacity:0.6; margin-top:4px;">
-                    예상 이동거리 약 {road_distance:.0f}km
-                </div>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
+                with transport_col1:
 
-    with transport_col2:
-        st.markdown(
-            f"""
-            <div class="section-card">
-                <div style="font-size:22px; margin-bottom:8px;">🚌</div>
-                <div style="font-size:17px; font-weight:700;">
-                    고속버스
-                </div>
-                <div style="font-size:15px; margin-top:6px;">
-                    약 <b>{bus_minutes}분</b>
-                </div>
-                <div style="font-size:12px; opacity:0.6; margin-top:4px;">
-                    터미널 이동시간은 포함되지 않을 수 있어요
-                </div>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
+                    st.markdown(
+                        f"""
+                        <div class="section-card">
+                            <div style="font-size:22px;">
+                                🚗
+                            </div>
 
-    transport_col3, transport_col4 = st.columns(2)
+                            <div style="font-size:17px; font-weight:700;">
+                                자가용
+                            </div>
 
-    with transport_col3:
-        st.markdown(
-            f"""
-            <div class="section-card">
-                <div style="font-size:22px; margin-bottom:8px;">🚆</div>
-                <div style="font-size:17px; font-weight:700;">
-                    기차
-                </div>
-                <div style="font-size:15px; margin-top:6px;">
-                    약 <b>{train_minutes}분</b>
-                </div>
-                <div style="font-size:12px; opacity:0.6; margin-top:4px;">
-                    역 이동 및 환승시간은 달라질 수 있어요
-                </div>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
+                            <div style="font-size:15px; margin-top:6px;">
+                                약 <b>{car_minutes}분</b>
+                            </div>
 
-    with transport_col4:
-        st.markdown(
-            f"""
-            <div class="section-card">
-                <div style="font-size:22px; margin-bottom:8px;">✈️</div>
-                <div style="font-size:17px; font-weight:700;">
-                    비행기
-                </div>
-                <div style="font-size:15px; margin-top:6px;">
-                    약 <b>{flight_minutes}분+</b>
-                </div>
-                <div style="font-size:12px; opacity:0.6; margin-top:4px;">
-                    공항 이동·탑승시간은 별도
-                </div>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
+                            <div style="font-size:12px; opacity:0.6; margin-top:4px;">
+                                예상 이동거리 약 {road_distance:.0f}km
+                            </div>
+                        </div>
+                        """,
+                        unsafe_allow_html=True,
+                    )
 
-    st.caption(
-        "※ 예상 소요시간은 지역 간 거리 기반의 참고용 계산값입니다. "
-        "실제 이동시간은 교통상황과 환승 등에 따라 달라질 수 있습니다."
-    )
+                with transport_col2:
 
-else:
+                    st.markdown(
+                        f"""
+                        <div class="section-card">
+                            <div style="font-size:22px;">
+                                🚌
+                            </div>
 
-    st.info(
-        "📍 사이드바에 출발지를 입력하면 "
-        "추천 지역까지 교통수단별 예상 소요시간을 확인할 수 있어요."
-    )
+                            <div style="font-size:17px; font-weight:700;">
+                                고속버스
+                            </div>
+
+                            <div style="font-size:15px; margin-top:6px;">
+                                약 <b>{bus_minutes}분</b>
+                            </div>
+
+                            <div style="font-size:12px; opacity:0.6; margin-top:4px;">
+                                터미널 이동시간은 별도
+                            </div>
+                        </div>
+                        """,
+                        unsafe_allow_html=True,
+                    )
+
+                transport_col3, transport_col4 = st.columns(2)
+
+                with transport_col3:
+
+                    st.markdown(
+                        f"""
+                        <div class="section-card">
+                            <div style="font-size:22px;">
+                                🚆
+                            </div>
+
+                            <div style="font-size:17px; font-weight:700;">
+                                기차
+                            </div>
+
+                            <div style="font-size:15px; margin-top:6px;">
+                                약 <b>{train_minutes}분</b>
+                            </div>
+
+                            <div style="font-size:12px; opacity:0.6; margin-top:4px;">
+                                역 이동 및 환승시간은 별도
+                            </div>
+                        </div>
+                        """,
+                        unsafe_allow_html=True,
+                    )
+
+                with transport_col4:
+
+                    st.markdown(
+                        f"""
+                        <div class="section-card">
+                            <div style="font-size:22px;">
+                                ✈️
+                            </div>
+
+                            <div style="font-size:17px; font-weight:700;">
+                                비행기
+                            </div>
+
+                            <div style="font-size:15px; margin-top:6px;">
+                                약 <b>{flight_minutes}분+</b>
+                            </div>
+
+                            <div style="font-size:12px; opacity:0.6; margin-top:4px;">
+                                공항 이동·탑승시간은 별도
+                            </div>
+                        </div>
+                        """,
+                        unsafe_allow_html=True,
+                    )
+
+                st.caption(
+                    "※ 예상 소요시간은 지역 간 거리 기반의 참고용 계산값입니다. "
+                    "실제 이동시간은 교통상황과 환승 등에 따라 달라질 수 있습니다."
+                )
+
+            else:
+
+                st.info(
+                    "📍 현재는 서울·인천·대전·대구·광주·부산·울산·세종·제주 "
+                    "등 주요 도시를 기준으로 계산할 수 있습니다."
+                )
+
+        else:
+
+            st.info(
+                "📍 사이드바에서 출발 위치를 입력하면 "
+                "추천 지역까지의 예상 이동시간을 확인할 수 있습니다."
+            )
         # -------------------------------------------------
         # 추천 일정
         # -------------------------------------------------
