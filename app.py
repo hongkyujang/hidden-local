@@ -879,23 +879,25 @@ with st.sidebar:
 
     st.divider()
     
-    # =====================================================
+   # =====================================================
     # 출발 위치
     # =====================================================
 
     st.markdown("### 📍 출발 위치")
 
     departure_location = st.text_input(
-         "출발지를 입력해주세요",
-          placeholder="예: 서울특별시 강남구",
-          key="departure_location",
-)
+        "출발지를 입력해주세요",
+        placeholder="예: 서울특별시 강남구",
+        key="departure_location",
+    )
 
-st.caption("입력한 출발지에서 추천 지역까지 예상 이동시간을 계산합니다.")
+    st.caption("추천 지역까지 교통수단별 예상 소요시간을 확인할 수 있습니다.")
 
-   # -----------------------------------------------------
-   # 여행 취향
-   # -----------------------------------------------------
+    # =====================================================
+    # 여행 조건
+    # =====================================================
+
+    st.markdown("### 👤 여행 조건")
 
     age_options = [
         "전체",
@@ -906,15 +908,10 @@ st.caption("입력한 출발지에서 추천 지역까지 예상 이동시간을
     ]
 
     age_group = st.selectbox(
-        "👤 선호 나이대",
+        "선호 나이대",
         age_options,
-        index=age_options.index(
-            st.session_state.age_group
-        ),
+        key="age_group",
     )
-
-    st.session_state.age_group = age_group
-
 
     group_options = [
         "전체",
@@ -925,15 +922,10 @@ st.caption("입력한 출발지에서 추천 지역까지 예상 이동시간을
     ]
 
     group_size = st.selectbox(
-        "👥 여행 인원",
+        "여행 인원",
         group_options,
-        index=group_options.index(
-            st.session_state.group_size
-        ),
+        key="group_size",
     )
-
-    st.session_state.group_size = group_size
-
 
     duration_options = [
         "전체",
@@ -944,61 +936,46 @@ st.caption("입력한 출발지에서 추천 지역까지 예상 이동시간을
     ]
 
     travel_duration = st.selectbox(
-        "🕐 여행 기간",
+        "여행 기간",
         duration_options,
-        index=duration_options.index(
-            st.session_state.travel_duration
-        ),
+        key="travel_duration",
     )
-
-    st.session_state.travel_duration = travel_duration
-
 
     theme_options = [
         "전체",
-        "액티비티",
-        "역사·문화",
         "맛집·미식",
-        "축제·행사",
         "사진 명소",
+        "역사·문화",
+        "액티비티",
         "가족 여행",
         "자연·힐링",
     ]
 
     travel_theme = st.selectbox(
-        "🎨 여행 테마",
+        "여행 테마",
         theme_options,
-        index=theme_options.index(
-            st.session_state.travel_theme
-        ),
+        key="travel_theme",
     )
-
-    st.session_state.travel_theme = travel_theme
-
 
     food_options = [
         "전체",
         "한식",
         "해산물",
-        "향토음식",
-        "간식·특산물",
+        "육류",
+        "전통음식",
+        "지역특산물",
     ]
 
     food_type = st.selectbox(
-        "🍴 선호 음식",
+        "먹거리",
         food_options,
-        index=food_options.index(
-            st.session_state.food_type
-        ),
+        key="food_type",
     )
 
-    st.session_state.food_type = food_type
-
-
     keyword = st.text_input(
-        "🔎 지역·음식·관광지 검색",
-        value=st.session_state.keyword,
-        placeholder="예: 정선, 곤드레, 산, 시장",
+        "🔎 지역 검색",
+        value=st.session_state.get("keyword", ""),
+        placeholder="지역·음식·관광지 검색",
     )
 
     st.session_state.keyword = keyword
