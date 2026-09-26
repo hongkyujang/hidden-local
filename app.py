@@ -1956,7 +1956,7 @@ if row is not None:
 
         st.divider()
 
-                # =====================================================
+                 # =====================================================
         # 교통수단 & 예상 소요시간
         # =====================================================
 
@@ -1965,10 +1965,10 @@ if row is not None:
         if departure_location:
 
             st.caption(
-                f"{departure_location} → {row['지역']}"
+                f"📍 {departure_location} → {row['지역']}"
             )
 
-            # 주요 출발지 좌표
+            # 주요 지역 좌표
             departure_coords = {
                 "서울": (37.5665, 126.9780),
                 "서울특별시": (37.5665, 126.9780),
@@ -2025,7 +2025,6 @@ if row is not None:
                 distance_km = R * c
                 road_distance = distance_km * 1.25
 
-                # 교통수단별 예상시간
                 car_minutes = max(
                     int((road_distance / 55) * 60),
                     20
@@ -2046,127 +2045,53 @@ if row is not None:
                     60
                 )
 
+                st.write("")
+
                 transport_col1, transport_col2 = st.columns(2)
 
                 with transport_col1:
-
-                    st.markdown(
-                        f"""
-                        <div class="section-card">
-                            <div style="font-size:22px;">
-                                🚗
-                            </div>
-
-                            <div style="font-size:17px; font-weight:700;">
-                                자가용
-                            </div>
-
-                            <div style="font-size:15px; margin-top:6px;">
-                                약 <b>{car_minutes}분</b>
-                            </div>
-
-                            <div style="font-size:12px; opacity:0.6; margin-top:4px;">
-                                예상 이동거리 약 {road_distance:.0f}km
-                            </div>
-                        </div>
-                        """,
-                        unsafe_allow_html=True,
+                    st.metric(
+                        "🚗 자가용",
+                        f"약 {car_minutes}분"
                     )
 
                 with transport_col2:
-
-                    st.markdown(
-                        f"""
-                        <div class="section-card">
-                            <div style="font-size:22px;">
-                                🚌
-                            </div>
-
-                            <div style="font-size:17px; font-weight:700;">
-                                고속버스
-                            </div>
-
-                            <div style="font-size:15px; margin-top:6px;">
-                                약 <b>{bus_minutes}분</b>
-                            </div>
-
-                            <div style="font-size:12px; opacity:0.6; margin-top:4px;">
-                                터미널 이동시간은 별도
-                            </div>
-                        </div>
-                        """,
-                        unsafe_allow_html=True,
+                    st.metric(
+                        "🚌 고속버스",
+                        f"약 {bus_minutes}분"
                     )
 
                 transport_col3, transport_col4 = st.columns(2)
 
                 with transport_col3:
-
-                    st.markdown(
-                        f"""
-                        <div class="section-card">
-                            <div style="font-size:22px;">
-                                🚆
-                            </div>
-
-                            <div style="font-size:17px; font-weight:700;">
-                                기차
-                            </div>
-
-                            <div style="font-size:15px; margin-top:6px;">
-                                약 <b>{train_minutes}분</b>
-                            </div>
-
-                            <div style="font-size:12px; opacity:0.6; margin-top:4px;">
-                                역 이동 및 환승시간은 별도
-                            </div>
-                        </div>
-                        """,
-                        unsafe_allow_html=True,
+                    st.metric(
+                        "🚆 기차",
+                        f"약 {train_minutes}분"
                     )
 
                 with transport_col4:
-
-                    st.markdown(
-                        f"""
-                        <div class="section-card">
-                            <div style="font-size:22px;">
-                                ✈️
-                            </div>
-
-                            <div style="font-size:17px; font-weight:700;">
-                                비행기
-                            </div>
-
-                            <div style="font-size:15px; margin-top:6px;">
-                                약 <b>{flight_minutes}분+</b>
-                            </div>
-
-                            <div style="font-size:12px; opacity:0.6; margin-top:4px;">
-                                공항 이동·탑승시간은 별도
-                            </div>
-                        </div>
-                        """,
-                        unsafe_allow_html=True,
+                    st.metric(
+                        "✈️ 비행기",
+                        f"약 {flight_minutes}분+"
                     )
 
                 st.caption(
-                    "※ 예상 소요시간은 지역 간 거리 기반의 참고용 계산값입니다. "
-                    "실제 이동시간은 교통상황과 환승 등에 따라 달라질 수 있습니다."
+                    f"예상 이동거리 약 {road_distance:.0f}km · "
+                    "교통상황과 환승 등에 따라 실제 시간은 달라질 수 있습니다."
                 )
 
             else:
 
                 st.info(
-                    "📍 현재는 서울·인천·대전·대구·광주·부산·울산·세종·제주 "
-                    "등 주요 도시를 기준으로 계산할 수 있습니다."
+                    "📍 현재는 주요 도시를 기준으로 "
+                    "예상 소요시간을 계산할 수 있습니다."
                 )
 
         else:
 
             st.info(
                 "📍 사이드바에서 출발 위치를 입력하면 "
-                "추천 지역까지의 예상 이동시간을 확인할 수 있습니다."
+                "추천 지역까지의 교통수단별 예상 소요시간이 표시됩니다."
             )
         # -------------------------------------------------
         # 추천 일정
