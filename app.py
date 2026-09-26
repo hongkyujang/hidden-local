@@ -2694,16 +2694,9 @@ if recommended_region is not None:
         recommended_region["추천기간"]
     )
 
-
-    region_images = IMAGE_DATA.get(
-        region_name,
-        {}
-    )
-
-    region_image = region_images.get(
-        "여행지"
-    )
-
+    # -----------------------------------------------------
+    # 추천 지역 안내
+    # -----------------------------------------------------
 
     if exact_match:
 
@@ -2720,35 +2713,43 @@ if recommended_region is not None:
         )
 
 
-          # -------------------------------------------------
+    # -----------------------------------------------------
     # 추천 지역 사진
-    # -------------------------------------------------
+    # -----------------------------------------------------
 
-    region_image = IMAGE_DATA.get(
-        row["지역"],
+    st.markdown(
+        "### 📸 추천 지역 미리보기"
+    )
+
+    region_images = IMAGE_DATA.get(
+        region_name,
         {}
-    ).get(
-        "여행지",
-        None
+    )
+
+    region_image = region_images.get(
+        "여행지"
     )
 
     if region_image:
 
-        image_col, empty_col = st.columns([1.8, 1])
+        image_col, empty_col = st.columns(
+            [1.5, 2.5]
+        )
 
         with image_col:
 
             st.image(
                 region_image,
-                use_container_width=True
+                use_container_width=True,
             )
 
-    # -------------------------------------------------
+
+    # -----------------------------------------------------
     # 추천 지역 이름
-    # -------------------------------------------------
+    # -----------------------------------------------------
 
     st.markdown(
-        f"### 📍 {row['지역']}"
+        f"### 📍 {region_name}"
     )
 
     st.caption(
@@ -2756,115 +2757,119 @@ if recommended_region is not None:
     )
 
 
-
-        # =================================================
-        # 왜 이 지역을 추천했을까?
-        # =================================================
-
-        st.markdown(
-            "### 💡 왜 이 지역을 추천했을까?"
-        )
-
-        st.caption(
-            "여행 취향과 지역 특징을 바탕으로 핵심 정보만 정리했습니다."
-        )
+    st.divider()
 
 
-        reason_col1, reason_col2 = st.columns(
-            2,
-            gap="medium",
-        )
+    # =====================================================
+    # 왜 이 지역을 추천했을까?
+    # =====================================================
+
+    st.markdown(
+        "### 💡 왜 이 지역을 추천했을까?"
+    )
+
+    st.caption(
+        "여행 취향과 지역 특징을 바탕으로 핵심 정보만 정리했습니다."
+    )
 
 
-        with reason_col1:
-
-            with st.container(border=True):
-
-                st.markdown(
-                    "#### 🧭 여행 취향"
-                )
-
-                if theme != "전체":
-
-                    st.markdown(
-                        f"**{theme}** 여행에 잘 어울려요."
-                    )
-
-                else:
-
-                    st.markdown(
-                        f"**{travel_type}** 중심의 "
-                        "여행을 즐기기 좋아요."
-                    )
-
-                st.caption(
-                    f"추천 기간 · {duration}"
-                )
+    reason_col1, reason_col2 = st.columns(
+        2,
+        gap="medium",
+    )
 
 
-        with reason_col2:
+    with reason_col1:
 
-            with st.container(border=True):
+        with st.container(border=True):
+
+            st.markdown(
+                "#### 🧭 여행 취향"
+            )
+
+            theme = st.session_state.travel_theme
+
+            if theme != "전체":
 
                 st.markdown(
-                    "#### 🍴 대표 먹거리"
+                    f"**{theme}** 여행에 잘 어울려요."
                 )
+
+            else:
 
                 st.markdown(
-                    f"**{food}**"
+                    f"**{travel_type}** 중심의 "
+                    "여행을 즐기기 좋아요."
                 )
 
-                st.caption(
-                    f"추천 음식점 · {restaurant}"
-                )
+            st.caption(
+                f"추천 기간 · {duration}"
+            )
 
 
-        reason_col3, reason_col4 = st.columns(
-            2,
-            gap="medium",
-        )
+    with reason_col2:
+
+        with st.container(border=True):
+
+            st.markdown(
+                "#### 🍴 대표 먹거리"
+            )
+
+            st.markdown(
+                f"**{food}**"
+            )
+
+            st.caption(
+                f"추천 음식점 · {restaurant}"
+            )
 
 
-        with reason_col3:
-
-            with st.container(border=True):
-
-                st.markdown(
-                    "#### 🏞️ 대표 볼거리"
-                )
-
-                st.markdown(
-                    f"**{tourist}**"
-                )
-
-                st.caption(
-                    f"{landmark_type} · {travel_type}"
-                )
+    reason_col3, reason_col4 = st.columns(
+        2,
+        gap="medium",
+    )
 
 
-        with reason_col4:
+    with reason_col3:
 
-            with st.container(border=True):
+        with st.container(border=True):
 
-                st.markdown(
-                    "#### 🎁 로컬 포인트"
-                )
+            st.markdown(
+                "#### 🏞️ 대표 볼거리"
+            )
 
-                st.markdown(
-                    f"**{specialty}**"
-                )
+            st.markdown(
+                f"**{tourist}**"
+            )
 
-                st.caption(
-                    "지역 대표 특산품"
-                )
+            st.caption(
+                f"{landmark_type} · {travel_type}"
+            )
 
 
-        st.info(
-            f"📌 **{region_name}**에서 "
-            f"**{food}**을(를) 맛보고 "
-            f"**{tourist}**을(를) 둘러보며 "
-            f"**{specialty}**까지 경험해 보세요."
-        )
+    with reason_col4:
+
+        with st.container(border=True):
+
+            st.markdown(
+                "#### 🎁 로컬 포인트"
+            )
+
+            st.markdown(
+                f"**{specialty}**"
+            )
+
+            st.caption(
+                "지역 대표 특산품"
+            )
+
+
+    st.info(
+        f"📌 **{region_name}**에서 "
+        f"**{food}**을(를) 맛보고 "
+        f"**{tourist}**을(를) 둘러보며 "
+        f"**{specialty}**까지 경험해 보세요."
+    )
 
 
 else:
@@ -2880,6 +2885,9 @@ else:
         )
 
 
+# =========================================================
+# 상세 지역 정보
+# =========================================================
 # =========================================================
 # 상세 지역 정보
 # =========================================================
