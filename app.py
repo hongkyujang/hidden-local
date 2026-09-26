@@ -69,10 +69,17 @@ st.markdown(
 }
 
 .top-logo {
-    font-size: 31px;
-    font-weight: 900;
-    color: #f3faf6;
-    margin-bottom: 20px;
+    font-size: 30px !important;
+    font-weight: 900 !important;
+    color: #9fe0b6 !important;
+    line-height: 1.4 !important;
+    white-space: nowrap !important;
+    overflow: visible !important;
+    display: block !important;
+    width: 100% !important;
+    padding: 10px 0 16px 0 !important;
+    margin: 0 !important;
+    box-sizing: border-box !important;
 }
 
 .top-logo span {
