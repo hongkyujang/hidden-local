@@ -70,29 +70,6 @@ st.markdown(
 }
 
 
-/* ---------------------------------------------------------
-   상단 로고
---------------------------------------------------------- */
-
-.top-logo {
-    font-size: 30px !important;
-    font-weight: 900 !important;
-    color: #9fe0b6 !important;
-    line-height: 1.4 !important;
-    white-space: nowrap !important;
-    overflow: visible !important;
-    display: block !important;
-    width: 100% !important;
-    min-height: 50px !important;
-    padding: 10px 0 16px 0 !important;
-    margin: 0 !important;
-    box-sizing: border-box !important;
-}
-
-.top-logo span {
-    color: #9fe0b6;
-}
-
 
 /* ---------------------------------------------------------
    사이드바
@@ -145,35 +122,7 @@ st.markdown(
 }
 
 
-/* ---------------------------------------------------------
-   여행 코스
---------------------------------------------------------- */
 
-.course-box {
-    background: #16221d;
-    border: 1px solid #30483c;
-    border-radius: 18px;
-    padding: 18px;
-}
-
-.course-header {
-    background: #1b2d25;
-    border-radius: 14px;
-    padding: 16px;
-    margin-bottom: 15px;
-}
-
-.course-header-title {
-    font-size: 20px;
-    font-weight: 900;
-    color: #eaf7ef;
-}
-
-.course-header-desc {
-    color: #9fb5a8;
-    font-size: 13px;
-    margin-top: 5px;
-}
 
 
 /* ---------------------------------------------------------
@@ -1343,10 +1292,8 @@ filtered_df = filtered_df.sort_values(
 # =========================================================
 
 st.markdown(
-    '<div class="top-logo">🚗 <span>로컬 쉼표</span></div>',
-    unsafe_allow_html=True,
+    "## 🚗 로컬 쉼표"
 )
-
 
 m1, m2, m3, m4 = st.columns(4)
 
@@ -2084,16 +2031,13 @@ if row is not None:
     # 맞춤 여행 코스
     # =====================================================
 
-    with course_col:
+  with course_col:
 
-        st.subheader(
-            "🧭 맞춤 여행 코스 만들기"
-        )
+    st.markdown("### 🧭 맞춤 여행 코스 만들기")
 
-        st.caption(
-            f"{row['지역']} · 선택한 여행 조건을 기준으로 구성된 추천 코스"
-        )
-
+    st.caption(
+        f"{row['지역']} · 선택한 여행 조건을 기준으로 구성된 추천 코스"
+    )
 
         tag1, tag2 = st.columns(2)
 
