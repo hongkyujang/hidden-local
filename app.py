@@ -36,9 +36,7 @@ defaults = {
 }
 
 for key, value in defaults.items():
-
     if key not in st.session_state:
-
         st.session_state[key] = value
 
 
@@ -70,7 +68,6 @@ st.markdown(
 }
 
 
-
 /* ---------------------------------------------------------
    사이드바
 --------------------------------------------------------- */
@@ -80,32 +77,6 @@ st.markdown(
     font-weight: 900;
     color: #dff6e7;
     margin-bottom: 16px;
-}
-
-
-/* ---------------------------------------------------------
-   상단 정보 카드
---------------------------------------------------------- */
-
-.metric-card {
-    background: #18251f;
-    border: 1px solid #2e463a;
-    border-radius: 16px;
-    padding: 16px 18px;
-    min-height: 92px;
-}
-
-.metric-title {
-    color: #91a99c;
-    font-size: 13px;
-    font-weight: 700;
-    margin-bottom: 7px;
-}
-
-.metric-value {
-    color: #f1f7f3;
-    font-size: 20px;
-    font-weight: 900;
 }
 
 
@@ -122,7 +93,16 @@ st.markdown(
 }
 
 
+/* ---------------------------------------------------------
+   사진 카드
+--------------------------------------------------------- */
 
+.photo-card {
+    background: #18251f;
+    border: 1px solid #30483c;
+    border-radius: 16px;
+    padding: 10px;
+}
 
 
 /* ---------------------------------------------------------
@@ -140,64 +120,6 @@ st.markdown(
     font-size: 13px;
     line-height: 1.55;
     word-break: keep-all;
-}
-
-.schedule-summary {
-    color: #a9c0b2;
-    font-size: 12px;
-}
-
-
-/* ---------------------------------------------------------
-   사진 카드
---------------------------------------------------------- */
-
-.photo-card {
-    background: #18251f;
-    border: 1px solid #30483c;
-    border-radius: 16px;
-    padding: 10px;
-}
-
-
-/* ---------------------------------------------------------
-   태그
---------------------------------------------------------- */
-
-.tag {
-    display: inline-block;
-    background: #21372c;
-    color: #b9ebc9;
-    border: 1px solid #345644;
-    border-radius: 999px;
-    padding: 5px 10px;
-    margin: 2px 4px 2px 0;
-    font-size: 12px;
-    font-weight: 700;
-}
-
-
-/* ---------------------------------------------------------
-   점수
---------------------------------------------------------- */
-
-.score-box {
-    background: #1c3027;
-    border: 1px solid #3b634f;
-    border-radius: 14px;
-    padding: 14px;
-    text-align: center;
-}
-
-.score-number {
-    font-size: 28px;
-    font-weight: 900;
-    color: #9fe0b6;
-}
-
-.score-label {
-    color: #9eb5a7;
-    font-size: 12px;
 }
 
 
@@ -222,6 +144,60 @@ div[data-testid="stExpander"] summary {
 
 button[data-baseweb="tab"] {
     font-weight: 800;
+}
+
+
+/* ---------------------------------------------------------
+   추천 배너 이미지
+--------------------------------------------------------- */
+
+.recommend-image img {
+    border-radius: 18px;
+}
+
+
+/* ---------------------------------------------------------
+   Streamlit metric
+--------------------------------------------------------- */
+
+div[data-testid="stMetric"] {
+    background: #18251f;
+    border: 1px solid #2e463a;
+    border-radius: 16px;
+    padding: 15px;
+}
+
+div[data-testid="stMetricLabel"] {
+    color: #91a99c !important;
+}
+
+div[data-testid="stMetricValue"] {
+    color: #f1f7f3 !important;
+}
+
+
+/* ---------------------------------------------------------
+   버튼
+--------------------------------------------------------- */
+
+.stButton > button,
+.stLinkButton > a {
+    border-radius: 10px !important;
+    font-weight: 800 !important;
+}
+
+
+/* ---------------------------------------------------------
+   모바일/좁은 화면
+--------------------------------------------------------- */
+
+@media (max-width: 900px) {
+
+    .block-container {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+
 }
 
 </style>
@@ -545,7 +521,7 @@ IMAGE_DATA = {
 
 
 # =========================================================
-# 함수
+# 추천 점수
 # =========================================================
 
 def calculate_hidden_score(row):
@@ -572,15 +548,9 @@ df["추천점수"] = df.apply(
 )
 
 
-def make_tags(row):
-
-    return (
-        f'<span class="tag">📍 {html.escape(str(row["관광유형"]))}</span>'
-        f'<span class="tag">🗺️ {html.escape(str(row["랜드마크유형"]))}</span>'
-        f'<span class="tag">🍴 {html.escape(str(row["대표음식"]))}</span>'
-        f'<span class="tag">🎁 {html.escape(str(row["특산품"]))}</span>'
-    )
-
+# =========================================================
+# 일정 문자열 분리
+# =========================================================
 
 def split_schedule_item(value):
 
@@ -601,6 +571,10 @@ def split_schedule_item(value):
         str(value).strip(),
     )
 
+
+# =========================================================
+# 이미지 카드
+# =========================================================
 
 def render_image_card(
     title,
@@ -668,34 +642,21 @@ def matches_preferences(row):
     theme = st.session_state.travel_theme
     food = st.session_state.food_type
 
-
     if age != "전체":
-
         if age not in row["나이대별_추천"]:
-
             return False
-
 
     if group != "전체":
-
         if group not in row["인원수별_추천"]:
-
             return False
-
 
     if duration != "전체":
-
         if duration not in row["추천기간"]:
-
             return False
-
 
     if theme != "전체":
-
         if theme not in row["여행테마"]:
-
             return False
-
 
     if food != "전체":
 
@@ -753,9 +714,7 @@ def matches_preferences(row):
             or item in str(row["특산품"])
             for item in allowed_foods
         ):
-
             return False
-
 
     return True
 
@@ -767,13 +726,12 @@ def matches_preferences(row):
 with st.sidebar:
 
     st.markdown(
-        '<div class="filter-heading">🧭 나만의 로컬 여행 찾기</div>',
-        unsafe_allow_html=True,
+        "### 🧭 나만의 로컬 여행 찾기"
     )
 
 
     # -----------------------------------------------------
-    # 지역 행사 홍보 배너
+    # 지역 행사 홍보
     # -----------------------------------------------------
 
     events = [
@@ -816,7 +774,6 @@ with st.sidebar:
         )
 
         slides_html += f"""
-
         <div class="event-slide"
              style="
                 display:{display};
@@ -825,6 +782,7 @@ with st.sidebar:
                 border-radius:14px;
                 padding:15px;
                 height:165px;
+                box-sizing:border-box;
              ">
 
             <div style="
@@ -841,7 +799,7 @@ with st.sidebar:
                 color:#ffffff;
                 margin-top:8px;
             ">
-                {event["title"]}
+                {html.escape(event["title"])}
             </div>
 
             <div style="
@@ -849,7 +807,7 @@ with st.sidebar:
                 color:#b2c8ba;
                 margin-top:8px;
             ">
-                📍 {event["region"]}
+                📍 {html.escape(event["region"])}
             </div>
 
             <div style="
@@ -857,7 +815,7 @@ with st.sidebar:
                 color:#dcebe1;
                 margin-top:5px;
             ">
-                📅 {event["date"]}
+                📅 {html.escape(event["date"])}
             </div>
 
         </div>
@@ -867,19 +825,14 @@ with st.sidebar:
     components.html(
         f"""
         <html>
-
         <head>
-
         <style>
-
         body {{
             margin:0;
             background:transparent;
             font-family:Arial,sans-serif;
         }}
-
         </style>
-
         </head>
 
         <body>
@@ -896,6 +849,10 @@ with st.sidebar:
                 document.querySelectorAll(".event-slide");
 
             function showNextSlide() {{
+
+                if (slides.length === 0) {{
+                    return;
+                }}
 
                 slides[current].style.display = "none";
 
@@ -914,7 +871,6 @@ with st.sidebar:
             </script>
 
         </body>
-
         </html>
         """,
         height=195,
@@ -925,7 +881,7 @@ with st.sidebar:
 
 
     # -----------------------------------------------------
-    # 취향 선택
+    # 여행 취향
     # -----------------------------------------------------
 
     age_options = [
@@ -1042,7 +998,9 @@ with st.sidebar:
     # 지도 표시
     # -----------------------------------------------------
 
-    st.markdown("### 🗺️ 지도 표시")
+    st.markdown(
+        "### 🗺️ 지도 표시"
+    )
 
 
     show_regions = st.checkbox(
@@ -1050,24 +1008,20 @@ with st.sidebar:
         value=True,
     )
 
-
     show_food = st.checkbox(
         "🍴 음식점",
         value=True,
     )
-
 
     show_tour = st.checkbox(
         "🏞️ 관광지",
         value=True,
     )
 
-
     show_events = st.checkbox(
         "🎉 지역 행사",
         value=True,
     )
-
 
     show_specialty = st.checkbox(
         "🎁 특산품",
@@ -1084,7 +1038,6 @@ with st.sidebar:
     ):
 
         for key, value in defaults.items():
-
             st.session_state[key] = value
 
         st.rerun()
@@ -1102,64 +1055,37 @@ if keyword.strip():
     q = keyword.strip().lower()
 
     mask = (
-
-        filtered_df["지역"]
-        .str.lower()
-        .str.contains(
+        filtered_df["지역"].str.lower().str.contains(
             q,
             na=False,
         )
-
         |
-
-        filtered_df["대표음식"]
-        .str.lower()
-        .str.contains(
+        filtered_df["대표음식"].str.lower().str.contains(
             q,
             na=False,
         )
-
         |
-
-        filtered_df["음식점"]
-        .str.lower()
-        .str.contains(
+        filtered_df["음식점"].str.lower().str.contains(
             q,
             na=False,
         )
-
         |
-
-        filtered_df["관광지"]
-        .str.lower()
-        .str.contains(
+        filtered_df["관광지"].str.lower().str.contains(
             q,
             na=False,
         )
-
         |
-
-        filtered_df["지역행사"]
-        .str.lower()
-        .str.contains(
+        filtered_df["지역행사"].str.lower().str.contains(
             q,
             na=False,
         )
-
         |
-
-        filtered_df["특산품"]
-        .str.lower()
-        .str.contains(
+        filtered_df["특산품"].str.lower().str.contains(
             q,
             na=False,
         )
-
         |
-
-        filtered_df["소개"]
-        .str.lower()
-        .str.contains(
+        filtered_df["소개"].str.lower().str.contains(
             q,
             na=False,
         )
@@ -1254,10 +1180,10 @@ if st.session_state.food_type != "전체":
 
     filtered_df = filtered_df[
         filtered_df.apply(
-            lambda row:
+            lambda r:
                 any(
-                    item in str(row["대표음식"])
-                    or item in str(row["특산품"])
+                    item in str(r["대표음식"])
+                    or item in str(r["특산품"])
                     for item in allowed
                 ),
             axis=1,
@@ -1287,6 +1213,12 @@ filtered_df = filtered_df.sort_values(
 )
 
 
+preference_df = preference_df.sort_values(
+    "추천점수",
+    ascending=False,
+)
+
+
 # =========================================================
 # 상단
 # =========================================================
@@ -1295,86 +1227,43 @@ st.markdown(
     "## 🚗 로컬 쉼표"
 )
 
+st.caption(
+    "숨은 지역의 먹거리·볼거리·특산품을 찾아 나만의 여행을 만들어보세요."
+)
+
+
 m1, m2, m3, m4 = st.columns(4)
 
 
 with m1:
 
-    st.markdown(
-        f"""
-        <div class="metric-card">
-
-            <div class="metric-title">
-                여행 인원
-            </div>
-
-            <div class="metric-value">
-                {st.session_state.group_size}
-            </div>
-
-        </div>
-        """,
-        unsafe_allow_html=True,
+    st.metric(
+        "여행 인원",
+        st.session_state.group_size,
     )
 
 
 with m2:
 
-    st.markdown(
-        f"""
-        <div class="metric-card">
-
-            <div class="metric-title">
-                선호 나이대
-            </div>
-
-            <div class="metric-value">
-                {st.session_state.age_group}
-            </div>
-
-        </div>
-        """,
-        unsafe_allow_html=True,
+    st.metric(
+        "선호 나이대",
+        st.session_state.age_group,
     )
 
 
 with m3:
 
-    st.markdown(
-        f"""
-        <div class="metric-card">
-
-            <div class="metric-title">
-                선택 여행 기간
-            </div>
-
-            <div class="metric-value">
-                {st.session_state.travel_duration}
-            </div>
-
-        </div>
-        """,
-        unsafe_allow_html=True,
+    st.metric(
+        "선택 여행 기간",
+        st.session_state.travel_duration,
     )
 
 
 with m4:
 
-    st.markdown(
-        f"""
-        <div class="metric-card">
-
-            <div class="metric-title">
-                선택 여행 테마
-            </div>
-
-            <div class="metric-value">
-                {st.session_state.travel_theme}
-            </div>
-
-        </div>
-        """,
-        unsafe_allow_html=True,
+    st.metric(
+        "선택 여행 테마",
+        st.session_state.travel_theme,
     )
 
 
@@ -1382,7 +1271,7 @@ st.write("")
 
 
 # =========================================================
-# 취향 일치 결과 안내
+# 취향 일치 결과
 # =========================================================
 
 if len(preference_df) == 0:
@@ -1498,8 +1387,7 @@ if row is not None:
         )
 
         second_activity = (
-            f"{row['관광지']} 주요 포인트 "
-            "둘러보기"
+            f"{row['관광지']} 주요 포인트 둘러보기"
         )
 
 
@@ -1517,13 +1405,11 @@ if row is not None:
     elif theme == "맛집·미식":
 
         first_activity = (
-            f"{row['지역']} 로컬시장 및 "
-            "지역 먹거리 탐방"
+            f"{row['지역']} 로컬시장 및 지역 먹거리 탐방"
         )
 
         second_activity = (
-            f"{row['대표음식']} 맛집 중심 "
-            "미식 여행"
+            f"{row['대표음식']} 맛집 중심 미식 여행"
         )
 
 
@@ -1711,13 +1597,13 @@ if row is not None:
 
 
     # =====================================================
-    # 지도
+    # 왼쪽 : 지도
     # =====================================================
 
     with map_col:
 
         st.markdown(
-            "### 🗺️ 취향 맞춤 지역 지도"
+            "### 🗺️ 숨은 지역 지도"
         )
 
         st.caption(
@@ -1811,7 +1697,6 @@ if row is not None:
 
 
                 popup_html = f"""
-
                 <div style="
                     width:230px;
                     font-family:Arial;
@@ -1820,7 +1705,7 @@ if row is not None:
                     <h4 style="
                         margin-bottom:6px;
                     ">
-                        📍 {html.escape(r["지역"])}
+                        📍 {html.escape(str(r["지역"]))}
                     </h4>
 
                     <b>추천점수</b>
@@ -1828,15 +1713,15 @@ if row is not None:
                     <br>
 
                     <b>대표음식</b>
-                    {html.escape(r["대표음식"])}
+                    {html.escape(str(r["대표음식"]))}
                     <br>
 
                     <b>관광지</b>
-                    {html.escape(r["관광지"])}
+                    {html.escape(str(r["관광지"]))}
                     <br>
 
                     <b>특산품</b>
-                    {html.escape(r["특산품"])}
+                    {html.escape(str(r["특산품"]))}
 
                 </div>
                 """
@@ -1887,8 +1772,8 @@ if row is not None:
 
                         popup=f"""
                         <b>🍴 음식점</b><br>
-                        {html.escape(r["음식점"])}<br>
-                        대표음식: {html.escape(r["대표음식"])}
+                        {html.escape(str(r["음식점"]))}<br>
+                        대표음식: {html.escape(str(r["대표음식"]))}
                         """,
 
                         icon=folium.Icon(
@@ -1917,7 +1802,7 @@ if row is not None:
 
                         popup=f"""
                         <b>🏞️ 관광지</b><br>
-                        {html.escape(r["관광지"])}
+                        {html.escape(str(r["관광지"]))}
                         """,
 
                         icon=folium.Icon(
@@ -1946,7 +1831,7 @@ if row is not None:
 
                         popup=f"""
                         <b>🎉 지역 행사</b><br>
-                        {html.escape(r["지역행사"])}
+                        {html.escape(str(r["지역행사"]))}
                         """,
 
                         icon=folium.Icon(
@@ -1975,7 +1860,7 @@ if row is not None:
 
                         popup=f"""
                         <b>🎁 특산품</b><br>
-                        {html.escape(r["특산품"])}
+                        {html.escape(str(r["특산품"]))}
                         """,
 
                         icon=folium.Icon(
@@ -2001,7 +1886,6 @@ if row is not None:
         elif len(bounds) == 1:
 
             fmap.location = bounds[0]
-
             fmap.zoom_start = 10
 
         else:
@@ -2022,77 +1906,70 @@ if row is not None:
         st_folium(
             fmap,
             width=None,
-            height=650,
+            height=600,
             returned_objects=[],
         )
 
 
     # =====================================================
-    # 맞춤 여행 코스
+    # 오른쪽 : 맞춤 여행 코스
     # =====================================================
 
-  with course_col:
+    with course_col:
 
-    st.markdown("### 🧭 맞춤 여행 코스 만들기")
+        st.markdown(
+            "### 🧭 맞춤 여행 코스 만들기"
+        )
 
-    st.caption(
-        f"{row['지역']} · 선택한 여행 조건을 기준으로 구성된 추천 코스"
-    )
+        st.caption(
+            f"{row['지역']} · 선택한 여행 조건을 기준으로 구성된 추천 코스"
+        )
+
+
+        # -------------------------------------------------
+        # 추천 점수 / 여행 기간
+        # -------------------------------------------------
 
         tag1, tag2 = st.columns(2)
 
 
         with tag1:
 
-            st.markdown(
-                f"""
-                <div class="score-box">
-
-                    <div class="score-number">
-                        {row['추천점수']}
-                    </div>
-
-                    <div class="score-label">
-                        로컬 추천점수
-                    </div>
-
-                </div>
-                """,
-                unsafe_allow_html=True,
+            st.metric(
+                "로컬 추천점수",
+                f"{row['추천점수']}점",
             )
 
 
         with tag2:
 
-            st.markdown(
-                f"""
-                <div class="score-box">
-
-                    <div class="score-number">
-                        {days}일
-                    </div>
-
-                    <div class="score-label">
-                        추천 여행기간
-                    </div>
-
-                </div>
-                """,
-                unsafe_allow_html=True,
+            st.metric(
+                "추천 여행기간",
+                f"{days}일",
             )
 
 
         st.write("")
 
 
+        # -------------------------------------------------
+        # 지역 특징
+        # -------------------------------------------------
+
         st.markdown(
-            make_tags(row),
-            unsafe_allow_html=True,
+            f"📍 {row['관광유형']}  ·  "
+            f"🗺️ {row['랜드마크유형']}  ·  "
+            f"🍴 {row['대표음식']}  ·  "
+            f"🎁 {row['특산품']}"
         )
 
 
         st.divider()
 
+
+        # -------------------------------------------------
+        # 여행자 맞춤 포인트
+        # -------------------------------------------------
 
         st.markdown(
             "**👥 여행자 맞춤 포인트**"
@@ -2103,6 +1980,10 @@ if row is not None:
         )
 
 
+        # -------------------------------------------------
+        # 코스 구성 방식
+        # -------------------------------------------------
+
         st.markdown(
             "**🧩 코스 구성 방식**"
         )
@@ -2111,6 +1992,10 @@ if row is not None:
             group_tip
         )
 
+
+        # -------------------------------------------------
+        # 추천 일정
+        # -------------------------------------------------
 
         st.markdown(
             "### 📅 추천 일정"
@@ -2163,16 +2048,10 @@ if row is not None:
                 )
 
 
-            expanded = (
-                plan["day"] == 1
-            )
-
-
             with st.expander(
                 f"📅 {plan['day']}일 차  ·  {summary}",
-                expanded=expanded,
+                expanded=(plan["day"] == 1),
             ):
-
 
                 schedule_col1, schedule_col2 = (
                     st.columns(2)
@@ -2246,7 +2125,7 @@ if row is not None:
                         </span>
 
                         <div class="schedule-text">
-                        {html.escape(evening_text)}
+                        {html.escape(evening_time)}
                         </div>
                         """,
                         unsafe_allow_html=True,
@@ -2349,7 +2228,7 @@ else:
 
 
 # =========================================================
-# 가장 잘 맞는 추천 지역
+# 추천 지역
 # =========================================================
 
 if recommended_region is not None:
@@ -2386,12 +2265,6 @@ if recommended_region is not None:
         recommended_region["추천기간"]
     )
 
-    theme_list = recommended_region["여행테마"]
-
-
-    # -----------------------------------------------------
-    # 지역 이미지
-    # -----------------------------------------------------
 
     region_images = IMAGE_DATA.get(
         region_name,
@@ -2402,10 +2275,6 @@ if recommended_region is not None:
         "여행지"
     )
 
-
-    # =====================================================
-    # 추천 상태
-    # =====================================================
 
     if exact_match:
 
@@ -2423,11 +2292,10 @@ if recommended_region is not None:
 
 
     # =====================================================
-    # 추천 지역 메인 배너
+    # 추천 지역 배너
     # =====================================================
 
     with st.container(border=True):
-
 
         # -------------------------------------------------
         # 지역 사진
@@ -2466,13 +2334,9 @@ if recommended_region is not None:
         )
 
         st.caption(
-            "선택한 여행 취향과 지역의 특징을 바탕으로 핵심 정보만 정리했습니다."
+            "여행 취향과 지역 특징을 바탕으로 핵심 정보만 정리했습니다."
         )
 
-
-        # -------------------------------------------------
-        # 핵심 추천 이유 1
-        # -------------------------------------------------
 
         reason_col1, reason_col2 = st.columns(
             2,
@@ -2488,7 +2352,6 @@ if recommended_region is not None:
                     "#### 🧭 여행 취향"
                 )
 
-
                 if theme != "전체":
 
                     st.markdown(
@@ -2502,15 +2365,10 @@ if recommended_region is not None:
                         "여행을 즐기기 좋아요."
                     )
 
-
                 st.caption(
                     f"추천 기간 · {duration}"
                 )
 
-
-        # -------------------------------------------------
-        # 핵심 추천 이유 2
-        # -------------------------------------------------
 
         with reason_col2:
 
@@ -2520,20 +2378,14 @@ if recommended_region is not None:
                     "#### 🍴 대표 먹거리"
                 )
 
-
                 st.markdown(
                     f"**{food}**"
                 )
-
 
                 st.caption(
                     f"추천 음식점 · {restaurant}"
                 )
 
-
-        # -------------------------------------------------
-        # 핵심 추천 이유 3
-        # -------------------------------------------------
 
         reason_col3, reason_col4 = st.columns(
             2,
@@ -2549,20 +2401,14 @@ if recommended_region is not None:
                     "#### 🏞️ 대표 볼거리"
                 )
 
-
                 st.markdown(
                     f"**{tourist}**"
                 )
-
 
                 st.caption(
                     f"{landmark_type} · {travel_type}"
                 )
 
-
-        # -------------------------------------------------
-        # 핵심 추천 이유 4
-        # -------------------------------------------------
 
         with reason_col4:
 
@@ -2572,20 +2418,14 @@ if recommended_region is not None:
                     "#### 🎁 로컬 포인트"
                 )
 
-
                 st.markdown(
                     f"**{specialty}**"
                 )
-
 
                 st.caption(
                     "지역 대표 특산품"
                 )
 
-
-        # -------------------------------------------------
-        # 한 줄 추천
-        # -------------------------------------------------
 
         st.info(
             f"📌 **{region_name}**에서 "
@@ -2683,6 +2523,23 @@ if row is not None:
             )
 
 
+            # 관광지 이미지
+
+            image_url = IMAGE_DATA.get(
+                row["지역"],
+                {}
+            ).get(
+                "여행지"
+            )
+
+            if image_url:
+
+                st.image(
+                    image_url,
+                    use_container_width=True,
+                )
+
+
     # -----------------------------------------------------
     # 먹거리
     # -----------------------------------------------------
@@ -2709,6 +2566,21 @@ if row is not None:
             st.write(
                 str(row["음식점"])
             )
+
+
+            image_url = IMAGE_DATA.get(
+                row["지역"],
+                {}
+            ).get(
+                "먹거리"
+            )
+
+            if image_url:
+
+                st.image(
+                    image_url,
+                    use_container_width=True,
+                )
 
 
             st.info(
@@ -2775,8 +2647,23 @@ if row is not None:
             )
 
             st.write(
-                str(row["지역특색"])
+                str(row["소개"])
             )
+
+
+            image_url = IMAGE_DATA.get(
+                row["지역"],
+                {}
+            ).get(
+                "구경거리"
+            )
+
+            if image_url:
+
+                st.image(
+                    image_url,
+                    use_container_width=True,
+                )
 
 
             st.info(
@@ -2786,7 +2673,7 @@ if row is not None:
 
 
 # =========================================================
-# 소개
+# 지역 소개
 # =========================================================
 
 if row is not None:
