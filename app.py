@@ -902,19 +902,6 @@ with st.sidebar:
 
     st.session_state.food_type = food_type
 
-    sort_type = st.selectbox(
-        "↕️ 정렬 기준",
-        ["점수순", "인구순", "음식점수순", "지역특색순"],
-        index=[
-            "점수순",
-            "인구순",
-            "음식점수순",
-            "지역특색순",
-        ].index(st.session_state.sort_type),
-    )
-
-    st.session_state.sort_type = sort_type
-
     keyword = st.text_input(
         "🔎 지역·음식·관광지 검색",
         value=st.session_state.keyword,
