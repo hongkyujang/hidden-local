@@ -2671,8 +2671,8 @@ if recommended_region is not None:
             f"**{region_name}**을(를) 추천합니다."
         )
 
-        # -----------------------------------------------------
-    # 사진 + 추천 이유 좌우 배치
+         # -----------------------------------------------------
+    # 사진 + 추천 이유 배너 (동일 높이)
     # -----------------------------------------------------
 
     photo_col, reason_col = st.columns(
@@ -2680,111 +2680,192 @@ if recommended_region is not None:
         gap="medium"
     )
 
+    region_images = IMAGE_DATA.get(
+        region_name,
+        {}
+    )
+
+    region_image = region_images.get("여행지")
+
     # -----------------------------------------------------
     # 왼쪽 : 지역 사진 배너
     # -----------------------------------------------------
 
     with photo_col:
 
-        with st.container(border=True):
+        if region_image:
 
-            region_images = IMAGE_DATA.get(
-                region_name,
-                {}
+            st.markdown(
+                f"""
+                <div style="
+                    height:340px;
+                    border-radius:16px;
+                    overflow:hidden;
+                    border:1px solid #34443c;
+                ">
+                    <img
+                        src="{html.escape(region_image, quote=True)}"
+                        style="
+                            width:100%;
+                            height:340px;
+                            object-fit:cover;
+                            display:block;
+                        "
+                    >
+                </div>
+                """,
+                unsafe_allow_html=True
             )
 
-            region_image = region_images.get(
-                "여행지"
-            )
+        else:
 
-            if region_image:
-                st.image(
-                    region_image,
-                    use_container_width=True
-                )
-            else:
-                st.info("📷 지역 사진 준비 중")
+            st.markdown(
+                """
+                <div style="
+                    height:340px;
+                    display:flex;
+                    align-items:center;
+                    justify-content:center;
+                    background:#18231f;
+                    border:1px solid #34443c;
+                    border-radius:16px;
+                    color:#9aa9a2;
+                    font-size:18px;
+                ">
+                    📷 지역 사진 준비 중
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
 
     # -----------------------------------------------------
     # 오른쪽 : 추천 이유 배너
-    # 펼치기/접기 기능 제거
     # -----------------------------------------------------
 
     with reason_col:
 
-        with st.container(border=True):
+        selected_theme = st.session_state.travel_theme
+        selected_age = st.session_state.age_group
+        selected_group = st.session_state.group_size
 
-            st.markdown(
-                "### 💡 왜 이 지역을 추천했을까?"
-            )
+        if selected_theme != "전체":
+            theme_text = selected_theme
+        else:
+            theme_text = travel_type
 
-            st.caption(
-                "선택한 여행 조건과 지역의 특징을 바탕으로 "
-                "추천 이유를 자세히 안내합니다."
-            )
+        age_text = (
+            selected_age
+            if selected_age != "전체"
+            else "전체"
+        )
 
-            st.divider()
+        group_text = (
+            selected_group
+            if selected_group != "전체"
+            else "전체"
+        )
 
-            # 여행 취향
-            st.markdown("#### 🧭 여행 취향")
+        st.markdown(
+            f"""
+            <div style="
+                height:340px;
+                box-sizing:border-box;
+                padding:22px;
+                border-radius:16px;
+                border:1px solid #34443c;
+                background:#17251f;
+                color:#f1f5f3;
+                overflow:hidden;
+            ">
 
-            selected_theme = st.session_state.travel_theme
-            selected_age = st.session_state.age_group
-            selected_group = st.session_state.group_size
+                <div style="
+                    font-size:23px;
+                    font-weight:700;
+                    margin-bottom:12px;
+                ">
+                    💡 왜 이 지역을 추천했을까?
+                </div>
 
-            if selected_theme != "전체":
-                st.write(
-                    f"**{selected_theme}** 테마를 중심으로 "
-                    "여행하기 좋은 지역입니다."
-                )
-            else:
-                st.write(
-                    f"**{travel_type}** 특색을 즐기며 "
-                    "지역의 다양한 매력을 경험할 수 있습니다."
-                )
+                <div style="
+                    font-size:14px;
+                    color:#aebdb5;
+                    line-height:1.6;
+                    margin-bottom:18px;
+                ">
+                    선택한 여행 취향과 지역의 특징을
+                    바탕으로 추천한 지역입니다.
+                </div>
 
-            if selected_age != "전체":
-                st.caption(
-                    f"👥 선호 나이대 · {selected_age}"
-                )
+                <div style="
+                    border-top:1px solid #34443c;
+                    padding-top:14px;
+                    margin-bottom:14px;
+                ">
+                    <div style="
+                        font-size:16px;
+                        font-weight:700;
+                        margin-bottom:7px;
+                    ">
+                        🧭 여행 취향
+                    </div>
+                    <div style="
+                        font-size:14px;
+                        line-height:1.6;
+                    ">
+                        {html.escape(theme_text)} 테마에 어울리는 여행지
+                    </div>
+                    <div style="
+                        font-size:12px;
+                        color:#aebdb5;
+                        margin-top:5px;
+                    ">
+                        여행 기간 · {html.escape(duration)}
+                    </div>
+                </div>
 
-            if selected_group != "전체":
-                st.caption(
-                    f"🧑‍🤝‍🧑 여행 인원 · {selected_group}"
-                )
+                <div style="
+                    border-top:1px solid #34443c;
+                    padding-top:14px;
+                    margin-bottom:14px;
+                ">
+                    <div style="
+                        font-size:16px;
+                        font-weight:700;
+                        margin-bottom:7px;
+                    ">
+                        🍴 대표 먹거리
+                    </div>
+                    <div style="
+                        font-size:14px;
+                        line-height:1.6;
+                    ">
+                        {html.escape(food)}
+                    </div>
+                </div>
 
-            st.divider()
+                <div style="
+                    border-top:1px solid #34443c;
+                    padding-top:14px;
+                ">
+                    <div style="
+                        font-size:16px;
+                        font-weight:700;
+                        margin-bottom:7px;
+                    ">
+                        🏞️ 대표 볼거리
+                    </div>
+                    <div style="
+                        font-size:14px;
+                        line-height:1.6;
+                    ">
+                        {html.escape(tourist)}
+                    </div>
+                </div>
 
-            # 지역의 매력
-            st.markdown("#### 🌿 지역의 매력")
-
-            st.write(
-                f"**{region_name}**은(는) "
-                f"{travel_type} 특색과 "
-                f"{landmark_type} 볼거리를 함께 "
-                "경험할 수 있는 지역입니다."
-            )
-
-            st.write(
-                f"대표 먹거리 **{food}**와 "
-                f"지역 특산품 **{specialty}**을(를) "
-                "통해 로컬 문화를 즐길 수 있습니다."
-            )
-
-            st.divider()
-
-            # 여행 계획
-            st.markdown("#### 🗓️ 여행 계획")
-
-            st.write(
-                f"추천 여행 기간은 **{duration}**입니다."
-            )
-
-            st.write(
-                f"대표 관광지인 **{tourist}**를 둘러보고, "
-                f"**{food}**을(를) 맛보는 코스로 "
-                "여행 일정을 구성해 보세요."
-            )
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
     # -----------------------------------------------------
     # 지역 이름
     # -----------------------------------------------------
