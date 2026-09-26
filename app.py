@@ -1173,6 +1173,10 @@ if len(filtered_df) > 0:
         filtered_df["지역"].iloc[0]
     )
 
+    # 현재 필터 결과에 선택된 지역이 없으면 첫 번째 지역으로 변경
+    if selected_region not in filtered_df["지역"].tolist():
+        selected_region = filtered_df["지역"].iloc[0]
+
     st.session_state.selected_region = selected_region
 
     selected_rows = filtered_df[
@@ -1185,12 +1189,10 @@ if len(filtered_df) > 0:
         row = filtered_df.iloc[0]
 
 else:
+
     selected_region = ""
     st.session_state.selected_region = ""
     row = None
-
-
-if row is not None:
 
 # =========================================================
 # 맞춤 여행 코스 계산
