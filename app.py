@@ -82,6 +82,15 @@ st.markdown(
     box-sizing: border-box !important;
 }
 
+/* 상단 로고 잘림 방지 */
+.block-container {
+    padding-top: 2rem !important;
+}
+
+.top-logo {
+    min-height: 50px !important;
+}
+
 .top-logo span {
     color: #9fe0b6;
 }
