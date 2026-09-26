@@ -4,6 +4,7 @@ import urllib.parse
 
 import pandas as pd
 import streamlit as st
+import streamlit.components.v1 as components
 import folium
 from streamlit_folium import st_folium
 
@@ -36,128 +37,7 @@ st.markdown(
         color: #f1f5f3;
     }
     # =========================================================
-# 사이드바 - 로컬 행사 홍보 광고
-# =========================================================
 
-st.markdown(
-    """
-    <div class="event-ad-wrapper">
-
-        <!-- 광고 1 -->
-        <div class="event-ad-slide">
-            <div class="event-ad-card">
-
-                <div class="event-ad-badge">
-                    "🔥 지금 떠나기 좋은 행사"
-                </div>
-
-                <div class="event-ad-title">
-                    "🎵 정선 아리랑제"
-                </div>
-
-                <div class="event-ad-region">
-                    "📍 강원특별자치도 정선군"
-                </div>
-
-                <div class="event-ad-date">
-                    "📅 2026.09.26 ~ 2026.09.30"
-                </div>
-
-                <div class="event-ad-desc">
-                    정선의 전통문화와 아리랑을 만나보세요.
-                </div>
-
-            </div>
-        </div>
-
-
-        <!-- 광고 2 -->
-        <div class="event-ad-slide">
-            <div class="event-ad-card">
-
-                <div class="event-ad-badge">
-                    "🌿 가을 로컬 여행 "
-                </div>
-
-                <div class="event-ad-title">
-                    "🏞️ 단양 로컬 풍경전"
-                </div>
-
-                <div class="event-ad-region">
-                    "📍 충청북도 단양군"
-                </div>
-
-                <div class="event-ad-date">
-                   " 📅 2026.09.25 ~ 2026.10.05"
-                </div>
-
-                <div class="event-ad-desc">
-                    "단양의 숨은 풍경과 가을 여행지를 만나보세요."
-                </div>
-
-            </div>
-        </div>
-
-
-        <!-- 광고 3 -->
-        <div class="event-ad-slide">
-            <div class="event-ad-card">
-
-                <div class="event-ad-badge">
-                   "🍚 로컬 미식 여행"
-                </div>
-
-                <div class="event-ad-title">
-                   "🍊 구례 가을 로컬마켓"
-                </div>
-
-                <div class="event-ad-region">
-                   "📍 전라남도 구례군"
-                </div>
-
-                <div class="event-ad-date">
-                    "📅 2026.09.27 ~ 2026.10.04"
-                </div>
-
-                <div class="event-ad-desc">
-                    "구례의 특산품과 지역 먹거리를 만나보세요."
-                </div>
-
-            </div>
-        </div>
-
-
-        <!-- 광고 4 -->
-        <div class="event-ad-slide">
-            <div class="event-ad-card">
-
-                <div class="event-ad-badge">
-                    "🍂 지금 떠나기 좋은 곳"
-                </div>
-
-                <div class="event-ad-title">
-                    "🍎 청송 가을 산책길"
-                </div>
-
-                <div class="event-ad-region">
-                    "📍 경상북도 청송군"
-                </div>
-
-                <div class="event-ad-date">
-                    "📅 2026.09.26 ~ 2026.10.11"
-                </div>
-
-                <div class="event-ad-desc">
-                    "청송의 자연과 가을 풍경을 천천히 즐겨보세요."
-                </div>
-
-            </div>
-        </div>
-
-    </div>
-    """,
-    unsafe_allow_html=True,
-)
 
     /* =========================================================
    상단 로컬 쉼표 작은 제목
@@ -869,142 +749,408 @@ for key, value in defaults.items():
 # =========================================================
 with st.sidebar:
 
+    # =====================================================
+    # 나만의 로컬 여행 찾기
+    # =====================================================
+
     st.markdown(
         '<div class="filter-heading">🧭 나만의 로컬 여행 찾기</div>',
-        unsafe_allow_html=True,
+        unsafe_allow_html=True
     )
 
-    # =========================================================
-# 사이드바 - 로컬 행사 홍보 광고
-# =========================================================
 
-st.markdown(
-    """
-    <div class="event-ad-wrapper">
+    # =====================================================
+    # 로컬 행사 광고
+    # =====================================================
 
-        <!-- 광고 1 -->
-        <div class="event-ad-slide">
-            <div class="event-ad-card">
+    components.html(
+        """
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
 
-                <div class="event-ad-badge">
-                    🔥 지금 떠나기 좋은 행사
+            <style>
+
+                * {
+                    box-sizing: border-box;
+                }
+
+                body {
+                    margin: 0;
+                    padding: 0;
+                    background: transparent;
+                    font-family:
+                        Arial,
+                        "Noto Sans KR",
+                        sans-serif;
+                }
+
+                .ad-container {
+                    width: 100%;
+                    height: 190px;
+                    position: relative;
+                    overflow: hidden;
+                    border-radius: 16px;
+                }
+
+                .ad-slide {
+                    position: absolute;
+                    width: 100%;
+                    height: 100%;
+                    left: 0;
+                    top: 0;
+
+                    opacity: 0;
+
+                    transition:
+                        opacity 0.6s ease,
+                        transform 0.6s ease;
+
+                    transform: translateX(20px);
+                }
+
+                .ad-slide.active {
+                    opacity: 1;
+                    transform: translateX(0);
+                }
+
+                .ad-card {
+                    width: 100%;
+                    height: 100%;
+
+                    padding: 17px;
+
+                    border-radius: 16px;
+
+                    background:
+                        linear-gradient(
+                            135deg,
+                            #315d46,
+                            #1d3328
+                        );
+
+                    border: 1px solid #426851;
+
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: center;
+
+                    box-shadow:
+                        0 6px 18px rgba(0,0,0,0.18);
+                }
+
+                .ad-badge {
+                    display: inline-block;
+
+                    width: fit-content;
+
+                    padding: 4px 8px;
+
+                    margin-bottom: 7px;
+
+                    border-radius: 20px;
+
+                    background:
+                        rgba(255,255,255,0.12);
+
+                    color: #b9dfc8;
+
+                    font-size: 10px;
+                    font-weight: 700;
+                }
+
+                .ad-title {
+                    color: #ffffff;
+
+                    font-size: 16px;
+                    font-weight: 800;
+
+                    line-height: 1.3;
+
+                    margin-bottom: 5px;
+                }
+
+                .ad-region {
+                    color: #b9dfc8;
+
+                    font-size: 11px;
+                    font-weight: 700;
+
+                    margin-bottom: 5px;
+                }
+
+                .ad-date {
+                    color: #ffffff;
+
+                    font-size: 11px;
+                    font-weight: 700;
+
+                    margin-bottom: 6px;
+                }
+
+                .ad-description {
+                    color: #c4d4cb;
+
+                    font-size: 10px;
+
+                    line-height: 1.45;
+                }
+
+                .ad-dots {
+                    position: absolute;
+
+                    left: 0;
+                    right: 0;
+                    bottom: 8px;
+
+                    text-align: center;
+
+                    z-index: 20;
+                }
+
+                .dot {
+                    display: inline-block;
+
+                    width: 5px;
+                    height: 5px;
+
+                    margin: 0 3px;
+
+                    border-radius: 50%;
+
+                    background: #789786;
+                }
+
+                .dot.active {
+                    width: 16px;
+
+                    border-radius: 10px;
+
+                    background: #dceee3;
+                }
+
+            </style>
+        </head>
+
+        <body>
+
+            <div class="ad-container">
+
+                <!-- 행사 1 -->
+                <div class="ad-slide active">
+
+                    <div class="ad-card">
+
+                        <div class="ad-badge">
+                            지금 떠나기 좋은 행사
+                        </div>
+
+                        <div class="ad-title">
+                            정선 아리랑제
+                        </div>
+
+                        <div class="ad-region">
+                            강원특별자치도 정선군
+                        </div>
+
+                        <div class="ad-date">
+                            2026.09.26 ~ 2026.09.30
+                        </div>
+
+                        <div class="ad-description">
+                            정선의 전통문화와 아리랑을 만나보세요.
+                        </div>
+
+                    </div>
+
                 </div>
 
-                <div class="event-ad-title">
-                    🎵 정선 아리랑제
+
+                <!-- 행사 2 -->
+                <div class="ad-slide">
+
+                    <div class="ad-card">
+
+                        <div class="ad-badge">
+                            가을 로컬 여행
+                        </div>
+
+                        <div class="ad-title">
+                            단양 로컬 풍경전
+                        </div>
+
+                        <div class="ad-region">
+                            충청북도 단양군
+                        </div>
+
+                        <div class="ad-date">
+                            2026.09.25 ~ 2026.10.05
+                        </div>
+
+                        <div class="ad-description">
+                            단양의 숨은 풍경과 가을 여행지를 만나보세요.
+                        </div>
+
+                    </div>
+
                 </div>
 
-                <div class="event-ad-region">
-                    📍 강원특별자치도 정선군
+
+                <!-- 행사 3 -->
+                <div class="ad-slide">
+
+                    <div class="ad-card">
+
+                        <div class="ad-badge">
+                            로컬 미식 여행
+                        </div>
+
+                        <div class="ad-title">
+                            구례 가을 로컬마켓
+                        </div>
+
+                        <div class="ad-region">
+                            전라남도 구례군
+                        </div>
+
+                        <div class="ad-date">
+                            2026.09.27 ~ 2026.10.04
+                        </div>
+
+                        <div class="ad-description">
+                            구례의 특산품과 지역 먹거리를 만나보세요.
+                        </div>
+
+                    </div>
+
                 </div>
 
-                <div class="event-ad-date">
-                    📅 2026.09.26 ~ 2026.09.30
+
+                <!-- 행사 4 -->
+                <div class="ad-slide">
+
+                    <div class="ad-card">
+
+                        <div class="ad-badge">
+                            가을 여행 추천
+                        </div>
+
+                        <div class="ad-title">
+                            청송 가을 산책길
+                        </div>
+
+                        <div class="ad-region">
+                            경상북도 청송군
+                        </div>
+
+                        <div class="ad-date">
+                            2026.09.26 ~ 2026.10.11
+                        </div>
+
+                        <div class="ad-description">
+                            청송의 자연과 가을 풍경을 천천히 즐겨보세요.
+                        </div>
+
+                    </div>
+
                 </div>
 
-                <div class="event-ad-desc">
-                    정선의 전통문화와 아리랑을 만나보세요.
+
+                <!-- 하단 광고 위치 표시 -->
+                <div class="ad-dots">
+
+                    <span class="dot active"></span>
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+
                 </div>
 
             </div>
-        </div>
 
 
-        <!-- 광고 2 -->
-        <div class="event-ad-slide">
-            <div class="event-ad-card">
+            <script>
 
-                <div class="event-ad-badge">
-                    🌿 가을 로컬 여행
-                </div>
+                const slides =
+                    document.querySelectorAll(".ad-slide");
 
-                <div class="event-ad-title">
-                    🏞️ 단양 로컬 풍경전
-                </div>
+                const dots =
+                    document.querySelectorAll(".dot");
 
-                <div class="event-ad-region">
-                    📍 충청북도 단양군
-                </div>
-
-                <div class="event-ad-date">
-                    📅 2026.09.25 ~ 2026.10.05
-                </div>
-
-                <div class="event-ad-desc">
-                    단양의 숨은 풍경과 가을 여행지를 만나보세요.
-                </div>
-
-            </div>
-        </div>
+                let currentIndex = 0;
 
 
-        <!-- 광고 3 -->
-        <div class="event-ad-slide">
-            <div class="event-ad-card">
+                function showNextSlide() {
 
-                <div class="event-ad-badge">
-                    🍚 로컬 미식 여행
-                </div>
+                    slides[currentIndex]
+                        .classList.remove("active");
 
-                <div class="event-ad-title">
-                    🍊 구례 가을 로컬마켓
-                </div>
-
-                <div class="event-ad-region">
-                    📍 전라남도 구례군
-                </div>
-
-                <div class="event-ad-date">
-                    📅 2026.09.27 ~ 2026.10.04
-                </div>
-
-                <div class="event-ad-desc">
-                    구례의 특산품과 지역 먹거리를 만나보세요.
-                </div>
-
-            </div>
-        </div>
+                    dots[currentIndex]
+                        .classList.remove("active");
 
 
-        <!-- 광고 4 -->
-        <div class="event-ad-slide">
-            <div class="event-ad-card">
+                    currentIndex =
+                        (currentIndex + 1)
+                        % slides.length;
 
-                <div class="event-ad-badge">
-                    🍂 지금 떠나기 좋은 곳
-                </div>
 
-                <div class="event-ad-title">
-                    🍎 청송 가을 산책길
-                </div>
+                    slides[currentIndex]
+                        .classList.add("active");
 
-                <div class="event-ad-region">
-                    📍 경상북도 청송군
-                </div>
+                    dots[currentIndex]
+                        .classList.add("active");
+                }
 
-                <div class="event-ad-date">
-                    📅 2026.09.26 ~ 2026.10.11
-                </div>
 
-                <div class="event-ad-desc">
-                    청송의 자연과 가을 풍경을 천천히 즐겨보세요.
-                </div>
+                /*
+                 * 3초마다 다음 행사로 변경
+                 */
+                setInterval(
+                    showNextSlide,
+                    3000
+                );
 
-            </div>
-        </div>
+            </script>
 
-    </div>
-    """,
-    unsafe_allow_html=True,
-)
+        </body>
+        </html>
+        """,
+        height=195,
+        scrolling=False,
+    )
+
+
+    # =====================================================
+    # 설명
+    # =====================================================
 
     st.caption(
         "여행 취향을 선택하면 추천 지역과 코스가 달라집니다."
     )
 
+
+    # =====================================================
+    # 기존 필터
+    # =====================================================
+
+    st.slider(
+        "최소 추천 점수",
+        min_value=0,
+        max_value=100,
+        value=st.session_state.min_score,
+        key="min_score",
+    )
+
     st.selectbox(
         "선호 나이대",
-        ["전체", "10대", "20대", "30~40대", "50대 이상"],
+        [
+            "전체",
+            "10대",
+            "20대",
+            "30~40대",
+            "50대 이상"
+        ],
         key="age_group",
     )
 
@@ -1015,7 +1161,7 @@ st.markdown(
             "1인 (혼행)",
             "2인 (커플/친구)",
             "3인",
-            "4인 이상 (가족)",
+            "4인 이상 (가족)"
         ],
         key="group_size",
     )
@@ -1027,7 +1173,7 @@ st.markdown(
             "당일치기",
             "1박 2일",
             "2박 3일",
-            "3박 이상",
+            "3박 이상"
         ],
         key="travel_duration",
     )
@@ -1042,7 +1188,7 @@ st.markdown(
             "맛집·미식",
             "축제·행사",
             "사진 명소",
-            "가족 여행",
+            "가족 여행"
         ],
         key="travel_theme",
     )
@@ -1055,7 +1201,7 @@ st.markdown(
             "해산물",
             "산채음식",
             "향토음식",
-            "간식·디저트",
+            "간식·디저트"
         ],
         key="food_type",
     )
@@ -1066,31 +1212,52 @@ st.markdown(
             "점수순",
             "인구 적은 순",
             "음식 점수순",
-            "지역 특색순",
+            "지역 특색순"
         ],
         key="sort_type",
     )
 
     st.text_input(
         "지역·음식·관광지 검색",
-        key="keyword",
+        key="keyword"
     )
 
     st.markdown("### 지도 표시 항목")
 
-    show_regions = st.checkbox("추천 지역", True)
-    show_food = st.checkbox("음식점", True)
-    show_tour = st.checkbox("관광지", True)
-    show_events = st.checkbox("지역 행사", True)
-    show_specialties = st.checkbox("특산품", True)
+    show_regions = st.checkbox(
+        "추천 지역",
+        True
+    )
 
-    if st.button("🔄 필터 초기화", use_container_width=True):
+    show_food = st.checkbox(
+        "음식점",
+        True
+    )
+
+    show_tour = st.checkbox(
+        "관광지",
+        True
+    )
+
+    show_events = st.checkbox(
+        "지역 행사",
+        True
+    )
+
+    show_specialties = st.checkbox(
+        "특산품",
+        True
+    )
+
+    if st.button(
+        "🔄 필터 초기화",
+        use_container_width=True
+    ):
 
         for key, value in defaults.items():
             st.session_state[key] = value
 
         st.rerun()
-
 
 # =========================================================
 # 필터 적용
