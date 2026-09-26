@@ -36,6 +36,24 @@ st.markdown(
         color: #f1f5f3;
     }
 
+    /* =========================================================
+   상단 로컬 쉼표 작은 제목
+   ========================================================= */
+
+.top-logo {
+    font-size: 22px;
+    font-weight: 800;
+    color: #dceee3;
+    margin-top: 5px;
+    margin-bottom: 18px;
+    text-align: left;
+    letter-spacing: -0.5px;
+}
+
+.top-logo span {
+    margin-left: 4px;
+}
+
     [data-testid="stSidebar"] {
         background: #17251f;
         border-right: 1px solid #30463b;
@@ -945,17 +963,13 @@ else:
 
 
 # =========================================================
-# 상단 제목
+# 상단 로고 / 제목
 # =========================================================
+
 st.markdown(
     """
-    <div class="main-title">
-        <h1>🚗 로컬 쉼표</h1>
-        <p>
-            음악의 '쉼표'처럼 잠시 숨을 쉬어가는 여행.
-            SGIS 기술을 활용해 붐비는 관광지를 벗어나
-            우리 일행만의 조용한 로컬 여행 코스를 찾아드립니다.
-        </p>
+    <div class="top-logo">
+        🚗 <span>로컬 쉼표</span>
     </div>
     """,
     unsafe_allow_html=True,
