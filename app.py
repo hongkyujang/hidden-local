@@ -48,19 +48,19 @@ st.markdown(
             <div class="event-ad-card">
 
                 <div class="event-ad-badge">
-                    🔥 지금 떠나기 좋은 행사
+                    "🔥 지금 떠나기 좋은 행사"
                 </div>
 
                 <div class="event-ad-title">
-                    🎵 정선 아리랑제
+                    "🎵 정선 아리랑제"
                 </div>
 
                 <div class="event-ad-region">
-                    📍 강원특별자치도 정선군
+                    "📍 강원특별자치도 정선군"
                 </div>
 
                 <div class="event-ad-date">
-                    📅 2026.09.26 ~ 2026.09.30
+                    "📅 2026.09.26 ~ 2026.09.30"
                 </div>
 
                 <div class="event-ad-desc">
@@ -76,23 +76,23 @@ st.markdown(
             <div class="event-ad-card">
 
                 <div class="event-ad-badge">
-                    🌿 가을 로컬 여행
+                    "🌿 가을 로컬 여행 "
                 </div>
 
                 <div class="event-ad-title">
-                    🏞️ 단양 로컬 풍경전
+                    "🏞️ 단양 로컬 풍경전"
                 </div>
 
                 <div class="event-ad-region">
-                    📍 충청북도 단양군
+                    "📍 충청북도 단양군"
                 </div>
 
                 <div class="event-ad-date">
-                    📅 2026.09.25 ~ 2026.10.05
+                   " 📅 2026.09.25 ~ 2026.10.05"
                 </div>
 
                 <div class="event-ad-desc">
-                    단양의 숨은 풍경과 가을 여행지를 만나보세요.
+                    "단양의 숨은 풍경과 가을 여행지를 만나보세요."
                 </div>
 
             </div>
@@ -104,23 +104,23 @@ st.markdown(
             <div class="event-ad-card">
 
                 <div class="event-ad-badge">
-                    🍚 로컬 미식 여행
+                   "🍚 로컬 미식 여행"
                 </div>
 
                 <div class="event-ad-title">
-                    🍊 구례 가을 로컬마켓
+                   "🍊 구례 가을 로컬마켓"
                 </div>
 
                 <div class="event-ad-region">
-                    📍 전라남도 구례군
+                   "📍 전라남도 구례군"
                 </div>
 
                 <div class="event-ad-date">
-                    📅 2026.09.27 ~ 2026.10.04
+                    "📅 2026.09.27 ~ 2026.10.04"
                 </div>
 
                 <div class="event-ad-desc">
-                    구례의 특산품과 지역 먹거리를 만나보세요.
+                    "구례의 특산품과 지역 먹거리를 만나보세요."
                 </div>
 
             </div>
@@ -132,23 +132,23 @@ st.markdown(
             <div class="event-ad-card">
 
                 <div class="event-ad-badge">
-                    🍂 지금 떠나기 좋은 곳
+                    "🍂 지금 떠나기 좋은 곳"
                 </div>
 
                 <div class="event-ad-title">
-                    🍎 청송 가을 산책길
+                    "🍎 청송 가을 산책길"
                 </div>
 
                 <div class="event-ad-region">
-                    📍 경상북도 청송군
+                    "📍 경상북도 청송군"
                 </div>
 
                 <div class="event-ad-date">
-                    📅 2026.09.26 ~ 2026.10.11
+                    "📅 2026.09.26 ~ 2026.10.11"
                 </div>
 
                 <div class="event-ad-desc">
-                    청송의 자연과 가을 풍경을 천천히 즐겨보세요.
+                    "청송의 자연과 가을 풍경을 천천히 즐겨보세요."
                 </div>
 
             </div>
