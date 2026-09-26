@@ -582,36 +582,25 @@ def render_image_card(
     description,
 ):
 
-    safe_title = html.escape(
-        str(title)
-    )
-
-    safe_desc = html.escape(
-        str(description)
-    )
-
-    safe_url = html.escape(
-        str(image_url)
-    )
-
     if image_url:
-    st.image(
-        image_url,
-        width="stretch"
+
+        st.image(
+            image_url,
+            width="stretch",
+        )
+
+    st.markdown(
+        f"""
+        <div class="detail-card-title">
+            {html.escape(str(title))}
+        </div>
+
+        <div class="detail-card-description">
+            {html.escape(str(description))}
+        </div>
+        """,
+        unsafe_allow_html=True,
     )
-
-st.markdown(
-    f"""
-    <div class="detail-title">
-        {html.escape(title)}
-    </div>
-    <div class="detail-description">
-        {html.escape(description)}
-    </div>
-    """,
-    unsafe_allow_html=True,
-)
-
 
 # =========================================================
 # 취향 일치 판별
@@ -1103,48 +1092,52 @@ if st.session_state.food_type != "전체":
 
     food_filter_map = {
 
-        "한식": [
-            "곤드레밥",
-            "산채정식",
-            "소바",
-            "어죽",
-            "마늘정식",
-            "산채비빔밥",
-            "닭백숙",
-            "꽃게",
-            "장어구이",
-            "오징어",
-        ],
+    "한식": [
+        "곤드레밥",
+        "산채정식",
+        "소바",
+        "어죽",
+        "마늘정식",
+        "산채비빔밥",
+        "닭백숙",
+        "꽃게",
+        "장어구이",
+        "오징어",
+    ],
 
-        "해산물": [
-            "꽃게",
-            "장어구이",
-            "오징어",
-        ],
+    "해산물": [
+        "꽃게",
+        "장어구이",
+        "오징어",
+    ],
 
-        "향토음식": [
-            "곤드레밥",
-            "산채정식",
-            "소바",
-            "어죽",
-            "마늘정식",
-            "산채비빔밥",
-            "닭백숙",
-        ],
+    "육류": [
+        "닭백숙",
+        "장어구이",
+    ],
 
-        "간식·특산물": [
-            "곤드레",
-            "산수유",
-            "의령망개떡",
-            "단양마늘",
-            "고추·산나물",
-            "청송사과",
-            "해산물",
-            "유자",
-            "오징어·호박엿",
-        ],
-    }
+    "전통음식": [
+        "곤드레밥",
+        "산채정식",
+        "소바",
+        "어죽",
+        "마늘정식",
+        "산채비빔밥",
+        "닭백숙",
+    ],
 
+    "지역특산물": [
+        "곤드레",
+        "산수유",
+        "의령망개떡",
+        "단양마늘",
+        "고추·산나물",
+        "청송사과",
+        "해산물",
+        "유자",
+        "오징어·호박엿",
+    ],
+}
 
     allowed = food_filter_map[
         st.session_state.food_type
@@ -2515,7 +2508,7 @@ if row is not None:
                         f"""
                         **🌅 오전**
 
-                        <span class="schedule-time">
+                        <span class="schedule-text">
                         {html.escape(morning_time)}
                         </span>
 
@@ -2910,10 +2903,6 @@ else:
         st.caption(
             "사이드바의 검색어나 여행 조건을 변경해 주세요."
         )
-
-                        src="{html.escape(image_url, quote=True)}"
-                        style="
-                            width:100%# =========================================================
 
 # =========================================================
 # 상세 지역 정보 - 카테고리별 목록
