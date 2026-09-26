@@ -1953,8 +1953,13 @@ if row is not None:
 st.markdown("## 📍 지금 취향에 맞는 추천 지역")
 
 st.caption(
-    "선택한 여행 취향을 분석하여 가장 잘 맞는 지역을 추천합니다."
+    "선택한 여행 취향과 지역 정보를 종합하여 가장 잘 맞는 지역을 추천합니다."
 )
+
+# ---------------------------------------------------------
+# 취향 일치 지역이 있으면 일치 지역 중 1위
+# 없으면 현재 검색 결과 중 추천점수 1위
+# ---------------------------------------------------------
 
 if len(preference_df) > 0:
 
@@ -1964,10 +1969,10 @@ if len(preference_df) > 0:
         .iloc[0]
     )
 
+    exact_match = True
+
 else:
 
-    # 모든 조건을 만족하는 지역이 없을 경우
-    # 현재 필터 결과에서 추천점수가 가장 높은 지역을 선택
     if len(filtered_df) > 0:
 
         recommended_region = (
@@ -1976,38 +1981,186 @@ else:
             .iloc[0]
         )
 
+        exact_match = False
+
     else:
 
         recommended_region = None
+        exact_match = False
 
+
+# =========================================================
+# 추천 지역 상세 정보
+# =========================================================
 
 if recommended_region is not None:
 
     region_name = str(recommended_region["지역"])
     score = recommended_region["추천점수"]
+
     food = str(recommended_region["대표음식"])
+    restaurant = str(recommended_region["음식점"])
+
     tourist = str(recommended_region["관광지"])
+    event = str(recommended_region["지역행사"])
+
     specialty = str(recommended_region["특산품"])
+
+    travel_type = str(recommended_region["관광유형"])
+    landmark_type = str(recommended_region["랜드마크유형"])
+
+    duration = str(recommended_region["추천기간"])
+    theme = str(recommended_region["여행테마"])
+
+    population = int(recommended_region["인구"])
+    population_change = float(
+        recommended_region["인구변화율"]
+    )
+
+    food_score = float(
+        recommended_region["음식점수"]
+    )
+
+    awareness = float(
+        recommended_region["관광인지도"]
+    )
+
+    distinctiveness = float(
+        recommended_region["지역특색"]
+    )
+
+    # -----------------------------------------------------
+    # 추천 상태
+    # -----------------------------------------------------
+
+    if exact_match:
+
+        st.success(
+            f"🎯 **{region_name}**은(는) "
+            "현재 선택한 여행 취향과 조건이 일치하는 지역입니다."
+        )
+
+    else:
+
+        st.info(
+            f"💡 현재 선택한 모든 조건을 동시에 만족하는 지역이 없어 "
+            f"**{region_name}**을(를) 가장 적합한 대안 지역으로 추천합니다."
+        )
+
+    # =====================================================
+    # 메인 추천 배너
+    # =====================================================
 
     with st.container(border=True):
 
-        st.markdown("### ✨ 가장 잘 맞는 지역")
+        st.markdown("### ✨ 가장 잘 맞는 추천 지역")
 
         st.markdown(
             f"# 📍 {region_name}"
         )
 
-        st.metric(
-            "추천점수",
-            f"{score}점"
+        st.markdown(
+            f"### ⭐ 추천점수 **{score}점**"
         )
 
         st.caption(
-            "선택한 여행 취향과 현재 지역 데이터를 종합하여 "
-            "가장 적합한 지역을 추천했습니다."
+            "지역 인지도, 음식, 지역 특색 및 여행 취향 정보를 "
+            "종합하여 산출한 추천 결과입니다."
         )
 
         st.divider()
+
+        # -------------------------------------------------
+        # 기본 지역 정보
+        # -------------------------------------------------
+
+        info_col1, info_col2, info_col3, info_col4 = st.columns(4)
+
+        with info_col1:
+
+            st.metric(
+                "👥 지역 인구",
+                f"{population:,}명"
+            )
+
+        with info_col2:
+
+            st.metric(
+                "📉 인구 변화율",
+                f"{population_change:+.1f}%"
+            )
+
+        with info_col3:
+
+            st.metric(
+                "🍴 음식 점수",
+                f"{food_score:.0f}점"
+            )
+
+        with info_col4:
+
+            st.metric(
+                "🏞️ 지역 특색",
+                f"{distinctiveness:.0f}점"
+            )
+
+        st.divider()
+
+        # =================================================
+        # 여행 정보
+        # =================================================
+
+        st.markdown("### 🧭 이 지역의 여행 정보")
+
+        travel_col1, travel_col2, travel_col3 = st.columns(3)
+
+        with travel_col1:
+
+            with st.container(border=True):
+
+                st.markdown("#### 🗓️ 추천 여행 기간")
+
+                st.markdown(
+                    f"**{duration}**"
+                )
+
+                st.caption(
+                    "지역 여행에 적합한 예상 일정"
+                )
+
+        with travel_col2:
+
+            with st.container(border=True):
+
+                st.markdown("#### 🏞️ 여행 테마")
+
+                st.markdown(
+                    f"**{theme}**"
+                )
+
+                st.caption(
+                    "지역의 주요 여행 테마"
+                )
+
+        with travel_col3:
+
+            with st.container(border=True):
+
+                st.markdown("#### 🗺️ 관광 유형")
+
+                st.markdown(
+                    f"**{travel_type}**"
+                )
+
+                st.caption(
+                    "추천 지역의 관광 특징"
+                )
+
+        # =================================================
+        # 먹거리 / 관광 / 특산품
+        # =================================================
+
+        st.markdown("### 🍴 지역에서 즐길 거리")
 
         photo_col1, photo_col2, photo_col3 = st.columns(
             3,
@@ -2025,52 +2178,169 @@ if recommended_region is not None:
 
         with photo_col1:
 
-            st.markdown("#### 🍴 대표 먹거리")
+            with st.container(border=True):
 
-            if food_image:
-                st.image(
-                    food_image,
-                    use_container_width=True
+                st.markdown("#### 🍴 대표 먹거리")
+
+                if food_image:
+
+                    st.image(
+                        food_image,
+                        use_container_width=True
+                    )
+
+                st.markdown(
+                    f"**{food}**"
                 )
 
-            st.markdown(f"**{food}**")
-            st.caption("이 지역의 대표 음식")
+                st.caption(
+                    f"추천 음식점 · {restaurant}"
+                )
 
         with photo_col2:
 
-            st.markdown("#### 🏞️ 대표 관광지")
+            with st.container(border=True):
 
-            if tourist_image:
-                st.image(
-                    tourist_image,
-                    use_container_width=True
+                st.markdown("#### 🏞️ 대표 관광지")
+
+                if tourist_image:
+
+                    st.image(
+                        tourist_image,
+                        use_container_width=True
+                    )
+
+                st.markdown(
+                    f"**{tourist}**"
                 )
 
-            st.markdown(f"**{tourist}**")
-            st.caption("추천 관광 명소")
+                st.caption(
+                    f"랜드마크 유형 · {landmark_type}"
+                )
 
         with photo_col3:
 
-            st.markdown("#### 🎁 지역 특산품")
+            with st.container(border=True):
 
-            if specialty_image:
-                st.image(
-                    specialty_image,
-                    use_container_width=True
+                st.markdown("#### 🎁 지역 특산품")
+
+                if specialty_image:
+
+                    st.image(
+                        specialty_image,
+                        use_container_width=True
+                    )
+
+                st.markdown(
+                    f"**{specialty}**"
                 )
 
-            st.markdown(f"**{specialty}**")
-            st.caption("지역 대표 특산품")
+                st.caption(
+                    "지역 대표 특산품"
+                )
+
+        # =================================================
+        # 지역 행사
+        # =================================================
+
+        st.markdown("### 🎉 지역 행사")
+
+        with st.container(border=True):
+
+            st.markdown(
+                f"### 🎊 {event}"
+            )
+
+            st.caption(
+                f"{region_name}에서 경험할 수 있는 지역 행사입니다."
+            )
+
+        # =================================================
+        # 추천 이유
+        # =================================================
+
+        st.markdown("### 💡 왜 이 지역을 추천했을까요?")
+
+        reasons = []
+
+        if awareness <= 40:
+            reasons.append(
+                "✨ 관광 인지도가 비교적 낮아 새로운 지역을 발견하기 좋습니다."
+            )
+
+        if food_score >= 90:
+            reasons.append(
+                "🍴 지역 음식 점수가 높아 로컬 먹거리를 즐기기 좋습니다."
+            )
+
+        if distinctiveness >= 94:
+            reasons.append(
+                "🏡 지역 특색이 높아 다른 지역과 차별화된 여행을 경험할 수 있습니다."
+            )
+
+        if population_change < 0:
+            reasons.append(
+                "📍 인구 변화 데이터를 고려하여 숨은 지역 후보로 선정되었습니다."
+            )
+
+        if theme != "없음":
+            reasons.append(
+                f"🧭 **{theme}** 중심의 여행을 계획하기 좋은 지역입니다."
+            )
+
+        if len(reasons) == 0:
+            reasons.append(
+                "🎯 지역 특성과 여행 취향을 종합하여 추천된 지역입니다."
+            )
+
+        for reason in reasons:
+
+            st.markdown(
+                f"- {reason}"
+            )
+
+        # =================================================
+        # 한눈에 보는 추천 정보
+        # =================================================
+
+        st.markdown("### 📋 한눈에 보는 추천 정보")
+
+        summary_col1, summary_col2 = st.columns(2)
+
+        with summary_col1:
+
+            st.markdown(
+                f"""
+- 📍 **지역:** {region_name}
+- ⭐ **추천점수:** {score}점
+- 🍴 **대표 음식:** {food}
+- 🏞️ **대표 관광지:** {tourist}
+- 🎁 **특산품:** {specialty}
+"""
+            )
+
+        with summary_col2:
+
+            st.markdown(
+                f"""
+- 🗓️ **추천 기간:** {duration}
+- 🧭 **여행 테마:** {theme}
+- 🏕️ **관광 유형:** {travel_type}
+- 🗺️ **랜드마크:** {landmark_type}
+- 🎉 **지역 행사:** {event}
+"""
+            )
 
 else:
 
     with st.container(border=True):
 
-        st.markdown("### 🔎 추천 지역을 찾을 수 없습니다.")
+        st.markdown(
+            "### 🔎 검색 결과가 없습니다."
+        )
 
         st.caption(
-            "검색 조건에 해당하는 지역 데이터가 없습니다. "
-            "키워드나 여행 기간을 변경해 주세요."
+            "사이드바의 검색어 또는 여행 조건을 변경해 주세요."
         )
 # =========================================================
 # 상세 지역 정보
