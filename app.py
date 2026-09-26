@@ -594,40 +594,23 @@ def render_image_card(
         str(image_url)
     )
 
-    st.markdown(
-        f"""
-        <div class="photo-card">
-
-            <img src="{safe_url}"
-                 style="
-                    width:100%;
-                    height:190px;
-                    object-fit:cover;
-                    border-radius:12px;
-                 ">
-
-            <div style="
-                font-size:16px;
-                font-weight:900;
-                margin-top:10px;
-                color:#eef7f1;
-            ">
-                {safe_title}
-            </div>
-
-            <div style="
-                font-size:12px;
-                color:#9eb5a7;
-                line-height:1.5;
-                margin-top:5px;
-            ">
-                {safe_desc}
-            </div>
-
-        </div>
-        """,
-        unsafe_allow_html=True,
+    if image_url:
+    st.image(
+        image_url,
+        width="stretch"
     )
+
+st.markdown(
+    f"""
+    <div class="detail-title">
+        {html.escape(title)}
+    </div>
+    <div class="detail-description">
+        {html.escape(description)}
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
 
 
 # =========================================================
