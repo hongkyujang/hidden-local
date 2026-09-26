@@ -1945,68 +1945,187 @@ if row is not None:
 
 
 # =========================================================
-# 추천 지역
+# 지금 취향에 맞는 추천 지역
 # =========================================================
+
+st.markdown("### 📍 지금 취향에 맞는 추천 지역")
+
+st.caption(
+    "선택한 여행 취향을 모두 고려하여 가장 잘 맞는 지역 1곳을 추천합니다."
+)
 
 if len(preference_df) > 0:
 
-    st.markdown(
-        "### 📍 지금 취향에 맞는 추천 지역"
+    # 추천점수가 가장 높은 지역 1곳만 선택
+    recommended_region = (
+        preference_df
+        .sort_values("추천점수", ascending=False)
+        .iloc[0]
     )
 
-    st.caption(
-        "사이드바에서 선택한 여행 취향을 기준으로 일치하는 지역입니다."
+    recommended_name = recommended_region["지역"]
+
+    # 지역별 이미지
+    recommended_images = IMAGE_DATA.get(
+        recommended_name,
+        {}
     )
 
-    recommend_cols = st.columns(3)
+    recommended_photo = recommended_images.get(
+        "여행지",
+        ""
+    )
 
-    for i, (_, r) in enumerate(
-        preference_df.sort_values(
-            "추천점수",
-            ascending=False,
-        ).head(6).iterrows()
-    ):
+    # -----------------------------------------------------
+    # 추천 지역 카드
+    # -----------------------------------------------------
 
-        with recommend_cols[i % 3]:
+    if recommended_photo:
 
-            st.markdown(
-                f"""
-                <div class="section-card">
+        st.markdown(
+            f"""
+            <div class="section-card"
+                 style="
+                    padding:0;
+                    overflow:hidden;
+                    margin-top:15px;
+                 ">
+
+                <img src="{recommended_photo}"
+                     style="
+                        width:100%;
+                        height:280px;
+                        object-fit:cover;
+                        display:block;
+                     ">
+
+                <div style="padding:24px;">
 
                     <div style="
-                        font-size:17px;
-                        font-weight:900;
-                        color:#edf7f0;
+                        color:#9fe0b6;
+                        font-size:14px;
+                        font-weight:800;
+                        margin-bottom:7px;
                     ">
-                        📍 {html.escape(r["지역"])}
+                        ✨ 당신에게 가장 잘 맞는 지역
+                    </div>
+
+                    <div style="
+                        color:#edf7f0;
+                        font-size:28px;
+                        font-weight:900;
+                        margin-bottom:8px;
+                    ">
+                        📍 {html.escape(str(recommended_name))}
                     </div>
 
                     <div style="
                         color:#9fe0b6;
-                        font-size:23px;
+                        font-size:24px;
                         font-weight:900;
-                        margin-top:8px;
+                        margin-bottom:18px;
                     ">
-                        {r["추천점수"]}점
+                        추천점수 {recommended_region["추천점수"]}점
                     </div>
 
                     <div style="
-                        color:#a5baad;
-                        font-size:13px;
-                        line-height:1.6;
-                        margin-top:7px;
+                        display:grid;
+                        grid-template-columns:
+                            repeat(3, 1fr);
+                        gap:12px;
                     ">
-                        🍴 {html.escape(r["대표음식"])}<br>
-                        🏞️ {html.escape(r["관광지"])}<br>
-                        🎁 {html.escape(r["특산품"])}
+
+                        <div style="
+                            background:#17251f;
+                            border-radius:12px;
+                            padding:14px;
+                        ">
+                            <div style="
+                                color:#82988d;
+                                font-size:12px;
+                            ">
+                                🍴 대표 음식
+                            </div>
+                            <div style="
+                                color:#edf7f0;
+                                font-size:15px;
+                                font-weight:800;
+                                margin-top:5px;
+                            ">
+                                {html.escape(
+                                    str(recommended_region["대표음식"])
+                                )}
+                            </div>
+                        </div>
+
+                        <div style="
+                            background:#17251f;
+                            border-radius:12px;
+                            padding:14px;
+                        ">
+                            <div style="
+                                color:#82988d;
+                                font-size:12px;
+                            ">
+                                🏞️ 대표 관광지
+                            </div>
+                            <div style="
+                                color:#edf7f0;
+                                font-size:15px;
+                                font-weight:800;
+                                margin-top:5px;
+                            ">
+                                {html.escape(
+                                    str(recommended_region["관광지"])
+                                )}
+                            </div>
+                        </div>
+
+                        <div style="
+                            background:#17251f;
+                            border-radius:12px;
+                            padding:14px;
+                        ">
+                            <div style="
+                                color:#82988d;
+                                font-size:12px;
+                            ">
+                                🎁 특산품
+                            </div>
+                            <div style="
+                                color:#edf7f0;
+                                font-size:15px;
+                                font-weight:800;
+                                margin-top:5px;
+                            ">
+                                {html.escape(
+                                    str(recommended_region["특산품"])
+                                )}
+                            </div>
+                        </div>
+
                     </div>
 
                 </div>
-                """,
-                unsafe_allow_html=True,
-            )
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
 
+    else:
 
+        # 사진이 없을 경우에도 추천 지역은 정상 표시
+        st.info(
+            f"📍 추천 지역: {recommended_name} "
+            f"({recommended_region['추천점수']}점)"
+        )
+
+else:
+
+    st.info(
+        "현재 선택한 여행 취향과 일치하는 지역이 없습니다. "
+        "사이드바의 여행 취향을 조금 완화해 보세요."
+    )
 # =========================================================
 # 선택 지역 사진
 # =========================================================
