@@ -1951,180 +1951,63 @@ if row is not None:
 st.markdown("### 📍 지금 취향에 맞는 추천 지역")
 
 st.caption(
-    "선택한 여행 취향을 모두 고려하여 가장 잘 맞는 지역 1곳을 추천합니다."
+    "선택한 여행 취향을 기준으로 가장 잘 맞는 지역 1곳을 추천합니다."
 )
 
 if len(preference_df) > 0:
 
-    # 추천점수가 가장 높은 지역 1곳만 선택
+    # 추천점수가 가장 높은 지역 1곳
     recommended_region = (
         preference_df
         .sort_values("추천점수", ascending=False)
         .iloc[0]
     )
 
-    recommended_name = recommended_region["지역"]
+    # 추천 지역 정보
+    region_name = str(recommended_region["지역"])
+    score = recommended_region["추천점수"]
+    food = str(recommended_region["대표음식"])
+    tourist = str(recommended_region["관광지"])
+    specialty = str(recommended_region["특산품"])
 
-    # 지역별 이미지
-    recommended_images = IMAGE_DATA.get(
-        recommended_name,
-        {}
+    # 추천 지역 표시
+    st.success(
+        f"✨ 지금 선택한 여행 취향에 가장 잘 맞는 지역은 "
+        f"**{region_name}** 입니다."
     )
 
-    recommended_photo = recommended_images.get(
-        "여행지",
-        ""
-    )
+    # 추천 점수
+    score_col, food_col, tourist_col, specialty_col = st.columns(4)
 
-    # -----------------------------------------------------
-    # 추천 지역 카드
-    # -----------------------------------------------------
-
-    if recommended_photo:
-
-        st.markdown(
-            f"""
-            <div class="section-card"
-                 style="
-                    padding:0;
-                    overflow:hidden;
-                    margin-top:15px;
-                 ">
-
-                <img src="{recommended_photo}"
-                     style="
-                        width:100%;
-                        height:280px;
-                        object-fit:cover;
-                        display:block;
-                     ">
-
-                <div style="padding:24px;">
-
-                    <div style="
-                        color:#9fe0b6;
-                        font-size:14px;
-                        font-weight:800;
-                        margin-bottom:7px;
-                    ">
-                        ✨ 당신에게 가장 잘 맞는 지역
-                    </div>
-
-                    <div style="
-                        color:#edf7f0;
-                        font-size:28px;
-                        font-weight:900;
-                        margin-bottom:8px;
-                    ">
-                        📍 {html.escape(str(recommended_name))}
-                    </div>
-
-                    <div style="
-                        color:#9fe0b6;
-                        font-size:24px;
-                        font-weight:900;
-                        margin-bottom:18px;
-                    ">
-                        추천점수 {recommended_region["추천점수"]}점
-                    </div>
-
-                    <div style="
-                        display:grid;
-                        grid-template-columns:
-                            repeat(3, 1fr);
-                        gap:12px;
-                    ">
-
-                        <div style="
-                            background:#17251f;
-                            border-radius:12px;
-                            padding:14px;
-                        ">
-                            <div style="
-                                color:#82988d;
-                                font-size:12px;
-                            ">
-                                🍴 대표 음식
-                            </div>
-                            <div style="
-                                color:#edf7f0;
-                                font-size:15px;
-                                font-weight:800;
-                                margin-top:5px;
-                            ">
-                                {html.escape(
-                                    str(recommended_region["대표음식"])
-                                )}
-                            </div>
-                        </div>
-
-                        <div style="
-                            background:#17251f;
-                            border-radius:12px;
-                            padding:14px;
-                        ">
-                            <div style="
-                                color:#82988d;
-                                font-size:12px;
-                            ">
-                                🏞️ 대표 관광지
-                            </div>
-                            <div style="
-                                color:#edf7f0;
-                                font-size:15px;
-                                font-weight:800;
-                                margin-top:5px;
-                            ">
-                                {html.escape(
-                                    str(recommended_region["관광지"])
-                                )}
-                            </div>
-                        </div>
-
-                        <div style="
-                            background:#17251f;
-                            border-radius:12px;
-                            padding:14px;
-                        ">
-                            <div style="
-                                color:#82988d;
-                                font-size:12px;
-                            ">
-                                🎁 특산품
-                            </div>
-                            <div style="
-                                color:#edf7f0;
-                                font-size:15px;
-                                font-weight:800;
-                                margin-top:5px;
-                            ">
-                                {html.escape(
-                                    str(recommended_region["특산품"])
-                                )}
-                            </div>
-                        </div>
-
-                    </div>
-
-                </div>
-            </div>
-            """,
-            unsafe_allow_html=True,
+    with score_col:
+        st.metric(
+            "추천점수",
+            f"{score}점"
         )
 
-    else:
+    with food_col:
+        st.metric(
+            "🍴 대표 음식",
+            food
+        )
 
-        # 사진이 없을 경우에도 추천 지역은 정상 표시
-        st.info(
-            f"📍 추천 지역: {recommended_name} "
-            f"({recommended_region['추천점수']}점)"
+    with tourist_col:
+        st.metric(
+            "🏞️ 대표 관광지",
+            tourist
+        )
+
+    with specialty_col:
+        st.metric(
+            "🎁 특산품",
+            specialty
         )
 
 else:
 
     st.info(
         "현재 선택한 여행 취향과 일치하는 지역이 없습니다. "
-        "사이드바의 여행 취향을 조금 완화해 보세요."
+        "사이드바의 여행 취향을 조금 변경해 보세요."
     )
 # =========================================================
 # 선택 지역 사진
