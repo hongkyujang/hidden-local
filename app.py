@@ -1213,6 +1213,16 @@ preference_df = preference_df.sort_values(
 # 상단
 # =========================================================
 
+st.markdown(
+    """
+    <style>
+    .block-container {
+        padding-top: 3rem !important;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
 
 m1, m2, m3, m4 = st.columns(4)
 
