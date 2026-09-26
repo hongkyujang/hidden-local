@@ -2070,42 +2070,7 @@ if recommended_region is not None:
 
         st.divider()
 
-        # -------------------------------------------------
-        # 기본 지역 정보
-        # -------------------------------------------------
-
-        info_col1, info_col2, info_col3, info_col4 = st.columns(4)
-
-        with info_col1:
-
-            st.metric(
-                "👥 지역 인구",
-                f"{population:,}명"
-            )
-
-        with info_col2:
-
-            st.metric(
-                "📉 인구 변화율",
-                f"{population_change:+.1f}%"
-            )
-
-        with info_col3:
-
-            st.metric(
-                "🍴 음식 점수",
-                f"{food_score:.0f}점"
-            )
-
-        with info_col4:
-
-            st.metric(
-                "🏞️ 지역 특색",
-                f"{distinctiveness:.0f}점"
-            )
-
-        st.divider()
-
+        
         # =================================================
         # 여행 정보
         # =================================================
