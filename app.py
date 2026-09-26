@@ -347,5 +347,12 @@ with col1:
     # 기본 지도 중심 위치 설정
     m = folium.Map(location=[36.5, 127.8], zoom_start=7)
     
-    for _, row in filtered_df.iterrows():
-        popup_html = f"**{row['지역']}**
+   for _, row in filtered_df.iterrows():
+    popup_text = str(row['지역']) + " (숨은점수: " + str(row['숨은지역점수']) + "점)"
+    
+    folium.Marker(
+        location=[row["위도"], row["경도"]],
+        popup=popup_text,
+        tooltip=row["지역"],
+        icon=folium.Icon(color="green", icon="info-sign"),
+    ).add_to(m)
