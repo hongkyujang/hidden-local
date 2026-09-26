@@ -2739,47 +2739,78 @@ if recommended_region is not None:
             )
 
         # -----------------------------------------------------
-    # 오른쪽 : 추천 이유 배너
+    # 오른쪽 : 추천 이유 배너 (사진과 동일한 높이)
     # -----------------------------------------------------
 
     with reason_col:
 
-        with st.container(border=True):
+        selected_theme = st.session_state.travel_theme
+        selected_age = st.session_state.age_group
+        selected_group = st.session_state.group_size
 
-            selected_theme = st.session_state.travel_theme
+        if selected_theme != "전체":
+            theme_text = selected_theme
+        else:
+            theme_text = travel_type
 
-            if selected_theme != "전체":
-                theme_text = selected_theme
-            else:
-                theme_text = travel_type
+        # 사진과 동일한 높이의 배너
+        st.markdown(
+            f"""
+            <div style="
+                height:340px;
+                box-sizing:border-box;
+                padding:22px;
+                border-radius:16px;
+                border:1px solid #34443c;
+                background:#17251f;
+                color:#f1f5f3;
+                overflow:hidden;
+            ">
 
-            st.markdown("### 💡 왜 이 지역을 추천했을까?")
+                <div style="
+                    font-size:23px;
+                    font-weight:700;
+                    margin-bottom:18px;
+                ">
+                    💡 왜 이 지역을 추천했을까?
+                </div>
 
-            st.caption(
-                "선택한 여행 취향과 지역의 특징을 바탕으로 추천한 지역입니다."
-            )
+                <div style="
+                    font-size:15px;
+                    line-height:1.8;
+                    color:#dce6df;
+                ">
+                    <p>
+                        <b>🧭 여행 취향</b><br>
+                        {html.escape(theme_text)} 테마에 어울리는
+                        여행지입니다.
+                    </p>
 
-            st.divider()
+                    <p>
+                        <b>🌿 지역의 매력</b><br>
+                        {html.escape(region_name)}의
+                        {html.escape(travel_type)} 특색과
+                        {html.escape(landmark_type)} 볼거리를
+                        함께 경험할 수 있습니다.
+                    </p>
 
-            st.markdown("#### 🧭 여행 취향")
+                    <p>
+                        <b>🍴 로컬 여행</b><br>
+                        대표 먹거리 {html.escape(food)}와
+                        지역 특산품 {html.escape(specialty)}을
+                        즐길 수 있습니다.
+                    </p>
 
-            st.write(
-                f"**{theme_text}** 테마에 어울리는 여행지입니다."
-            )
+                    <p>
+                        <b>🗓️ 추천 여행 기간</b><br>
+                        {html.escape(duration)}
+                    </p>
+                </div>
 
-            st.caption(f"여행 기간 · {duration}")
-
-            st.divider()
-
-            st.markdown("#### 🍴 대표 먹거리")
-
-            st.write(f"**{food}**")
-
-            st.divider()
-
-            st.markdown("#### 🏞️ 대표 볼거리")
-
-            st.write(f"**{tourist}**")
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
     # -----------------------------------------------------
     # 지역 이름
     # -----------------------------------------------------
