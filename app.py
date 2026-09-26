@@ -1173,13 +1173,7 @@ if len(filtered_df) > 0:
     if st.session_state.selected_region not in region_names:
         st.session_state.selected_region = region_names[0]
 
-    selected_region = st.selectbox(
-        "📍 상세 정보를 볼 지역",
-        region_names,
-        index=region_names.index(
-            st.session_state.selected_region
-        ),
-    )
+ 
 
     st.session_state.selected_region = selected_region
 
