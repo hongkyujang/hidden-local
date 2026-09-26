@@ -2774,12 +2774,9 @@ if recommended_region is not None:
     # 지역 이름
     # -----------------------------------------------------
 
-    st.markdown(f"### 📍 {region_name}")
+    st.markdown(f"###  {region_name}")
 
-    st.caption(
-        "현재 선택한 여행 조건을 기준으로 추천한 지역입니다."
-    )
-
+   
     st.divider()
 
     # -----------------------------------------------------
