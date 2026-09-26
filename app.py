@@ -274,7 +274,7 @@ def calculate_hidden_score(row):
 
 
 def make_tags(items):
-    return " ".join(f'{html.escape(str(item))}' for item in items)
+    return " ".join(f"{html.escape(str(item))}" for item in items)
 
 
 df = pd.DataFrame(load_data())
@@ -334,6 +334,7 @@ IMAGE_DATA = {
     },
 }
 
+
 def render_image_card(title, image_url, description):
     st.markdown(
-        f""")
+        f"""
