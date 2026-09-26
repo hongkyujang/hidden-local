@@ -2605,43 +2605,6 @@ if row is not None:
 
 
 # =========================================================
-# 길찾기
-# =========================================================
-
-if row is not None:
-
-    st.markdown(
-        "### 🚗 여행지 길찾기"
-    )
-
-
-    query = urllib.parse.quote(
-        f"{row['지역']} {row['관광지']}"
-    )
-
-
-    nav1, nav2 = st.columns(2)
-
-
-    with nav1:
-
-        st.link_button(
-            "🗺️ 네이버 지도에서 길찾기",
-            f"https://map.naver.com/p/search/{query}",
-            use_container_width=True,
-        )
-
-
-    with nav2:
-
-        st.link_button(
-            "📍 카카오맵에서 검색",
-            f"https://map.kakao.com/?q={query}",
-            use_container_width=True,
-        )
-
-
-# =========================================================
 # 지금 취향에 맞는 추천 지역
 # =========================================================
 
