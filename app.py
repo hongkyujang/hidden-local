@@ -1947,47 +1947,47 @@ if row is not None:
 
 
 # =========================================================
-# 지금 취향에 가장 잘 맞는 지역
+# 지금 취향에 맞는 추천 지역
 # =========================================================
 
 st.markdown("## 📍 지금 취향에 맞는 추천 지역")
 
 st.caption(
-    "선택한 여행 취향을 분석하여 가장 잘 맞는 지역 1곳을 추천합니다."
+    "선택한 여행 취향을 분석하여 가장 잘 맞는 지역을 추천합니다."
 )
 
 if len(preference_df) > 0:
 
-    # 추천점수가 가장 높은 지역 1곳
     recommended_region = (
         preference_df
         .sort_values("추천점수", ascending=False)
         .iloc[0]
     )
 
+else:
+
+    # 모든 조건을 만족하는 지역이 없을 경우
+    # 현재 필터 결과에서 추천점수가 가장 높은 지역을 선택
+    if len(filtered_df) > 0:
+
+        recommended_region = (
+            filtered_df
+            .sort_values("추천점수", ascending=False)
+            .iloc[0]
+        )
+
+    else:
+
+        recommended_region = None
+
+
+if recommended_region is not None:
+
     region_name = str(recommended_region["지역"])
     score = recommended_region["추천점수"]
     food = str(recommended_region["대표음식"])
     tourist = str(recommended_region["관광지"])
     specialty = str(recommended_region["특산품"])
-
-    # -----------------------------------------------------
-    # 지역 이미지 가져오기
-    # -----------------------------------------------------
-
-    region_images = IMAGE_DATA.get(
-        region_name,
-        {}
-    )
-
-    travel_image = region_images.get("여행지")
-    food_image = region_images.get("먹거리")
-    tourist_image = region_images.get("구경거리")
-    specialty_image = region_images.get("특산품")
-
-    # -----------------------------------------------------
-    # 가장 잘 맞는 지역
-    # -----------------------------------------------------
 
     with st.container(border=True):
 
@@ -1997,107 +1997,81 @@ if len(preference_df) > 0:
             f"# 📍 {region_name}"
         )
 
-        st.markdown(
-            f"### 추천점수 **{score}점**"
+        st.metric(
+            "추천점수",
+            f"{score}점"
         )
 
         st.caption(
-            "현재 선택한 여행 취향을 기준으로 가장 높은 추천점수를 받은 지역입니다."
+            "선택한 여행 취향과 현재 지역 데이터를 종합하여 "
+            "가장 적합한 지역을 추천했습니다."
         )
 
         st.divider()
-
-        # -------------------------------------------------
-        # 지역 대표 사진
-        # -------------------------------------------------
-
-        if travel_image:
-
-            st.image(
-                travel_image,
-                use_container_width=True,
-                caption=f"{region_name} 대표 여행지"
-            )
-
-        # -------------------------------------------------
-        # 음식 / 관광지 / 특산품 사진
-        # -------------------------------------------------
 
         photo_col1, photo_col2, photo_col3 = st.columns(
             3,
             gap="medium"
         )
 
+        region_images = IMAGE_DATA.get(
+            region_name,
+            {}
+        )
+
+        food_image = region_images.get("먹거리")
+        tourist_image = region_images.get("구경거리")
+        specialty_image = region_images.get("특산품")
+
         with photo_col1:
 
             st.markdown("#### 🍴 대표 먹거리")
 
             if food_image:
-
                 st.image(
                     food_image,
                     use_container_width=True
                 )
 
-            st.markdown(
-                f"**{food}**"
-            )
-
-            st.caption(
-                "이 지역의 대표 음식"
-            )
+            st.markdown(f"**{food}**")
+            st.caption("이 지역의 대표 음식")
 
         with photo_col2:
 
             st.markdown("#### 🏞️ 대표 관광지")
 
             if tourist_image:
-
                 st.image(
                     tourist_image,
                     use_container_width=True
                 )
 
-            st.markdown(
-                f"**{tourist}**"
-            )
-
-            st.caption(
-                "추천 관광 명소"
-            )
+            st.markdown(f"**{tourist}**")
+            st.caption("추천 관광 명소")
 
         with photo_col3:
 
             st.markdown("#### 🎁 지역 특산품")
 
             if specialty_image:
-
                 st.image(
                     specialty_image,
                     use_container_width=True
                 )
 
-            st.markdown(
-                f"**{specialty}**"
-            )
-
-            st.caption(
-                "지역 대표 특산품"
-            )
+            st.markdown(f"**{specialty}**")
+            st.caption("지역 대표 특산품")
 
 else:
 
     with st.container(border=True):
 
-        st.markdown(
-            "### 🔎 맞춤 지역을 찾지 못했어요"
-        )
+        st.markdown("### 🔎 추천 지역을 찾을 수 없습니다.")
 
         st.caption(
-            "사이드바의 여행 취향을 조금 변경하면 "
-            "새로운 지역을 추천받을 수 있습니다."
+            "검색 조건에 해당하는 지역 데이터가 없습니다. "
+            "키워드나 여행 기간을 변경해 주세요."
         )
-
 # =========================================================
 # 상세 지역 정보
 # =========================================================
