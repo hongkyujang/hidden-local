@@ -1957,8 +1957,7 @@ st.caption(
 )
 
 # ---------------------------------------------------------
-# 취향 일치 지역이 있으면 일치 지역 중 1위
-# 없으면 현재 검색 결과 중 추천점수 1위
+# 추천 지역 선정
 # ---------------------------------------------------------
 
 if len(preference_df) > 0:
@@ -1988,6 +1987,363 @@ else:
         recommended_region = None
         exact_match = False
 
+
+# =========================================================
+# 추천 지역 출력
+# =========================================================
+
+if recommended_region is not None:
+
+    region_name = str(recommended_region["지역"])
+    score = recommended_region["추천점수"]
+
+    food = str(recommended_region["대표음식"])
+    restaurant = str(recommended_region["음식점"])
+
+    tourist = str(recommended_region["관광지"])
+    event = str(recommended_region["지역행사"])
+
+    specialty = str(recommended_region["특산품"])
+
+    travel_type = str(recommended_region["관광유형"])
+    landmark_type = str(recommended_region["랜드마크유형"])
+
+    duration = str(recommended_region["추천기간"])
+    theme = str(recommended_region["여행테마"])
+
+    # -----------------------------------------------------
+    # 추천 상태
+    # -----------------------------------------------------
+
+    if exact_match:
+
+        st.success(
+            f"🎯 **{region_name}**은(는) "
+            "현재 선택한 여행 취향과 조건이 잘 맞는 지역입니다."
+        )
+
+    else:
+
+        st.info(
+            f"💡 모든 취향 조건을 동시에 만족하는 지역이 없어 "
+            f"현재 검색 결과 중 **{region_name}**을(를) 추천합니다."
+        )
+
+    # =====================================================
+    # 메인 추천 배너
+    # =====================================================
+
+    with st.container(border=True):
+
+        st.markdown("### ✨ 가장 잘 맞는 추천 지역")
+
+        st.markdown(
+            f"# 📍 {region_name}"
+        )
+
+        st.markdown(
+            f"### ⭐ 추천점수 **{score}점**"
+        )
+
+        st.caption(
+            "선택한 여행 취향과 지역 정보를 종합하여 "
+            "추천한 결과입니다."
+        )
+
+        st.divider()
+
+        # =================================================
+        # ① 왜 이 지역을 추천했을까?
+        # =================================================
+
+        st.markdown("### 💡 왜 이 지역을 추천했을까?")
+
+        reasons = []
+
+        if "맛집·미식" in theme:
+            reasons.append(
+                f"🍴 **{food}**을(를) 중심으로 로컬 먹거리를 즐기기 좋은 지역입니다."
+            )
+
+        if "사진 명소" in theme:
+            reasons.append(
+                f"📸 **{tourist}** 등 사진으로 남기기 좋은 관광지를 만나볼 수 있습니다."
+            )
+
+        if "자연·힐링" in theme:
+            reasons.append(
+                f"🌿 **{travel_type}** 중심의 여유로운 여행을 즐기기 좋은 지역입니다."
+            )
+
+        if "액티비티" in theme:
+            reasons.append(
+                f"🚗 **{tourist}** 등 다양한 활동을 포함한 여행을 구성하기 좋습니다."
+            )
+
+        if "역사·문화" in theme:
+            reasons.append(
+                f"🏛️ 지역의 역사와 문화를 경험할 수 있는 관광지가 있습니다."
+            )
+
+        if "가족 여행" in theme:
+            reasons.append(
+                "👨‍👩‍👧‍👦 가족 단위 여행으로 즐길 수 있는 관광 요소가 있습니다."
+            )
+
+        if food != "":
+            reasons.append(
+                f"🍽️ 대표 먹거리로 **{food}**을(를) 즐길 수 있습니다."
+            )
+
+        if specialty != "":
+            reasons.append(
+                f"🎁 지역 특산품으로 **{specialty}**이(가) 있습니다."
+            )
+
+        if event != "":
+            reasons.append(
+                f"🎉 **{event}** 등 지역 행사를 함께 경험할 수 있습니다."
+            )
+
+        # 중복 제거
+        unique_reasons = []
+
+        for reason in reasons:
+            if reason not in unique_reasons:
+                unique_reasons.append(reason)
+
+        # 최대 4개까지만 표시
+        for reason in unique_reasons[:4]:
+
+            st.markdown(
+                f"- {reason}"
+            )
+
+        # =================================================
+        # ② 이 지역의 여행 정보
+        # =================================================
+
+        st.divider()
+
+        st.markdown("### 🧭 이 지역의 여행 정보")
+
+        info_col1, info_col2, info_col3 = st.columns(3)
+
+        with info_col1:
+
+            with st.container(border=True):
+
+                st.markdown("#### 🗓️ 추천 여행 기간")
+
+                st.markdown(
+                    f"**{duration}**"
+                )
+
+                st.caption(
+                    "추천 여행 일정"
+                )
+
+        with info_col2:
+
+            with st.container(border=True):
+
+                st.markdown("#### 🧭 여행 테마")
+
+                st.markdown(
+                    f"**{theme}**"
+                )
+
+                st.caption(
+                    "지역의 주요 여행 테마"
+                )
+
+        with info_col3:
+
+            with st.container(border=True):
+
+                st.markdown("#### 🗺️ 관광 유형")
+
+                st.markdown(
+                    f"**{travel_type}**"
+                )
+
+                st.caption(
+                    f"주요 랜드마크 · {landmark_type}"
+                )
+
+        # =================================================
+        # ③ 즐길 거리
+        # =================================================
+
+        st.divider()
+
+        st.markdown("### 🎒 이 지역에서 즐길 거리")
+
+        photo_col1, photo_col2, photo_col3 = st.columns(
+            3,
+            gap="medium"
+        )
+
+        region_images = IMAGE_DATA.get(
+            region_name,
+            {}
+        )
+
+        food_image = region_images.get("먹거리")
+        tourist_image = region_images.get("구경거리")
+        specialty_image = region_images.get("특산품")
+
+        with photo_col1:
+
+            with st.container(border=True):
+
+                st.markdown("#### 🍴 대표 먹거리")
+
+                if food_image:
+
+                    st.image(
+                        food_image,
+                        use_container_width=True
+                    )
+
+                st.markdown(
+                    f"**{food}**"
+                )
+
+                st.caption(
+                    f"추천 음식점 · {restaurant}"
+                )
+
+        with photo_col2:
+
+            with st.container(border=True):
+
+                st.markdown("#### 🏞️ 대표 관광지")
+
+                if tourist_image:
+
+                    st.image(
+                        tourist_image,
+                        use_container_width=True
+                    )
+
+                st.markdown(
+                    f"**{tourist}**"
+                )
+
+                st.caption(
+                    f"랜드마크 · {landmark_type}"
+                )
+
+        with photo_col3:
+
+            with st.container(border=True):
+
+                st.markdown("#### 🎁 지역 특산품")
+
+                if specialty_image:
+
+                    st.image(
+                        specialty_image,
+                        use_container_width=True
+                    )
+
+                st.markdown(
+                    f"**{specialty}**"
+                )
+
+                st.caption(
+                    "지역 대표 특산품"
+                )
+
+        # =================================================
+        # ④ 지역 행사
+        # =================================================
+
+        st.divider()
+
+        st.markdown("### 🎉 지역 행사")
+
+        with st.container(border=True):
+
+            st.markdown(
+                f"#### 🎊 {event}"
+            )
+
+            st.caption(
+                f"{region_name}에서 경험할 수 있는 지역 행사입니다."
+            )
+
+        # =================================================
+        # ⑤ 한눈에 보는 추천 정보
+        # =================================================
+
+        st.divider()
+
+        with st.expander(
+            "📋 한눈에 보는 추천 정보",
+            expanded=False
+        ):
+
+            st.markdown(
+                "#### 📍 추천 지역 요약"
+            )
+
+            summary_col1, summary_col2 = st.columns(2)
+
+            with summary_col1:
+
+                st.markdown(
+                    f"""
+- 📍 **지역**  
+  {region_name}
+
+- ⭐ **추천점수**  
+  {score}점
+
+- 🍴 **대표 음식**  
+  {food}
+
+- 🏞️ **대표 관광지**  
+  {tourist}
+
+- 🎁 **지역 특산품**  
+  {specialty}
+"""
+                )
+
+            with summary_col2:
+
+                st.markdown(
+                    f"""
+- 🗓️ **추천 여행 기간**  
+  {duration}
+
+- 🧭 **여행 테마**  
+  {theme}
+
+- 🏕️ **관광 유형**  
+  {travel_type}
+
+- 🗺️ **랜드마크 유형**  
+  {landmark_type}
+
+- 🎉 **지역 행사**  
+  {event}
+"""
+                )
+
+else:
+
+    with st.container(border=True):
+
+        st.markdown(
+            "### 🔎 검색 결과가 없습니다."
+        )
+
+        st.caption(
+            "사이드바의 검색어나 여행 조건을 변경해 주세요."
+        )
 
 # =========================================================
 # 추천 지역 상세 정보
