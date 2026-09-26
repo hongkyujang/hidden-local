@@ -1,4 +1,3 @@
-import os
 import html
 import urllib.parse
 
@@ -6,12 +5,14 @@ import pandas as pd
 import streamlit as st
 import streamlit.components.v1 as components
 import folium
+from folium.plugins import Fullscreen
 from streamlit_folium import st_folium
 
 
 # =========================================================
 # 페이지 설정
 # =========================================================
+
 st.set_page_config(
     page_title="로컬 쉼표",
     page_icon="🚗",
@@ -21,8 +22,9 @@ st.set_page_config(
 
 
 # =========================================================
-# 세션 상태 기본값
+# 세션 기본값
 # =========================================================
+
 defaults = {
     "age_group": "전체",
     "group_size": "전체",
@@ -40,270 +42,180 @@ for key, value in defaults.items():
 
 
 # =========================================================
-# 스타일
+# CSS
 # =========================================================
+
 st.markdown(
     """
-    <style>
-    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap');
+<style>
 
-    html, body, [class*="css"] {
-        font-family: 'Noto Sans KR', sans-serif;
-    }
+.stApp {
+    background: #101916;
+    color: #f1f5f3;
+}
 
-    .stApp {
-        background: #101916;
-        color: #f1f5f3;
-    }
+[data-testid="stSidebar"] {
+    background: #17251f;
+}
 
-    /* =========================================================
-       상단 로컬 쉼표 작은 제목
-       ========================================================= */
+[data-testid="stSidebar"] * {
+    color: #edf5f0;
+}
 
-    .top-logo {
-        font-size: 22px;
-        font-weight: 800;
-        color: #dceee3;
-        margin-top: 5px;
-        margin-bottom: 18px;
-        text-align: left;
-        letter-spacing: -0.5px;
-    }
+.block-container {
+    max-width: 1500px;
+    padding-top: 1.2rem;
+    padding-bottom: 2rem;
+}
 
-    .top-logo span {
-        margin-left: 4px;
-    }
+.top-logo {
+    font-size: 31px;
+    font-weight: 900;
+    color: #f3faf6;
+    margin-bottom: 20px;
+}
 
-    [data-testid="stSidebar"] {
-        background: #17251f;
-        border-right: 1px solid #30463b;
-    }
+.top-logo span {
+    color: #9fe0b6;
+}
 
-    [data-testid="stSidebar"] * {
-        color: #e8f0eb;
-    }
+.filter-heading {
+    font-size: 20px;
+    font-weight: 900;
+    color: #dff6e7;
+    margin-bottom: 16px;
+}
 
-    .main-title {
-        padding: 28px 32px;
-        border-radius: 24px;
-        background: linear-gradient(135deg, #1d3d31, #284f3d);
-        border: 1px solid #456b58;
-        margin-bottom: 22px;
-    }
+.metric-card {
+    background: #18251f;
+    border: 1px solid #2e463a;
+    border-radius: 16px;
+    padding: 16px 18px;
+    min-height: 92px;
+}
 
-    .main-title h1 {
-        margin: 0;
-        color: #ffffff;
-        font-size: 38px;
-        font-weight: 800;
-    }
+.metric-title {
+    color: #91a99c;
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 7px;
+}
 
-    .main-title p {
-        margin: 10px 0 0;
-        color: #c5d9cd;
-        font-size: 15px;
-        line-height: 1.7;
-    }
+.metric-value {
+    color: #f1f7f3;
+    font-size: 20px;
+    font-weight: 900;
+}
 
-    .metric-card {
-        background: #1b2b24;
-        border: 1px solid #355143;
-        border-radius: 18px;
-        padding: 18px;
-        min-height: 112px;
-    }
+.section-card {
+    background: #16221d;
+    border: 1px solid #30483c;
+    border-radius: 18px;
+    padding: 20px;
+    margin-bottom: 18px;
+}
 
-    .metric-label {
-        color: #a9c0b2;
-        font-size: 13px;
-    }
+.map-course-title {
+    font-size: 23px;
+    font-weight: 900;
+    color: #eff8f2;
+    margin: 12px 0 15px 0;
+}
 
-    .metric-value {
-        color: #ffffff;
-        font-size: 22px;
-        font-weight: 800;
-        margin-top: 8px;
-        word-break: keep-all;
-    }
+.course-box {
+    background: #16221d;
+    border: 1px solid #30483c;
+    border-radius: 18px;
+    padding: 18px;
+}
 
-    .section-card {
-        background: #18271f;
-        border: 1px solid #334e40;
-        border-radius: 20px;
-        padding: 22px;
-        margin: 14px 0;
-    }
+.course-header {
+    background: #1b2d25;
+    border-radius: 14px;
+    padding: 16px;
+    margin-bottom: 15px;
+}
 
-    .section-card h3 {
-        color: #dceee3;
-        margin-top: 0;
-    }
+.course-header-title {
+    font-size: 20px;
+    font-weight: 900;
+    color: #eaf7ef;
+}
 
-    .tag {
-        display: inline-block;
-        background: #294c3b;
-        color: #d5eddf;
-        border: 1px solid #47745b;
-        padding: 5px 10px;
-        border-radius: 999px;
-        margin: 3px;
-        font-size: 12px;
-    }
+.course-header-desc {
+    color: #9fb5a8;
+    font-size: 13px;
+    margin-top: 5px;
+}
 
-    .score {
-        color: #8bd3a8;
-        font-size: 32px;
-        font-weight: 800;
-    }
+.schedule-time {
+    color: #9fe0b6;
+    font-weight: 900;
+    font-size: 13px;
+}
 
-    .small-muted {
-        color: #9eb6a7;
-        font-size: 13px;
-    }
+.schedule-text {
+    color: #e4eee8;
+    font-size: 13px;
+    line-height: 1.55;
+    word-break: keep-all;
+}
 
-    div[data-testid="stMetric"] {
-        background: #1b2b24;
-        border: 1px solid #355143;
-        border-radius: 16px;
-        padding: 12px;
-    }
+.schedule-summary {
+    color: #a9c0b2;
+    font-size: 12px;
+}
 
-    .stButton > button {
-        border-radius: 12px;
-        border: 1px solid #527b62;
-    }
+.photo-card {
+    background: #18251f;
+    border: 1px solid #30483c;
+    border-radius: 16px;
+    padding: 10px;
+}
 
-    [data-testid="stSidebar"] .stSlider,
-    [data-testid="stSidebar"] .stSelectbox,
-    [data-testid="stSidebar"] .stTextInput {
-        background: #20352a;
-        border-radius: 16px;
-        padding: 8px 10px;
-        margin-bottom: 10px;
-    }
+.tag {
+    display: inline-block;
+    background: #21372c;
+    color: #b9ebc9;
+    border: 1px solid #345644;
+    border-radius: 999px;
+    padding: 5px 10px;
+    margin: 2px 4px 2px 0;
+    font-size: 12px;
+    font-weight: 700;
+}
 
-    .filter-heading {
-        background: linear-gradient(135deg, #315d46, #244434);
-        padding: 14px 16px;
-        border-radius: 16px;
-        color: #ffffff;
-        font-weight: 800;
-        margin: 8px 0 14px 0;
-    }
+.score-box {
+    background: #1c3027;
+    border: 1px solid #3b634f;
+    border-radius: 14px;
+    padding: 14px;
+    text-align: center;
+}
 
-    .photo-card {
-        background: #1b2b24;
-        border: 1px solid #355143;
-        border-radius: 18px;
-        overflow: hidden;
-        height: 100%;
-    }
+.score-number {
+    font-size: 28px;
+    font-weight: 900;
+    color: #9fe0b6;
+}
 
-    .photo-card img {
-        width: 100%;
-        height: 210px;
-        object-fit: cover;
-    }
+.score-label {
+    color: #9eb5a7;
+    font-size: 12px;
+}
 
-    .photo-card-content {
-        padding: 14px 16px;
-    }
+div[data-testid="stExpander"] {
+    border: 1px solid #30483c !important;
+    border-radius: 13px !important;
+    background: #16221d !important;
+}
 
-    .photo-card-title {
-        color: #ffffff;
-        font-size: 17px;
-        font-weight: 800;
-    }
+div[data-testid="stExpander"] summary {
+    font-weight: 800;
+}
 
-    .photo-card-desc {
-        color: #b4cbbb;
-        font-size: 13px;
-        margin-top: 6px;
-    }
-
-    /* =========================================================
-       지도 + 코스 영역
-       ========================================================= */
-
-    .map-course-title {
-        color: #dceee3;
-        font-size: 23px;
-        font-weight: 800;
-        margin-bottom: 12px;
-    }
-
-    .course-box {
-        background: #18271f;
-        border: 1px solid #334e40;
-        border-radius: 20px;
-        padding: 20px;
-        height: 100%;
-    }
-
-    .course-header {
-        background: linear-gradient(135deg, #315d46, #244434);
-        border-radius: 15px;
-        padding: 16px;
-        margin-bottom: 15px;
-    }
-
-    .course-header-title {
-        color: #ffffff;
-        font-size: 20px;
-        font-weight: 800;
-        margin-bottom: 5px;
-    }
-
-    .course-header-desc {
-        color: #c5d9cd;
-        font-size: 13px;
-    }
-
-    .course-day {
-        background: #20352a;
-        border: 1px solid #3a5949;
-        border-radius: 14px;
-        padding: 14px;
-        margin-bottom: 10px;
-    }
-
-    .course-day-title {
-        color: #9fe0b6;
-        font-weight: 800;
-        font-size: 15px;
-        margin-bottom: 8px;
-    }
-
-    .course-line {
-        color: #d8e8de;
-        font-size: 13px;
-        line-height: 1.65;
-        margin: 3px 0;
-    }
-
-    .course-info {
-        color: #a9c0b2;
-        font-size: 12px;
-        line-height: 1.6;
-        margin-top: 10px;
-    }
-
-    .course-mini-tag {
-        display: inline-block;
-        background: #294c3b;
-        border: 1px solid #47745b;
-        color: #d5eddf;
-        border-radius: 999px;
-        padding: 4px 8px;
-        margin: 2px;
-        font-size: 11px;
-    }
-
-    .nav-button {
-        margin-top: 10px;
-    }
-    </style>
-    """,
+</style>
+""",
     unsafe_allow_html=True,
 )
 
@@ -311,416 +223,321 @@ st.markdown(
 # =========================================================
 # 데이터
 # =========================================================
+
 @st.cache_data
 def load_data():
-    return [
+
+    data = [
+
         {
             "지역": "강원특별자치도 정선군",
             "위도": 37.3806,
             "경도": 128.6608,
-            "인구": 36000,
+            "인구": 34419,
             "인구변화율": -2.1,
             "음식점수": 91,
-            "관광인지도": 38,
+            "관광인지도": 43,
             "지역특색": 94,
-            "대표음식": "곤드레밥, 콧등치기국수",
-            "음식점": "정선 곤드레 전문점",
-            "관광지": "병방치 스카이워크, 아리랑시장",
-            "지역행사": "정선아리랑제",
-            "특산품": "곤드레, 황기",
-            "관광유형": ["자연", "체험", "전통시장"],
-            "랜드마크유형": ["전망대", "시장", "문화"],
-            "추천기간": ["당일치기", "1박 2일", "2박 3일"],
-            "여행테마": ["자연·힐링", "맛집·미식", "역사·문화", "사진 명소"],
-            "나이대별_추천": {
-                "10대": "시장 체험과 전망대 방문",
-                "20대": "감성 사진 명소와 로컬 맛집",
-                "30~40대": "자연 산책과 가족 체험",
-                "50대 이상": "전통시장과 여유로운 힐링",
-            },
-            "인원수별_추천": {
-                "1인 (혼행)": "시장과 전망대 중심",
-                "2인 (커플/친구)": "사진 명소와 맛집 중심",
-                "3인": "체험과 식사 중심",
-                "4인 이상 (가족)": "시장·자연·체험 코스",
-            },
-            "소개": "산과 시장, 향토음식이 어우러진 로컬 여행지입니다.",
+            "대표음식": "곤드레밥",
+            "음식점": "정선 곤드레밥 로컬식당",
+            "관광지": "정선 아리랑시장 · 가리왕산",
+            "지역행사": "정선 아리랑제",
+            "특산품": "곤드레",
+            "관광유형": "자연·문화",
+            "랜드마크유형": "산·시장",
+            "추천기간": ["1박 2일", "2박 3일"],
+            "여행테마": ["맛집·미식", "사진 명소", "역사·문화"],
+            "나이대별_추천": ["20대", "30~40대", "50대 이상"],
+            "인원수별_추천": ["1인", "2인", "3인", "4인 이상"],
+            "소개": "산과 전통시장을 함께 즐길 수 있는 강원도의 대표적인 로컬 여행지입니다.",
         },
+
         {
             "지역": "전라남도 구례군",
             "위도": 35.2025,
             "경도": 127.4628,
-            "인구": 24000,
+            "인구": 24500,
             "인구변화율": -1.8,
-            "음식점수": 90,
-            "관광인지도": 42,
+            "음식점수": 92,
+            "관광인지도": 39,
             "지역특색": 96,
-            "대표음식": "산채비빔밥, 재첩국",
-            "음식점": "구례 산채음식점",
-            "관광지": "지리산 둘레길, 화엄사",
+            "대표음식": "산채정식",
+            "음식점": "구례 산채 로컬밥상",
+            "관광지": "지리산 · 화엄사",
             "지역행사": "구례 산수유꽃축제",
-            "특산품": "산수유, 매실",
-            "관광유형": ["자연", "문화", "트레킹"],
-            "랜드마크유형": ["사찰", "둘레길", "꽃 명소"],
-            "추천기간": ["당일치기", "1박 2일", "2박 3일"],
-            "여행테마": ["자연·힐링", "역사·문화", "사진 명소", "축제·행사"],
-            "나이대별_추천": {
-                "10대": "꽃 명소와 산책",
-                "20대": "감성 카페와 사진 명소",
-                "30~40대": "둘레길과 가족 여행",
-                "50대 이상": "사찰과 자연 힐링",
-            },
-            "인원수별_추천": {
-                "1인 (혼행)": "둘레길과 사찰",
-                "2인 (커플/친구)": "꽃 명소와 카페",
-                "3인": "자연 산책과 식사",
-                "4인 이상 (가족)": "사찰과 완만한 산책로",
-            },
-            "소개": "지리산의 자연과 산수유 마을의 정취를 느낄 수 있습니다.",
+            "특산품": "산수유",
+            "관광유형": "자연·힐링",
+            "랜드마크유형": "산·사찰",
+            "추천기간": ["1박 2일", "2박 3일"],
+            "여행테마": ["맛집·미식", "사진 명소", "가족 여행"],
+            "나이대별_추천": ["20대", "30~40대", "50대 이상"],
+            "인원수별_추천": ["1인", "2인", "3인", "4인 이상"],
+            "소개": "지리산과 산채음식을 중심으로 자연 속에서 여유롭게 여행하기 좋은 지역입니다.",
         },
+
         {
             "지역": "경상남도 의령군",
             "위도": 35.3222,
             "경도": 128.2617,
-            "인구": 26000,
-            "인구변화율": -1.2,
-            "음식점수": 87,
-            "관광인지도": 35,
-            "지역특색": 89,
-            "대표음식": "망개떡, 소고기국밥",
-            "음식점": "의령 향토음식점",
-            "관광지": "솥바위, 충익사",
-            "지역행사": "의령 홍의장군축제",
-            "특산품": "망개떡, 수박",
-            "관광유형": ["역사", "문화", "먹거리"],
-            "랜드마크유형": ["역사유적", "강변", "전통음식"],
+            "인구": 26300,
+            "인구변화율": -1.4,
+            "음식점수": 89,
+            "관광인지도": 36,
+            "지역특색": 92,
+            "대표음식": "의령 소바",
+            "음식점": "의령 로컬 소바집",
+            "관광지": "의령 구름다리 · 충익사",
+            "지역행사": "의병제전",
+            "특산품": "의령망개떡",
+            "관광유형": "역사·문화",
+            "랜드마크유형": "역사·전통",
             "추천기간": ["당일치기", "1박 2일"],
-            "여행테마": ["맛집·미식", "역사·문화", "축제·행사"],
-            "나이대별_추천": {
-                "10대": "역사 체험",
-                "20대": "전통 간식과 사진 명소",
-                "30~40대": "가족 역사 여행",
-                "50대 이상": "향토음식과 문화유적",
-            },
-            "인원수별_추천": {
-                "1인 (혼행)": "문화유적 탐방",
-                "2인 (커플/친구)": "전통음식과 강변 산책",
-                "3인": "역사·먹거리 코스",
-                "4인 이상 (가족)": "체험형 역사 여행",
-            },
-            "소개": "전통 먹거리와 역사 이야기가 살아 있는 지역입니다.",
+            "여행테마": ["맛집·미식", "역사·문화"],
+            "나이대별_추천": ["20대", "30~40대", "50대 이상"],
+            "인원수별_추천": ["1인", "2인", "3인", "4인 이상"],
+            "소개": "의병 역사와 로컬 먹거리를 함께 경험할 수 있는 경남의 숨은 지역입니다.",
         },
+
         {
             "지역": "전북특별자치도 무주군",
             "위도": 36.0071,
             "경도": 127.6608,
-            "인구": 23000,
-            "인구변화율": -1.9,
-            "음식점수": 86,
-            "관광인지도": 40,
-            "지역특색": 93,
-            "대표음식": "어죽, 산채정식",
-            "음식점": "무주 산채정식 식당",
-            "관광지": "덕유산, 반디랜드",
+            "인구": 23800,
+            "인구변화율": -1.6,
+            "음식점수": 88,
+            "관광인지도": 45,
+            "지역특색": 91,
+            "대표음식": "어죽",
+            "음식점": "무주 로컬 어죽집",
+            "관광지": "덕유산 · 반디랜드",
             "지역행사": "무주 반딧불축제",
-            "특산품": "머루, 천마",
-            "관광유형": ["자연", "가족", "체험"],
-            "랜드마크유형": ["산", "과학관", "축제"],
-            "추천기간": ["1박 2일", "2박 3일", "3박 이상"],
-            "여행테마": ["자연·힐링", "액티비티", "축제·행사", "가족 여행"],
-            "나이대별_추천": {
-                "10대": "반디랜드 체험",
-                "20대": "덕유산과 액티비티",
-                "30~40대": "가족 자연 여행",
-                "50대 이상": "산채음식과 힐링",
-            },
-            "인원수별_추천": {
-                "1인 (혼행)": "산책과 자연 감상",
-                "2인 (커플/친구)": "산과 사진 명소",
-                "3인": "체험과 식사",
-                "4인 이상 (가족)": "반디랜드와 자연 코스",
-            },
-            "소개": "산과 체험시설, 계절 축제를 함께 즐길 수 있습니다.",
+            "특산품": "머루",
+            "관광유형": "자연·체험",
+            "랜드마크유형": "산·체험",
+            "추천기간": ["1박 2일", "2박 3일"],
+            "여행테마": ["액티비티", "가족 여행", "사진 명소"],
+            "나이대별_추천": ["10대", "20대", "30~40대"],
+            "인원수별_추천": ["2인", "3인", "4인 이상"],
+            "소개": "덕유산 자연과 체험형 관광을 함께 즐길 수 있는 지역입니다.",
         },
+
         {
             "지역": "충청북도 단양군",
-            "위도": 36.9846,
-            "경도": 128.3656,
-            "인구": 27000,
-            "인구변화율": -1.5,
-            "음식점수": 88,
-            "관광인지도": 48,
-            "지역특색": 95,
-            "대표음식": "마늘정식, 올갱이국",
-            "음식점": "단양 마늘요리 전문점",
-            "관광지": "만천하스카이워크, 도담삼봉",
-            "지역행사": "단양 온달문화축제",
+            "위도": 36.9845,
+            "경도": 128.3657,
+            "인구": 27500,
+            "인구변화율": -1.1,
+            "음식점수": 87,
+            "관광인지도": 50,
+            "지역특색": 94,
+            "대표음식": "마늘정식",
+            "음식점": "단양 마늘 로컬식당",
+            "관광지": "도담삼봉 · 만천하스카이워크",
+            "지역행사": "단양 마늘축제",
             "특산품": "단양마늘",
-            "관광유형": ["자연", "액티비티", "사진"],
-            "랜드마크유형": ["전망대", "강변", "역사"],
-            "추천기간": ["당일치기", "1박 2일", "2박 3일"],
-            "여행테마": ["액티비티", "자연·힐링", "맛집·미식", "사진 명소"],
-            "나이대별_추천": {
-                "10대": "전망대와 액티비티",
-                "20대": "스카이워크와 사진 명소",
-                "30~40대": "가족 체험과 맛집",
-                "50대 이상": "강변 풍경과 마늘요리",
-            },
-            "인원수별_추천": {
-                "1인 (혼행)": "강변과 전망대",
-                "2인 (커플/친구)": "사진 명소와 액티비티",
-                "3인": "관광·맛집 코스",
-                "4인 이상 (가족)": "전망대와 완만한 관광 코스",
-            },
-            "소개": "강과 절벽 풍경, 전망대와 마늘 음식이 특징입니다.",
+            "관광유형": "자연·액티비티",
+            "랜드마크유형": "강·전망대",
+            "추천기간": ["당일치기", "1박 2일"],
+            "여행테마": ["액티비티", "사진 명소", "맛집·미식"],
+            "나이대별_추천": ["10대", "20대", "30~40대"],
+            "인원수별_추천": ["2인", "3인", "4인 이상"],
+            "소개": "강변 풍경과 액티비티, 마늘 먹거리를 함께 즐길 수 있습니다.",
         },
+
         {
             "지역": "경상북도 영양군",
-            "위도": 36.6668,
-            "경도": 129.1124,
+            "위도": 36.6667,
+            "경도": 129.1125,
             "인구": 16000,
-            "인구변화율": -2.5,
-            "음식점수": 89,
-            "관광인지도": 28,
-            "지역특색": 92,
-            "대표음식": "산나물비빔밥, 고추전",
-            "음식점": "영양 산나물 식당",
-            "관광지": "국립생태원, 일월산",
-            "지역행사": "영양산나물축제",
-            "특산품": "고추, 산나물",
-            "관광유형": ["자연", "미식", "생태"],
-            "랜드마크유형": ["산", "생태", "축제"],
+            "인구변화율": -2.8,
+            "음식점수": 90,
+            "관광인지도": 29,
+            "지역특색": 95,
+            "대표음식": "산채비빔밥",
+            "음식점": "영양 산나물 로컬식당",
+            "관광지": "검마산 · 국제밤하늘보호공원",
+            "지역행사": "영양 산나물축제",
+            "특산품": "고추·산나물",
+            "관광유형": "자연·힐링",
+            "랜드마크유형": "산·별빛",
             "추천기간": ["1박 2일", "2박 3일"],
-            "여행테마": ["자연·힐링", "맛집·미식", "축제·행사"],
-            "나이대별_추천": {
-                "10대": "생태 체험",
-                "20대": "산나물 맛집과 자연",
-                "30~40대": "생태·가족 여행",
-                "50대 이상": "산나물과 산책",
-            },
-            "인원수별_추천": {
-                "1인 (혼행)": "생태와 산책",
-                "2인 (커플/친구)": "자연과 맛집",
-                "3인": "생태 체험",
-                "4인 이상 (가족)": "자연·먹거리 코스",
-            },
-            "소개": "청정 자연과 산나물 음식이 어우러진 지역입니다.",
+            "여행테마": ["사진 명소", "맛집·미식", "자연"],
+            "나이대별_추천": ["20대", "30~40대", "50대 이상"],
+            "인원수별_추천": ["1인", "2인", "3인", "4인 이상"],
+            "소개": "관광객이 비교적 적고 밤하늘과 산나물 등 지역 고유의 매력이 강한 곳입니다.",
         },
+
         {
             "지역": "경상북도 청송군",
             "위도": 36.4363,
             "경도": 129.0571,
-            "인구": 24000,
-            "인구변화율": -1.7,
-            "음식점수": 88,
+            "인구": 24500,
+            "인구변화율": -1.9,
+            "음식점수": 89,
             "관광인지도": 34,
             "지역특색": 94,
-            "대표음식": "닭백숙, 사과요리",
-            "음식점": "청송 닭백숙 전문점",
-            "관광지": "주왕산, 용연폭포",
-            "지역행사": "청송사과축제",
+            "대표음식": "닭백숙",
+            "음식점": "청송 닭백숙 로컬식당",
+            "관광지": "주왕산 · 용연폭포",
+            "지역행사": "청송 사과축제",
             "특산품": "청송사과",
-            "관광유형": ["자연", "트레킹", "미식"],
-            "랜드마크유형": ["폭포", "산", "축제"],
+            "관광유형": "자연·힐링",
+            "랜드마크유형": "산·폭포",
             "추천기간": ["1박 2일", "2박 3일"],
-            "여행테마": ["자연·힐링", "맛집·미식", "사진 명소", "축제·행사"],
-            "나이대별_추천": {
-                "10대": "폭포와 사진 명소",
-                "20대": "트레킹과 사과 디저트",
-                "30~40대": "자연과 가족 여행",
-                "50대 이상": "산책과 향토음식",
-            },
-            "인원수별_추천": {
-                "1인 (혼행)": "주왕산 산책",
-                "2인 (커플/친구)": "폭포와 사진",
-                "3인": "자연·맛집 코스",
-                "4인 이상 (가족)": "완만한 산책과 체험",
-            },
-            "소개": "주왕산의 절경과 사과 특산품이 유명합니다.",
+            "여행테마": ["자연·힐링", "사진 명소", "가족 여행"],
+            "나이대별_추천": ["30~40대", "50대 이상"],
+            "인원수별_추천": ["2인", "3인", "4인 이상"],
+            "소개": "주왕산의 자연경관과 청송사과를 중심으로 여유로운 여행을 즐길 수 있습니다.",
         },
+
         {
             "지역": "충청남도 태안군",
             "위도": 36.7456,
-            "경도": 126.2980,
+            "경도": 126.2979,
             "인구": 61000,
-            "인구변화율": -0.8,
-            "음식점수": 90,
-            "관광인지도": 52,
-            "지역특색": 91,
-            "대표음식": "꽃게탕, 해산물",
-            "음식점": "태안 해산물 식당",
-            "관광지": "꽃지해수욕장, 신두리 해안사구",
-            "지역행사": "태안 튤립축제",
-            "특산품": "꽃게, 해산물",
-            "관광유형": ["바다", "자연", "사진"],
-            "랜드마크유형": ["해변", "사구", "꽃 명소"],
-            "추천기간": ["당일치기", "1박 2일", "2박 3일"],
-            "여행테마": ["자연·힐링", "맛집·미식", "사진 명소", "가족 여행"],
-            "나이대별_추천": {
-                "10대": "해변과 사진 명소",
-                "20대": "노을과 해산물",
-                "30~40대": "가족 해변 여행",
-                "50대 이상": "해안 산책과 미식",
-            },
-            "인원수별_추천": {
-                "1인 (혼행)": "해변 산책",
-                "2인 (커플/친구)": "노을과 해산물",
-                "3인": "해변·맛집 코스",
-                "4인 이상 (가족)": "해변과 체험",
-            },
-            "소개": "해변, 노을, 해산물을 함께 즐길 수 있는 서해안 지역입니다.",
+            "인구변화율": -0.7,
+            "음식점수": 88,
+            "관광인지도": 48,
+            "지역특색": 90,
+            "대표음식": "꽃게",
+            "음식점": "태안 꽃게 로컬맛집",
+            "관광지": "꽃지해수욕장 · 안면도",
+            "지역행사": "태안 빛축제",
+            "특산품": "해산물",
+            "관광유형": "바다·힐링",
+            "랜드마크유형": "해변·섬",
+            "추천기간": ["당일치기", "1박 2일"],
+            "여행테마": ["사진 명소", "맛집·미식", "가족 여행"],
+            "나이대별_추천": ["10대", "20대", "30~40대", "50대 이상"],
+            "인원수별_추천": ["2인", "3인", "4인 이상"],
+            "소개": "서해안의 바다 풍경과 해산물을 함께 즐기기 좋은 여행지입니다.",
         },
+
         {
             "지역": "전라남도 고흥군",
             "위도": 34.6112,
             "경도": 127.2851,
-            "인구": 62000,
-            "인구변화율": -1.6,
-            "음식점수": 89,
+            "인구": 61000,
+            "인구변화율": -1.5,
+            "음식점수": 91,
             "관광인지도": 31,
-            "지역특색": 93,
-            "대표음식": "장어구이, 유자음식",
-            "음식점": "고흥 장어구이 식당",
-            "관광지": "나로우주센터, 우주발사전망대",
+            "지역특색": 96,
+            "대표음식": "장어구이",
+            "음식점": "고흥 장어 로컬맛집",
+            "관광지": "나로우주센터 · 팔영산",
             "지역행사": "고흥 유자축제",
-            "특산품": "유자, 김",
-            "관광유형": ["과학", "바다", "미식"],
-            "랜드마크유형": ["전망대", "우주", "해안"],
-            "추천기간": ["1박 2일", "2박 3일", "3박 이상"],
-            "여행테마": ["액티비티", "맛집·미식", "사진 명소", "가족 여행"],
-            "나이대별_추천": {
-                "10대": "우주 체험",
-                "20대": "해안 사진 명소",
-                "30~40대": "우주·가족 여행",
-                "50대 이상": "해산물과 해안 풍경",
-            },
-            "인원수별_추천": {
-                "1인 (혼행)": "전망대와 해안",
-                "2인 (커플/친구)": "해안 드라이브",
-                "3인": "우주 체험과 식사",
-                "4인 이상 (가족)": "우주센터와 가족 코스",
-            },
-            "소개": "우주과학과 해안 풍경, 유자 먹거리가 공존합니다.",
+            "특산품": "유자",
+            "관광유형": "바다·우주",
+            "랜드마크유형": "우주·산",
+            "추천기간": ["1박 2일", "2박 3일"],
+            "여행테마": ["사진 명소", "액티비티", "맛집·미식"],
+            "나이대별_추천": ["10대", "20대", "30~40대"],
+            "인원수별_추천": ["2인", "3인", "4인 이상"],
+            "소개": "우주센터와 바다, 유자 등 다른 지역에서 쉽게 경험하기 어려운 콘텐츠가 있습니다.",
         },
+
         {
             "지역": "경상북도 울릉군",
-            "위도": 37.4845,
+            "위도": 37.4844,
             "경도": 130.9057,
             "인구": 9000,
-            "인구변화율": -2.8,
-            "음식점수": 92,
-            "관광인지도": 45,
-            "지역특색": 98,
-            "대표음식": "홍합밥, 오징어",
-            "음식점": "울릉도 해산물 식당",
-            "관광지": "독도전망대, 성인봉",
+            "인구변화율": -1.2,
+            "음식점수": 93,
+            "관광인지도": 57,
+            "지역특색": 99,
+            "대표음식": "오징어",
+            "음식점": "울릉도 오징어 로컬식당",
+            "관광지": "독도전망대 · 성인봉",
             "지역행사": "울릉도 오징어축제",
-            "특산품": "오징어, 명이나물",
-            "관광유형": ["섬", "자연", "트레킹"],
-            "랜드마크유형": ["전망대", "산", "항구"],
+            "특산품": "오징어·호박엿",
+            "관광유형": "섬·자연",
+            "랜드마크유형": "섬·바다",
             "추천기간": ["2박 3일", "3박 이상"],
-            "여행테마": ["자연·힐링", "액티비티", "맛집·미식", "사진 명소"],
-            "나이대별_추천": {
-                "10대": "전망대와 섬 체험",
-                "20대": "트레킹과 사진",
-                "30~40대": "섬 자연 여행",
-                "50대 이상": "해산물과 여유로운 관광",
-            },
-            "인원수별_추천": {
-                "1인 (혼행)": "전망대와 항구",
-                "2인 (커플/친구)": "해안 풍경",
-                "3인": "트레킹과 미식",
-                "4인 이상 (가족)": "섬 관광과 체험",
-            },
-            "소개": "독특한 섬 지형과 해산물, 해안 풍경이 특징입니다.",
+            "여행테마": ["자연·힐링", "사진 명소", "맛집·미식"],
+            "나이대별_추천": ["20대", "30~40대", "50대 이상"],
+            "인원수별_추천": ["2인", "3인", "4인 이상"],
+            "소개": "섬이라는 지리적 특성과 독특한 자연환경을 활용한 특별한 로컬 여행지입니다.",
         },
     ]
 
+    return pd.DataFrame(data)
+
+
+df = load_data()
+
 
 # =========================================================
-# 지역 이미지
+# 이미지
 # =========================================================
+
 IMAGE_DATA = {
+
     "강원특별자치도 정선군": {
-        "여행지": "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=1200",
-        "먹거리": "https://images.unsplash.com/photo-1547592180-85f173990554?w=1200",
-        "구경거리": "https://images.unsplash.com/photo-1500534623283-312aade485b7?w=1200",
+        "여행지": "https://images.unsplash.com/photo-1500534623283-312aade485b7?auto=format&fit=crop&w=1000&q=80",
+        "먹거리": "https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=1000&q=80",
+        "구경거리": "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1000&q=80",
     },
+
     "전라남도 구례군": {
-        "여행지": "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1200",
-        "먹거리": "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=1200",
-        "구경거리": "https://images.unsplash.com/photo-1500534623283-312aade485b7?w=1200",
+        "여행지": "https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=1000&q=80",
+        "먹거리": "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=1000&q=80",
+        "구경거리": "https://images.unsplash.com/photo-1470770841072-f978cf4d019e?auto=format&fit=crop&w=1000&q=80",
     },
+
     "경상남도 의령군": {
-        "여행지": "https://images.unsplash.com/photo-1470770841072-f978cf4d019e?w=1200",
-        "먹거리": "https://images.unsplash.com/photo-1498837167922-ddd27525d352?w=1200",
-        "구경거리": "https://images.unsplash.com/photo-1519681393784-d120267933ba?w=1200",
+        "여행지": "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1000&q=80",
+        "먹거리": "https://images.unsplash.com/photo-1555126634-323283e090fa?auto=format&fit=crop&w=1000&q=80",
+        "구경거리": "https://images.unsplash.com/photo-1493246507139-91e8fad9978e?auto=format&fit=crop&w=1000&q=80",
     },
+
     "전북특별자치도 무주군": {
-        "여행지": "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=1200",
-        "먹거리": "https://images.unsplash.com/photo-1547592180-85f173990554?w=1200",
-        "구경거리": "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1200",
+        "여행지": "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1000&q=80",
+        "먹거리": "https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=1000&q=80",
+        "구경거리": "https://images.unsplash.com/photo-1473445361085-b9a07f55608b?auto=format&fit=crop&w=1000&q=80",
     },
+
     "충청북도 단양군": {
-        "여행지": "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=1200",
-        "먹거리": "https://images.unsplash.com/photo-1498837167922-ddd27525d352?w=1200",
-        "구경거리": "https://images.unsplash.com/photo-1519681393784-d120267933ba?w=1200",
+        "여행지": "https://images.unsplash.com/photo-1500534623283-312aade485b7?auto=format&fit=crop&w=1000&q=80",
+        "먹거리": "https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=1000&q=80",
+        "구경거리": "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1000&q=80",
     },
+
     "경상북도 영양군": {
-        "여행지": "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=1200",
-        "먹거리": "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=1200",
-        "구경거리": "https://images.unsplash.com/photo-1470770841072-f978cf4d019e?w=1200",
+        "여행지": "https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=1000&q=80",
+        "먹거리": "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=1000&q=80",
+        "구경거리": "https://images.unsplash.com/photo-1511497584788-876760111969?auto=format&fit=crop&w=1000&q=80",
     },
+
     "경상북도 청송군": {
-        "여행지": "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1200",
-        "먹거리": "https://images.unsplash.com/photo-1498837167922-ddd27525d352?w=1200",
-        "구경거리": "https://images.unsplash.com/photo-1500534623283-312aade485b7?w=1200",
+        "여행지": "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1000&q=80",
+        "먹거리": "https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=1000&q=80",
+        "구경거리": "https://images.unsplash.com/photo-1470770841072-f978cf4d019e?auto=format&fit=crop&w=1000&q=80",
     },
+
     "충청남도 태안군": {
-        "여행지": "https://images.unsplash.com/photo-1507524275556-7e4f7b3f0f7f?w=1200",
-        "먹거리": "https://images.unsplash.com/photo-1498837167922-ddd27525d352?w=1200",
-        "구경거리": "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=1200",
+        "여행지": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1000&q=80",
+        "먹거리": "https://images.unsplash.com/photo-1559339352-11d035aa65de?auto=format&fit=crop&w=1000&q=80",
+        "구경거리": "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1000&q=80",
     },
+
     "전라남도 고흥군": {
-        "여행지": "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=1200",
-        "먹거리": "https://images.unsplash.com/photo-1547592180-85f173990554?w=1200",
-        "구경거리": "https://images.unsplash.com/photo-1470770841072-f978cf4d019e?w=1200",
+        "여행지": "https://images.unsplash.com/photo-1500534623283-312aade485b7?auto=format&fit=crop&w=1000&q=80",
+        "먹거리": "https://images.unsplash.com/photo-1559339352-11d035aa65de?auto=format&fit=crop&w=1000&q=80",
+        "구경거리": "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1000&q=80",
     },
+
     "경상북도 울릉군": {
-        "여행지": "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1200",
-        "먹거리": "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=1200",
-        "구경거리": "https://images.unsplash.com/photo-1507524275556-7e4f7b3f0f7f?w=1200",
+        "여행지": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1000&q=80",
+        "먹거리": "https://images.unsplash.com/photo-1559339352-11d035aa65de?auto=format&fit=crop&w=1000&q=80",
+        "구경거리": "https://images.unsplash.com/photo-1470770841072-f978cf4d019e?auto=format&fit=crop&w=1000&q=80",
     },
 }
 
 
 # =========================================================
-# 이미지 카드
+# 함수
 # =========================================================
-def render_image_card(title, image_url, description):
-    safe_title = html.escape(str(title))
-    safe_desc = html.escape(str(description))
-    safe_url = html.escape(str(image_url))
 
-    st.markdown(
-        f"""
-        <div class="photo-card">
-            <img src="{safe_url}"
-                 alt="{safe_title}"
-                 onerror="this.style.display='none';">
-            <div class="photo-card-content">
-                <div class="photo-card-title">{safe_title}</div>
-                <div class="photo-card-desc">{safe_desc}</div>
-            </div>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-
-
-# =========================================================
-# 점수 계산
-# =========================================================
 def calculate_hidden_score(row):
     hidden_score = 100 - row["관광인지도"]
     population_score = min(abs(row["인구변화율"]) * 5, 20)
@@ -734,386 +551,252 @@ def calculate_hidden_score(row):
     )
 
 
-def make_tags(items):
-    return " ".join(
-        f'<span class="tag">{html.escape(str(item))}</span>'
-        for item in items
+df["추천점수"] = df.apply(calculate_hidden_score, axis=1)
+
+
+def make_tags(row):
+    return (
+        f'<span class="tag">📍 {html.escape(str(row["관광유형"]))}</span>'
+        f'<span class="tag">🗺️ {html.escape(str(row["랜드마크유형"]))}</span>'
+        f'<span class="tag">🍴 {html.escape(str(row["대표음식"]))}</span>'
+        f'<span class="tag">🎁 {html.escape(str(row["특산품"]))}</span>'
+    )
+
+
+def split_schedule_item(value):
+    parts = str(value).split("·", 1)
+
+    if len(parts) == 2:
+        return parts[0].strip(), parts[1].strip()
+
+    return "", str(value).strip()
+
+
+def render_image_card(title, image_url, description):
+
+    safe_title = html.escape(str(title))
+    safe_desc = html.escape(str(description))
+    safe_url = html.escape(str(image_url))
+
+    st.markdown(
+        f"""
+        <div class="photo-card">
+            <img src="{safe_url}"
+                 style="
+                    width:100%;
+                    height:190px;
+                    object-fit:cover;
+                    border-radius:12px;
+                 ">
+            <div style="
+                font-size:16px;
+                font-weight:900;
+                margin-top:10px;
+                color:#eef7f1;
+            ">
+                {safe_title}
+            </div>
+            <div style="
+                font-size:12px;
+                color:#9eb5a7;
+                line-height:1.5;
+                margin-top:5px;
+            ">
+                {safe_desc}
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
     )
 
 
 # =========================================================
-# 데이터 생성
+# 취향 일치 판별
 # =========================================================
-df = pd.DataFrame(load_data())
-df["숨은지역점수"] = df.apply(calculate_hidden_score, axis=1)
+
+def matches_preferences(row):
+
+    age = st.session_state.age_group
+    group = st.session_state.group_size
+    duration = st.session_state.travel_duration
+    theme = st.session_state.travel_theme
+    food = st.session_state.food_type
+
+    # 나이대
+    if age != "전체":
+        if age not in row["나이대별_추천"]:
+            return False
+
+    # 여행 인원
+    if group != "전체":
+        if group not in row["인원수별_추천"]:
+            return False
+
+    # 여행 기간
+    if duration != "전체":
+        if duration not in row["추천기간"]:
+            return False
+
+    # 여행 테마
+    if theme != "전체":
+        if theme not in row["여행테마"]:
+            return False
+
+    # 음식
+    if food != "전체":
+
+        food_map = {
+            "한식": ["곤드레밥", "산채정식", "소바", "어죽", "마늘정식",
+                   "산채비빔밥", "닭백숙", "꽃게", "장어구이", "오징어"],
+
+            "해산물": ["꽃게", "장어구이", "오징어"],
+
+            "향토음식": ["곤드레밥", "산채정식", "소바", "어죽",
+                       "마늘정식", "산채비빔밥", "닭백숙"],
+
+            "간식·특산물": ["의령망개떡", "곤드레", "산수유", "단양마늘",
+                         "고추·산나물", "청송사과", "해산물",
+                         "유자", "오징어·호박엿"],
+        }
+
+        allowed_foods = food_map.get(food, [])
+
+        if not any(
+            item in str(row["대표음식"]) or item in str(row["특산품"])
+            for item in allowed_foods
+        ):
+            return False
+
+    return True
 
 
 # =========================================================
 # 사이드바
 # =========================================================
-with st.sidebar:
 
-    # =====================================================
-    # 나만의 로컬 여행 찾기
-    # =====================================================
+with st.sidebar:
 
     st.markdown(
         '<div class="filter-heading">🧭 나만의 로컬 여행 찾기</div>',
-        unsafe_allow_html=True
+        unsafe_allow_html=True,
     )
 
+    # -----------------------------------------------------
+    # 지역 행사 홍보 배너
+    # -----------------------------------------------------
 
-    # =====================================================
-    # 로컬 행사 광고
-    # =====================================================
+    events = [
+        {
+            "title": "정선 아리랑제",
+            "region": "강원특별자치도 정선군",
+            "date": "2026.09.26 ~ 2026.09.30",
+        },
+        {
+            "title": "단양 로컬 풍경전",
+            "region": "충청북도 단양군",
+            "date": "2026.09.25 ~ 2026.10.05",
+        },
+        {
+            "title": "구례 가을 로컬마켓",
+            "region": "전라남도 구례군",
+            "date": "2026.09.27 ~ 2026.10.04",
+        },
+        {
+            "title": "청송 가을 산책길",
+            "region": "경상북도 청송군",
+            "date": "2026.09.26 ~ 2026.10.11",
+        },
+    ]
+
+    slides_html = ""
+
+    for i, event in enumerate(events):
+
+        display = "block" if i == 0 else "none"
+
+        slides_html += f"""
+        <div class="event-slide"
+             style="
+                display:{display};
+                background:#20342a;
+                border:1px solid #355343;
+                border-radius:14px;
+                padding:15px;
+                height:165px;
+             ">
+
+            <div style="
+                font-size:12px;
+                color:#9fe0b6;
+                font-weight:800;
+            ">
+                📢 LOCAL EVENT
+            </div>
+
+            <div style="
+                font-size:19px;
+                font-weight:900;
+                color:#ffffff;
+                margin-top:8px;
+            ">
+                {event["title"]}
+            </div>
+
+            <div style="
+                font-size:12px;
+                color:#b2c8ba;
+                margin-top:8px;
+            ">
+                📍 {event["region"]}
+            </div>
+
+            <div style="
+                font-size:12px;
+                color:#dcebe1;
+                margin-top:5px;
+            ">
+                📅 {event["date"]}
+            </div>
+
+        </div>
+        """
 
     components.html(
-        """
-        <!DOCTYPE html>
+        f"""
         <html>
         <head>
-            <meta charset="UTF-8">
-
-            <style>
-
-                * {
-                    box-sizing: border-box;
-                }
-
-                body {
-                    margin: 0;
-                    padding: 0;
-                    background: transparent;
-                    font-family:
-                        Arial,
-                        "Noto Sans KR",
-                        sans-serif;
-                }
-
-                .ad-container {
-                    width: 100%;
-                    height: 190px;
-                    position: relative;
-                    overflow: hidden;
-                    border-radius: 16px;
-                }
-
-                .ad-slide {
-                    position: absolute;
-                    width: 100%;
-                    height: 100%;
-                    left: 0;
-                    top: 0;
-
-                    opacity: 0;
-
-                    transition:
-                        opacity 0.6s ease,
-                        transform 0.6s ease;
-
-                    transform: translateX(20px);
-                }
-
-                .ad-slide.active {
-                    opacity: 1;
-                    transform: translateX(0);
-                }
-
-                .ad-card {
-                    width: 100%;
-                    height: 100%;
-
-                    padding: 17px;
-
-                    border-radius: 16px;
-
-                    background:
-                        linear-gradient(
-                            135deg,
-                            #315d46,
-                            #1d3328
-                        );
-
-                    border: 1px solid #426851;
-
-                    display: flex;
-                    flex-direction: column;
-                    justify-content: center;
-
-                    box-shadow:
-                        0 6px 18px rgba(0,0,0,0.18);
-                }
-
-                .ad-badge {
-                    display: inline-block;
-
-                    width: fit-content;
-
-                    padding: 4px 8px;
-
-                    margin-bottom: 7px;
-
-                    border-radius: 20px;
-
-                    background:
-                        rgba(255,255,255,0.12);
-
-                    color: #b9dfc8;
-
-                    font-size: 10px;
-                    font-weight: 700;
-                }
-
-                .ad-title {
-                    color: #ffffff;
-
-                    font-size: 16px;
-                    font-weight: 800;
-
-                    line-height: 1.3;
-
-                    margin-bottom: 5px;
-                }
-
-                .ad-region {
-                    color: #b9dfc8;
-
-                    font-size: 11px;
-                    font-weight: 700;
-
-                    margin-bottom: 5px;
-                }
-
-                .ad-date {
-                    color: #ffffff;
-
-                    font-size: 11px;
-                    font-weight: 700;
-
-                    margin-bottom: 6px;
-                }
-
-                .ad-description {
-                    color: #c4d4cb;
-
-                    font-size: 10px;
-
-                    line-height: 1.45;
-                }
-
-                .ad-dots {
-                    position: absolute;
-
-                    left: 0;
-                    right: 0;
-                    bottom: 8px;
-
-                    text-align: center;
-
-                    z-index: 20;
-                }
-
-                .dot {
-                    display: inline-block;
-
-                    width: 5px;
-                    height: 5px;
-
-                    margin: 0 3px;
-
-                    border-radius: 50%;
-
-                    background: #789786;
-                }
-
-                .dot.active {
-                    width: 16px;
-
-                    border-radius: 10px;
-
-                    background: #dceee3;
-                }
-
-            </style>
+        <style>
+            body {{
+                margin:0;
+                background:transparent;
+                font-family:Arial,sans-serif;
+            }}
+        </style>
         </head>
 
         <body>
 
-            <div class="ad-container">
-
-                <!-- 행사 1 -->
-                <div class="ad-slide active">
-
-                    <div class="ad-card">
-
-                        <div class="ad-badge">
-                            지금 떠나기 좋은 행사
-                        </div>
-
-                        <div class="ad-title">
-                            정선 아리랑제
-                        </div>
-
-                        <div class="ad-region">
-                            강원특별자치도 정선군
-                        </div>
-
-                        <div class="ad-date">
-                            2026.09.26 ~ 2026.09.30
-                        </div>
-
-                        <div class="ad-description">
-                            정선의 전통문화와 아리랑을 만나보세요.
-                        </div>
-
-                    </div>
-
-                </div>
-
-
-                <!-- 행사 2 -->
-                <div class="ad-slide">
-
-                    <div class="ad-card">
-
-                        <div class="ad-badge">
-                            가을 로컬 여행
-                        </div>
-
-                        <div class="ad-title">
-                            단양 로컬 풍경전
-                        </div>
-
-                        <div class="ad-region">
-                            충청북도 단양군
-                        </div>
-
-                        <div class="ad-date">
-                            2026.09.25 ~ 2026.10.05
-                        </div>
-
-                        <div class="ad-description">
-                            단양의 숨은 풍경과 가을 여행지를 만나보세요.
-                        </div>
-
-                    </div>
-
-                </div>
-
-
-                <!-- 행사 3 -->
-                <div class="ad-slide">
-
-                    <div class="ad-card">
-
-                        <div class="ad-badge">
-                            로컬 미식 여행
-                        </div>
-
-                        <div class="ad-title">
-                            구례 가을 로컬마켓
-                        </div>
-
-                        <div class="ad-region">
-                            전라남도 구례군
-                        </div>
-
-                        <div class="ad-date">
-                            2026.09.27 ~ 2026.10.04
-                        </div>
-
-                        <div class="ad-description">
-                            구례의 특산품과 지역 먹거리를 만나보세요.
-                        </div>
-
-                    </div>
-
-                </div>
-
-
-                <!-- 행사 4 -->
-                <div class="ad-slide">
-
-                    <div class="ad-card">
-
-                        <div class="ad-badge">
-                            가을 여행 추천
-                        </div>
-
-                        <div class="ad-title">
-                            청송 가을 산책길
-                        </div>
-
-                        <div class="ad-region">
-                            경상북도 청송군
-                        </div>
-
-                        <div class="ad-date">
-                            2026.09.26 ~ 2026.10.11
-                        </div>
-
-                        <div class="ad-description">
-                            청송의 자연과 가을 풍경을 천천히 즐겨보세요.
-                        </div>
-
-                    </div>
-
-                </div>
-
-
-                <!-- 하단 광고 위치 표시 -->
-                <div class="ad-dots">
-
-                    <span class="dot active"></span>
-                    <span class="dot"></span>
-                    <span class="dot"></span>
-                    <span class="dot"></span>
-
-                </div>
-
+            <div id="event-container">
+                {slides_html}
             </div>
-
 
             <script>
 
-                const slides =
-                    document.querySelectorAll(".ad-slide");
+            let current = 0;
 
-                const dots =
-                    document.querySelectorAll(".dot");
+            const slides =
+                document.querySelectorAll(".event-slide");
 
-                let currentIndex = 0;
+            function showNextSlide() {{
 
+                slides[current].style.display = "none";
 
-                function showNextSlide() {
+                current = (current + 1) % slides.length;
 
-                    slides[currentIndex]
-                        .classList.remove("active");
+                slides[current].style.display = "block";
+            }}
 
-                    dots[currentIndex]
-                        .classList.remove("active");
-
-
-                    currentIndex =
-                        (currentIndex + 1)
-                        % slides.length;
-
-
-                    slides[currentIndex]
-                        .classList.add("active");
-
-                    dots[currentIndex]
-                        .classList.add("active");
-                }
-
-
-                /*
-                 * 3초마다 다음 행사로 변경
-                 */
-                setInterval(
-                    showNextSlide,
-                    3000
-                );
+            setInterval(showNextSlide, 3000);
 
             </script>
 
@@ -1121,133 +804,143 @@ with st.sidebar:
         </html>
         """,
         height=195,
-        scrolling=False,
     )
 
+    st.divider()
 
-    # =====================================================
-    # 설명
-    # =====================================================
+    # -----------------------------------------------------
+    # 취향 선택
+    # -----------------------------------------------------
 
-    st.caption(
-        "여행 취향을 선택하면 추천 지역과 코스가 달라집니다."
+    age_group = st.selectbox(
+        "👤 선호 나이대",
+        ["전체", "10대", "20대", "30~40대", "50대 이상"],
+        index=["전체", "10대", "20대", "30~40대", "50대 이상"].index(
+            st.session_state.age_group
+        ),
     )
 
+    st.session_state.age_group = age_group
 
-    # =====================================================
-    # 기존 필터
-    # =====================================================
-
-    st.selectbox(
-        "선호 나이대",
-        [
-            "전체",
-            "10대",
-            "20대",
-            "30~40대",
-            "50대 이상"
-        ],
-        key="age_group",
+    group_size = st.selectbox(
+        "👥 여행 인원",
+        ["전체", "1인", "2인", "3인", "4인 이상"],
+        index=["전체", "1인", "2인", "3인", "4인 이상"].index(
+            st.session_state.group_size
+        ),
     )
 
-    st.selectbox(
-        "여행 인원",
-        [
-            "전체",
-            "1인 (혼행)",
-            "2인 (커플/친구)",
-            "3인",
-            "4인 이상 (가족)"
-        ],
-        key="group_size",
-    )
+    st.session_state.group_size = group_size
 
-    st.selectbox(
-        "여행 기간",
-        [
+    travel_duration = st.selectbox(
+        "🕐 여행 기간",
+        ["전체", "당일치기", "1박 2일", "2박 3일", "3박 이상"],
+        index=[
             "전체",
             "당일치기",
             "1박 2일",
             "2박 3일",
-            "3박 이상"
-        ],
-        key="travel_duration",
+            "3박 이상",
+        ].index(st.session_state.travel_duration),
     )
 
-    st.selectbox(
-        "여행 테마",
+    st.session_state.travel_duration = travel_duration
+
+    travel_theme = st.selectbox(
+        "🎨 여행 테마",
         [
             "전체",
-            "자연·힐링",
             "액티비티",
             "역사·문화",
             "맛집·미식",
             "축제·행사",
             "사진 명소",
-            "가족 여행"
+            "가족 여행",
+            "자연·힐링",
         ],
-        key="travel_theme",
+        index=[
+            "전체",
+            "액티비티",
+            "역사·문화",
+            "맛집·미식",
+            "축제·행사",
+            "사진 명소",
+            "가족 여행",
+            "자연·힐링",
+        ].index(st.session_state.travel_theme),
     )
 
-    st.selectbox(
-        "선호 음식",
-        [
+    st.session_state.travel_theme = travel_theme
+
+    food_type = st.selectbox(
+        "🍴 선호 음식",
+        ["전체", "한식", "해산물", "향토음식", "간식·특산물"],
+        index=[
             "전체",
             "한식",
             "해산물",
-            "산채음식",
             "향토음식",
-            "간식·디저트"
-        ],
-        key="food_type",
+            "간식·특산물",
+        ].index(st.session_state.food_type),
     )
 
-    st.selectbox(
-        "정렬 기준",
-        [
+    st.session_state.food_type = food_type
+
+    sort_type = st.selectbox(
+        "↕️ 정렬 기준",
+        ["점수순", "인구순", "음식점수순", "지역특색순"],
+        index=[
             "점수순",
-            "인구 적은 순",
-            "음식 점수순",
-            "지역 특색순"
-        ],
-        key="sort_type",
+            "인구순",
+            "음식점수순",
+            "지역특색순",
+        ].index(st.session_state.sort_type),
     )
 
-    st.text_input(
-        "지역·음식·관광지 검색",
-        key="keyword"
+    st.session_state.sort_type = sort_type
+
+    keyword = st.text_input(
+        "🔎 지역·음식·관광지 검색",
+        value=st.session_state.keyword,
+        placeholder="예: 정선, 곤드레, 산, 시장",
     )
 
-    st.markdown("### 지도 표시 항목")
+    st.session_state.keyword = keyword
+
+    st.divider()
+
+    st.markdown("### 🗺️ 지도 표시")
 
     show_regions = st.checkbox(
-        "추천 지역",
-        True
+        "📍 추천 지역",
+        value=True,
     )
 
     show_food = st.checkbox(
-        "음식점",
-        True
+        "🍴 음식점",
+        value=True,
     )
 
     show_tour = st.checkbox(
-        "관광지",
-        True
+        "🏞️ 관광지",
+        value=True,
     )
 
     show_events = st.checkbox(
-        "지역 행사",
-        True
+        "🎉 지역 행사",
+        value=True,
     )
 
-    show_specialties = st.checkbox(
-        "특산품",
-        True
+    show_specialty = st.checkbox(
+        "🎁 특산품",
+        value=True,
     )
+
+    st.divider()
 
     if st.button(
-        "🔄 필터 초기화",
-        use_container_width=True
+        "🔄 선택 초기화",
+        use_container_width=True,
     ):
 
         for key, value in defaults.items():
@@ -1257,91 +950,32 @@ with st.sidebar:
 
 
 # =========================================================
-# 필터 적용
+# 검색 필터
 # =========================================================
+
 filtered_df = df.copy()
 
+if keyword.strip():
 
-# =========================================================
-# 키워드 검색
-# =========================================================
-if st.session_state.keyword.strip():
+    q = keyword.strip().lower()
 
-    keyword = st.session_state.keyword.strip().lower()
+    mask = (
+        filtered_df["지역"].str.lower().str.contains(q, na=False)
+        | filtered_df["대표음식"].str.lower().str.contains(q, na=False)
+        | filtered_df["음식점"].str.lower().str.contains(q, na=False)
+        | filtered_df["관광지"].str.lower().str.contains(q, na=False)
+        | filtered_df["지역행사"].str.lower().str.contains(q, na=False)
+        | filtered_df["특산품"].str.lower().str.contains(q, na=False)
+        | filtered_df["소개"].str.lower().str.contains(q, na=False)
+    )
 
-    filtered_df = filtered_df[
-        filtered_df.apply(
-            lambda row: keyword in " ".join(
-                [
-                    str(row["지역"]),
-                    str(row["대표음식"]),
-                    str(row["음식점"]),
-                    str(row["관광지"]),
-                    str(row["지역행사"]),
-                    str(row["특산품"]),
-                    str(row["소개"]),
-                ]
-            ).lower(),
-            axis=1,
-        )
-    ]
+    filtered_df = filtered_df[mask]
 
 
 # =========================================================
-# 음식 필터
+# 여행 기간 / 테마 / 음식 필터
 # =========================================================
-if st.session_state.food_type != "전체":
 
-    food_keywords = {
-        "한식": [
-            "밥",
-            "국",
-            "정식",
-            "비빔",
-            "떡",
-            "백숙"
-        ],
-        "해산물": [
-            "해산물",
-            "오징어",
-            "꽃게",
-            "장어",
-            "홍합",
-            "재첩",
-        ],
-        "산채음식": [
-            "산채",
-            "곤드레",
-            "산나물",
-        ],
-        "향토음식": [
-            "향토",
-            "마늘",
-            "고추",
-            "사과",
-        ],
-        "간식·디저트": [
-            "떡",
-            "유자",
-            "사과",
-        ],
-    }
-
-    keys = food_keywords[st.session_state.food_type]
-
-    filtered_df = filtered_df[
-        filtered_df["대표음식"].apply(
-            lambda x: any(
-                k in str(x)
-                for k in keys
-            )
-        )
-    ]
-
-
-# =========================================================
-# 여행 기간 필터
-# =========================================================
 if st.session_state.travel_duration != "전체":
 
     filtered_df = filtered_df[
@@ -1351,9 +985,6 @@ if st.session_state.travel_duration != "전체":
     ]
 
 
-# =========================================================
-# 여행 테마 필터
-# =========================================================
 if st.session_state.travel_theme != "전체":
 
     filtered_df = filtered_df[
@@ -1363,31 +994,74 @@ if st.session_state.travel_theme != "전체":
     ]
 
 
+if st.session_state.food_type != "전체":
+
+    food_filter_map = {
+        "한식": ["곤드레밥", "산채정식", "소바", "어죽",
+               "마늘정식", "산채비빔밥", "닭백숙",
+               "꽃게", "장어구이", "오징어"],
+
+        "해산물": ["꽃게", "장어구이", "오징어"],
+
+        "향토음식": ["곤드레밥", "산채정식", "소바", "어죽",
+                   "마늘정식", "산채비빔밥", "닭백숙"],
+
+        "간식·특산물": ["곤드레", "산수유", "의령망개떡",
+                     "단양마늘", "고추·산나물",
+                     "청송사과", "해산물",
+                     "유자", "오징어·호박엿"],
+    }
+
+    allowed = food_filter_map[st.session_state.food_type]
+
+    filtered_df = filtered_df[
+        filtered_df.apply(
+            lambda row:
+                any(
+                    item in str(row["대표음식"])
+                    or item in str(row["특산품"])
+                    for item in allowed
+                ),
+            axis=1,
+        )
+    ]
+
+
+# =========================================================
+# 취향 일치 지역 계산
+# =========================================================
+
+preference_df = filtered_df[
+    filtered_df.apply(matches_preferences, axis=1)
+].copy()
+
+
 # =========================================================
 # 정렬
 # =========================================================
+
 if st.session_state.sort_type == "점수순":
 
     filtered_df = filtered_df.sort_values(
-        "숨은지역점수",
+        "추천점수",
         ascending=False,
     )
 
-elif st.session_state.sort_type == "인구 적은 순":
+elif st.session_state.sort_type == "인구순":
 
     filtered_df = filtered_df.sort_values(
         "인구",
-        ascending=True,
+        ascending=False,
     )
 
-elif st.session_state.sort_type == "음식 점수순":
+elif st.session_state.sort_type == "음식점수순":
 
     filtered_df = filtered_df.sort_values(
         "음식점수",
         ascending=False,
     )
 
-else:
+elif st.session_state.sort_type == "지역특색순":
 
     filtered_df = filtered_df.sort_values(
         "지역특색",
@@ -1396,21 +1070,14 @@ else:
 
 
 # =========================================================
-# 상단 로고
+# 상단
 # =========================================================
+
 st.markdown(
-    """
-    <div class="top-logo">
-        🚗 <span>로컬 쉼표</span>
-    </div>
-    """,
+    '<div class="top-logo">🚗 <span>로컬 쉼표</span></div>',
     unsafe_allow_html=True,
 )
 
-
-# =========================================================
-# 상단 선택 정보
-# =========================================================
 m1, m2, m3, m4 = st.columns(4)
 
 with m1:
@@ -1418,9 +1085,9 @@ with m1:
     st.markdown(
         f"""
         <div class="metric-card">
-            <div class="metric-label">여행 인원</div>
+            <div class="metric-title">여행 인원</div>
             <div class="metric-value">
-                {html.escape(st.session_state.group_size)}
+                {st.session_state.group_size}
             </div>
         </div>
         """,
@@ -1432,9 +1099,9 @@ with m2:
     st.markdown(
         f"""
         <div class="metric-card">
-            <div class="metric-label">선호 나이대</div>
+            <div class="metric-title">선호 나이대</div>
             <div class="metric-value">
-                {html.escape(st.session_state.age_group)}
+                {st.session_state.age_group}
             </div>
         </div>
         """,
@@ -1446,9 +1113,9 @@ with m3:
     st.markdown(
         f"""
         <div class="metric-card">
-            <div class="metric-label">선택 여행 기간</div>
+            <div class="metric-title">선택 여행 기간</div>
             <div class="metric-value">
-                {html.escape(st.session_state.travel_duration)}
+                {st.session_state.travel_duration}
             </div>
         </div>
         """,
@@ -1460,9 +1127,9 @@ with m4:
     st.markdown(
         f"""
         <div class="metric-card">
-            <div class="metric-label">선택 여행 테마</div>
+            <div class="metric-title">선택 여행 테마</div>
             <div class="metric-value">
-                {html.escape(st.session_state.travel_theme)}
+                {st.session_state.travel_theme}
             </div>
         </div>
         """,
@@ -1470,788 +1137,1103 @@ with m4:
     )
 
 
+st.write("")
+
+
 # =========================================================
-# 필터 결과가 없을 경우
+# 취향 일치 결과 안내
 # =========================================================
-if filtered_df.empty:
+
+if len(preference_df) == 0:
 
     st.warning(
-        "현재 조건에 맞는 지역이 없습니다. "
-        "필터를 조금 완화해 보세요."
+        "현재 선택한 여행 취향과 정확히 일치하는 지역이 없습니다. "
+        "사이드바의 취향 조건을 조금 완화해 보세요."
     )
 
-    st.stop()
+else:
+
+    st.success(
+        f"🎯 선택한 여행 취향과 일치하는 지역 "
+        f"{len(preference_df)}곳을 지도에 표시합니다."
+    )
 
 
 # =========================================================
 # 지역 선택
 # =========================================================
-region_names = filtered_df["지역"].tolist()
 
-if st.session_state.selected_region not in region_names:
+if len(filtered_df) > 0:
 
-    st.session_state.selected_region = region_names[0]
+    region_names = filtered_df["지역"].tolist()
 
+    if st.session_state.selected_region not in region_names:
+        st.session_state.selected_region = region_names[0]
 
-selected_region = st.selectbox(
-    "🔎 상세 정보를 볼 지역",
-    region_names,
-    index=region_names.index(
-        st.session_state.selected_region
-    ),
-    key="region_selector",
-)
-
-st.session_state.selected_region = selected_region
-
-row = filtered_df[
-    filtered_df["지역"] == selected_region
-].iloc[0]
-
-
-# =========================================================
-# 맞춤 코스 데이터 계산
-# =========================================================
-duration_days = {
-    "당일치기": 1,
-    "1박 2일": 2,
-    "2박 3일": 3,
-    "3박 이상": 4,
-}
-
-selected_duration = st.session_state.travel_duration
-
-if selected_duration == "전체":
-    selected_duration = row["추천기간"][0]
-
-days = duration_days.get(
-    selected_duration,
-    1,
-)
-
-
-theme = st.session_state.travel_theme
-group = st.session_state.group_size
-age = st.session_state.age_group
-
-
-# =========================================================
-# 코스 내용
-# =========================================================
-if theme == "액티비티":
-
-    first_activity = "대표 관광지에서 체험·전망 활동"
-    second_activity = "주변 산책 또는 자연 체험"
-
-elif theme == "역사·문화":
-
-    first_activity = "지역 문화·역사 명소 탐방"
-    second_activity = "전통시장 또는 지역 문화 공간 방문"
-
-elif theme == "맛집·미식":
-
-    first_activity = (
-        f"{row['음식점']}에서 대표 음식 즐기기"
-    )
-    second_activity = (
-        f"{row['대표음식']} 관련 로컬 먹거리 탐방"
+    selected_region = st.selectbox(
+        "📍 상세 정보를 볼 지역",
+        region_names,
+        index=region_names.index(
+            st.session_state.selected_region
+        ),
     )
 
-elif theme == "축제·행사":
+    st.session_state.selected_region = selected_region
 
-    first_activity = (
-        f"{row['지역행사']} 관련 장소 방문"
-    )
-    second_activity = "지역 행사장 주변 산책 및 체험"
-
-elif theme == "사진 명소":
-
-    first_activity = (
-        f"{row['관광지']}에서 사진 촬영"
-    )
-    second_activity = "노을·전망·자연 풍경 감상"
-
-elif theme == "가족 여행":
-
-    first_activity = "가족 단위로 이동하기 좋은 관광지 방문"
-    second_activity = "무리 없는 산책과 지역 먹거리 체험"
+    row = filtered_df[
+        filtered_df["지역"] == selected_region
+    ].iloc[0]
 
 else:
 
-    first_activity = f"{row['관광지']} 방문"
-    second_activity = "주변 자연 경관과 로컬 공간 탐방"
+    row = None
 
 
 # =========================================================
-# 인원별 팁
+# 맞춤 여행 코스 계산
 # =========================================================
-if group == "1인 (혼행)":
 
-    group_tip = "혼자 이동하기 편하도록 주요 명소 중심"
+if row is not None:
 
-elif group == "2인 (커플/친구)":
+    duration_days = {
+        "당일치기": 1,
+        "1박 2일": 2,
+        "2박 3일": 3,
+        "3박 이상": 4,
+    }
 
-    group_tip = "사진 명소와 여유로운 식사 중심"
+    selected_duration = st.session_state.travel_duration
 
-elif group == "3인":
+    if selected_duration == "전체":
 
-    group_tip = "관광·식사·휴식의 균형 중심"
+        selected_duration = row["추천기간"][0]
 
-elif group == "4인 이상 (가족)":
+    days = duration_days.get(
+        selected_duration,
+        1,
+    )
 
-    group_tip = "이동 부담을 줄이고 가족 체험 중심"
+    theme = st.session_state.travel_theme
+    group = st.session_state.group_size
+    age = st.session_state.age_group
 
-else:
+    # -----------------------------------------------------
+    # 테마별 활동
+    # -----------------------------------------------------
 
-    group_tip = "다양한 여행객이 이용할 수 있는 기본 코스"
+    if theme == "액티비티":
 
-
-# =========================================================
-# 나이대별 팁
-# =========================================================
-if age == "10대":
-
-    age_tip = "체험·사진·활동 중심"
-
-elif age == "20대":
-
-    age_tip = "감성 명소·맛집·활동 중심"
-
-elif age == "30~40대":
-
-    age_tip = "관광·식사·휴식이 균형 잡힌 구성"
-
-elif age == "50대 이상":
-
-    age_tip = "무리 없는 이동과 자연·문화 중심"
-
-else:
-
-    age_tip = "일반적인 관광·식사·휴식 중심"
-
-
-# =========================================================
-# 하루 일정 생성
-# =========================================================
-daily_plan = []
-
-for day in range(1, days + 1):
-
-    if day == 1:
-
-        daily_plan.append(
-            {
-                "day": day,
-                "morning": (
-                    f"09:30 · {first_activity}"
-                ),
-                "lunch": (
-                    f"12:30 · {row['음식점']} / "
-                    f"{row['대표음식']}"
-                ),
-                "afternoon": (
-                    f"14:00 · {second_activity}"
-                ),
-                "evening": (
-                    f"17:30 · {row['지역']} "
-                    f"로컬 거리 또는 시장 산책"
-                ),
-            }
+        first_activity = (
+            f"{row['관광지']} 중심 체험 및 "
+            "가벼운 액티비티"
         )
 
-    elif day == days:
+        second_activity = (
+            f"{row['관광지']} 주요 포인트 "
+            "둘러보기"
+        )
 
-        daily_plan.append(
-            {
-                "day": day,
-                "morning": (
-                    f"09:30 · {row['특산품']} "
-                    f"알아보기 및 기념품 구입"
-                ),
-                "lunch": (
-                    f"12:00 · {row['대표음식']} "
-                    f"중심의 지역 식사"
-                ),
-                "afternoon": (
-                    f"14:00 · {row['관광지']} 중 "
-                    f"방문하지 못한 장소 탐방"
-                ),
-                "evening": (
-                    "16:30 · 여행 정리 및 귀가"
-                ),
-            }
+    elif theme == "역사·문화":
+
+        first_activity = (
+            f"{row['지역']}의 역사·문화 명소 탐방"
+        )
+
+        second_activity = (
+            f"{row['지역행사']}와 지역 문화 알아보기"
+        )
+
+    elif theme == "맛집·미식":
+
+        first_activity = (
+            f"{row['지역']} 로컬시장 및 "
+            "지역 먹거리 탐방"
+        )
+
+        second_activity = (
+            f"{row['대표음식']} 맛집 중심 "
+            "미식 여행"
+        )
+
+    elif theme == "축제·행사":
+
+        first_activity = (
+            f"{row['지역행사']} 관련 장소 탐방"
+        )
+
+        second_activity = (
+            "지역 행사 및 로컬 프로그램 즐기기"
+        )
+
+    elif theme == "사진 명소":
+
+        first_activity = (
+            f"{row['관광지']} 사진 명소 탐방"
+        )
+
+        second_activity = (
+            "노을·전망·지역 풍경 중심 촬영"
+        )
+
+    elif theme == "가족 여행":
+
+        first_activity = (
+            f"{row['관광지']} 가족 체험"
+        )
+
+        second_activity = (
+            f"{row['지역']} 주변 편안한 산책"
         )
 
     else:
 
-        daily_plan.append(
-            {
-                "day": day,
-                "morning": (
-                    f"09:30 · {row['관광지']} "
-                    f"주변 산책 및 자유 일정"
-                ),
-                "lunch": (
-                    f"12:30 · {row['음식점']} "
-                    f"또는 인근 로컬 식당"
-                ),
-                "afternoon": (
-                    f"14:00 · {row['지역행사']} "
-                    f"또는 지역 특색 체험"
-                ),
-                "evening": (
-                    f"17:30 · {row['특산품']} "
-                    f"쇼핑 및 휴식"
-                ),
-            }
+        first_activity = (
+            f"{row['관광지']} 대표 명소 탐방"
         )
+
+        second_activity = (
+            f"{row['지역']}의 로컬 명소 둘러보기"
+        )
+
+    # -----------------------------------------------------
+    # 여행 인원 팁
+    # -----------------------------------------------------
+
+    group_tip = {
+
+        "1인":
+            "혼자 이동하기 편하도록 주요 명소와 자유시간 중심으로 구성했습니다.",
+
+        "2인":
+            "사진 명소와 여유로운 식사, 산책 시간을 중심으로 구성했습니다.",
+
+        "3인":
+            "관광·식사·휴식의 균형을 고려한 코스입니다.",
+
+        "4인 이상":
+            "이동 부담을 줄이고 가족·단체 체험을 고려한 코스입니다.",
+
+        "전체":
+            "다양한 여행객이 이용할 수 있도록 관광·식사·휴식을 균형 있게 구성했습니다.",
+    }.get(
+        group,
+        "기본 여행 코스로 구성했습니다.",
+    )
+
+    # -----------------------------------------------------
+    # 나이대 팁
+    # -----------------------------------------------------
+
+    age_tip = {
+
+        "10대":
+            "체험·사진·활동적인 관광지를 중심으로 구성했습니다.",
+
+        "20대":
+            "감성 명소·맛집·사진과 활동적인 여행지를 중심으로 구성했습니다.",
+
+        "30~40대":
+            "관광·식사·휴식이 균형 잡힌 구성으로 만들었습니다.",
+
+        "50대 이상":
+            "무리 없는 이동과 자연·문화 중심의 여행을 고려했습니다.",
+
+        "전체":
+            "일반적인 관광·식사·휴식 중심의 기본 여행 코스입니다.",
+    }.get(
+        age,
+        "일반적인 여행 코스로 구성했습니다.",
+    )
+
+    # -----------------------------------------------------
+    # 일정 생성
+    # -----------------------------------------------------
+
+    daily_plan = []
+
+    for day in range(1, days + 1):
+
+        if day == 1:
+
+            daily_plan.append(
+                {
+                    "day": day,
+                    "morning":
+                        f"09:30 · {first_activity}",
+
+                    "lunch":
+                        f"12:30 · {row['음식점']} / {row['대표음식']}",
+
+                    "afternoon":
+                        f"14:00 · {second_activity}",
+
+                    "evening":
+                        f"17:30 · {row['지역']} 로컬 거리 또는 시장 산책",
+                }
+            )
+
+        elif day == days:
+
+            daily_plan.append(
+                {
+                    "day": day,
+
+                    "morning":
+                        f"09:30 · {row['특산품']} 알아보기 및 기념품 구입",
+
+                    "lunch":
+                        f"12:00 · {row['대표음식']} 중심의 지역 식사",
+
+                    "afternoon":
+                        f"14:00 · {row['관광지']} 중 방문하지 못한 장소 탐방",
+
+                    "evening":
+                        "16:30 · 여행 정리 및 귀가",
+                }
+            )
+
+        else:
+
+            daily_plan.append(
+                {
+                    "day": day,
+
+                    "morning":
+                        f"09:30 · {row['관광지']} 주변 산책 및 자유 일정",
+
+                    "lunch":
+                        f"12:30 · {row['음식점']} 또는 인근 로컬 식당",
+
+                    "afternoon":
+                        f"14:00 · {row['지역행사']} 또는 지역 특색 체험",
+
+                    "evening":
+                        f"17:30 · {row['특산품']} 쇼핑 및 휴식",
+                }
+            )
 
 
 # =========================================================
 # 지도 + 맞춤 여행 코스
 # =========================================================
-st.markdown(
-    '<div class="map-course-title">🗺️ 숨은 지역 지도 &nbsp; + &nbsp; 🧭 맞춤 여행 코스</div>',
-    unsafe_allow_html=True,
-)
 
-map_col, course_col = st.columns(
-    [1, 1],
-    gap="medium",
-)
+if row is not None:
 
-
-# =========================================================
-# 왼쪽 : 지도
-# =========================================================
-with map_col:
-
-    map_center = [36.2, 127.8]
-
-    m = folium.Map(
-        location=map_center,
-        zoom_start=7,
-        tiles=None,
-        control_scale=True,
+    st.markdown(
+        """
+        <div class="map-course-title">
+            🗺️ 숨은 지역 지도
+            &nbsp; + &nbsp;
+            🧭 맞춤 여행 코스
+        </div>
+        """,
+        unsafe_allow_html=True,
     )
 
-    folium.TileLayer(
-        tiles="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-        name="일반 지도",
-        attr="© OpenStreetMap",
-    ).add_to(m)
+    map_col, course_col = st.columns(
+        [1, 1],
+        gap="medium",
+    )
 
-    folium.TileLayer(
-        tiles="https://xdworld.vworld.kr/2d/Base/service/{z}/{x}/{y}.png",
-        name="VWorld 일반",
-        attr="VWorld",
-        overlay=False,
-    ).add_to(m)
+    # =====================================================
+    # 지도
+    # =====================================================
 
-    for _, map_row in filtered_df.iterrows():
+    with map_col:
 
-        popup_html = f"""
-        <div style="width:240px">
-            <h4>{html.escape(map_row['지역'])}</h4>
-            <b>추천 점수: {map_row['숨은지역점수']}점</b><br>
-            대표 음식: {html.escape(map_row['대표음식'])}<br>
-            관광지: {html.escape(map_row['관광지'])}
-        </div>
-        """
+        st.markdown(
+            "### 🗺️ 취향 맞춤 지역 지도"
+        )
+
+        st.caption(
+            "선택한 여행 취향과 일치하는 지역만 지도에 표시하며, "
+            "해당 지역들이 화면에 들어오도록 자동 확대합니다."
+        )
+
+        # -------------------------------------------------
+        # 지도에 표시할 지역
+        # -------------------------------------------------
+
+        map_regions = preference_df.copy()
+
+        # 취향 전체일 때는 검색/기본 필터 결과를 지도에 표시
+        if (
+            st.session_state.age_group == "전체"
+            and st.session_state.group_size == "전체"
+            and st.session_state.travel_duration == "전체"
+            and st.session_state.travel_theme == "전체"
+            and st.session_state.food_type == "전체"
+        ):
+            map_regions = filtered_df.copy()
+
+        # -------------------------------------------------
+        # 지도 시작 위치
+        # -------------------------------------------------
+
+        if len(map_regions) > 0:
+
+            center_lat = map_regions["위도"].mean()
+            center_lon = map_regions["경도"].mean()
+
+        else:
+
+            center_lat = 36.2
+            center_lon = 127.8
+
+        fmap = folium.Map(
+            location=[
+                center_lat,
+                center_lon,
+            ],
+            zoom_start=7,
+            control_scale=True,
+            tiles=None,
+        )
+
+        # 기본 지도
+        folium.TileLayer(
+            tiles="OpenStreetMap",
+            name="OpenStreetMap",
+            control=True,
+        ).add_to(fmap)
+
+        # 위성/도로 보조
+        folium.TileLayer(
+            tiles="https://xdworld.vworld.kr/2d/Base/service/{z}/{x}/{y}.png",
+            attr="VWorld",
+            name="VWorld",
+            control=True,
+        ).add_to(fmap)
+
+        # 전체화면 버튼
+        Fullscreen(
+            position="topright",
+            title="전체화면",
+            title_cancel="전체화면 종료",
+            force_separate_button=True,
+        ).add_to(fmap)
+
+        # -------------------------------------------------
+        # 지역 마커
+        # -------------------------------------------------
+
+        bounds = []
 
         if show_regions:
 
-            folium.Marker(
-                [map_row["위도"], map_row["경도"]],
-                tooltip=(
-                    f"{map_row['지역']} · "
-                    f"{map_row['숨은지역점수']}점"
-                ),
-                popup=folium.Popup(
-                    popup_html,
-                    max_width=300,
-                ),
-                icon=folium.Icon(
-                    color="green",
-                    icon="map-marker",
-                ),
-            ).add_to(m)
+            for _, r in map_regions.iterrows():
 
-        if show_food:
+                bounds.append(
+                    [
+                        r["위도"],
+                        r["경도"],
+                    ]
+                )
 
-            folium.Marker(
-                [
-                    map_row["위도"] + 0.018,
-                    map_row["경도"] + 0.012,
-                ],
-                tooltip=f"🍴 {map_row['음식점']}",
-                popup=map_row["음식점"],
-                icon=folium.Icon(
-                    color="orange",
-                    icon="cutlery",
-                ),
-            ).add_to(m)
+                is_selected = (
+                    r["지역"] == selected_region
+                )
 
-        if show_tour:
+                popup_html = f"""
+                <div style="
+                    width:230px;
+                    font-family:Arial;
+                ">
 
-            folium.Marker(
-                [
-                    map_row["위도"] - 0.018,
-                    map_row["경도"] - 0.012,
-                ],
-                tooltip=f"🏞️ {map_row['관광지']}",
-                popup=map_row["관광지"],
-                icon=folium.Icon(
-                    color="blue",
-                    icon="camera",
-                ),
-            ).add_to(m)
+                    <h4 style="
+                        margin-bottom:6px;
+                    ">
+                        📍 {html.escape(r["지역"])}
+                    </h4>
 
-        if show_events:
+                    <b>추천점수</b>
+                    {r["추천점수"]}점
+                    <br>
 
-            folium.Marker(
-                [
-                    map_row["위도"] + 0.012,
-                    map_row["경도"] - 0.018,
-                ],
-                tooltip=f"🎉 {map_row['지역행사']}",
-                popup=map_row["지역행사"],
-                icon=folium.Icon(
-                    color="purple",
-                    icon="star",
-                ),
-            ).add_to(m)
+                    <b>대표음식</b>
+                    {html.escape(r["대표음식"])}
+                    <br>
 
-        if show_specialties:
+                    <b>관광지</b>
+                    {html.escape(r["관광지"])}
+                    <br>
 
-            folium.Marker(
-                [
-                    map_row["위도"] - 0.012,
-                    map_row["경도"] + 0.018,
-                ],
-                tooltip=f"🎁 {map_row['특산품']}",
-                popup=map_row["특산품"],
-                icon=folium.Icon(
-                    color="red",
-                    icon="shopping-basket",
-                ),
-            ).add_to(m)
+                    <b>특산품</b>
+                    {html.escape(r["특산품"])}
 
-    folium.LayerControl().add_to(m)
+                </div>
+                """
 
-    st_folium(
-        m,
-        use_container_width=True,
-        height=500,
-        returned_objects=[],
-    )
+                folium.Marker(
+                    location=[
+                        r["위도"],
+                        r["경도"],
+                    ],
+                    tooltip=f"📍 {r['지역']}",
+                    popup=folium.Popup(
+                        popup_html,
+                        max_width=280,
+                    ),
+                    icon=folium.Icon(
+                        color="red" if is_selected else "green",
+                        icon="map-marker",
+                        prefix="fa",
+                    ),
+                ).add_to(fmap)
 
+        # -------------------------------------------------
+        # 선택 지역의 세부 지도 정보
+        # -------------------------------------------------
 
-# =========================================================
-# 오른쪽 : 맞춤 여행 코스
-# =========================================================
-with course_col:
+        if len(map_regions) > 0:
 
-    st.subheader("🧭 맞춤 여행 코스 만들기")
+            # 음식점
+            if show_food:
 
-    st.caption(
-        f"{row['지역']} · 선택한 여행 조건을 기준으로 구성된 추천 코스"
-    )
+                for _, r in map_regions.iterrows():
 
-    tag1, tag2 = st.columns(2)
+                    folium.Marker(
+                        location=[
+                            r["위도"] + 0.025,
+                            r["경도"] + 0.025,
+                        ],
+                        tooltip=f"🍴 {r['음식점']}",
+                        popup=f"""
+                        <b>🍴 음식점</b><br>
+                        {html.escape(r["음식점"])}<br>
+                        대표음식: {html.escape(r["대표음식"])}
+                        """,
+                        icon=folium.Icon(
+                            color="orange",
+                            icon="cutlery",
+                            prefix="fa",
+                        ),
+                    ).add_to(fmap)
 
-    with tag1:
+            # 관광지
+            if show_tour:
 
-        st.markdown(
-            f"👤 **여행 인원**  \n{group}"
+                for _, r in map_regions.iterrows():
+
+                    folium.Marker(
+                        location=[
+                            r["위도"] - 0.025,
+                            r["경도"] + 0.025,
+                        ],
+                        tooltip=f"🏞️ {r['관광지']}",
+                        popup=f"""
+                        <b>🏞️ 관광지</b><br>
+                        {html.escape(r["관광지"])}
+                        """,
+                        icon=folium.Icon(
+                            color="blue",
+                            icon="camera",
+                            prefix="fa",
+                        ),
+                    ).add_to(fmap)
+
+            # 행사
+            if show_events:
+
+                for _, r in map_regions.iterrows():
+
+                    folium.Marker(
+                        location=[
+                            r["위도"] + 0.025,
+                            r["경도"] - 0.025,
+                        ],
+                        tooltip=f"🎉 {r['지역행사']}",
+                        popup=f"""
+                        <b>🎉 지역 행사</b><br>
+                        {html.escape(r["지역행사"])}
+                        """,
+                        icon=folium.Icon(
+                            color="purple",
+                            icon="calendar",
+                            prefix="fa",
+                        ),
+                    ).add_to(fmap)
+
+            # 특산품
+            if show_specialty:
+
+                for _, r in map_regions.iterrows():
+
+                    folium.Marker(
+                        location=[
+                            r["위도"] - 0.025,
+                            r["경도"] - 0.025,
+                        ],
+                        tooltip=f"🎁 {r['특산품']}",
+                        popup=f"""
+                        <b>🎁 특산품</b><br>
+                        {html.escape(r["특산품"])}
+                        """,
+                        icon=folium.Icon(
+                            color="cadetblue",
+                            icon="gift",
+                            prefix="fa",
+                        ),
+                    ).add_to(fmap)
+
+        # -------------------------------------------------
+        # ★ 핵심: 취향 일치 지역 자동 확대
+        # -------------------------------------------------
+
+        if len(bounds) >= 2:
+
+            fmap.fit_bounds(
+                bounds,
+                padding=(35, 35),
+                max_zoom=10,
+            )
+
+        elif len(bounds) == 1:
+
+            fmap.location = bounds[0]
+            fmap.zoom_start = 10
+
+        else:
+
+            fmap.location = [
+                36.2,
+                127.8,
+            ]
+
+            fmap.zoom_start = 7
+
+        folium.LayerControl(
+            collapsed=False
+        ).add_to(fmap)
+
+        st_folium(
+            fmap,
+            width=None,
+            height=650,
+            returned_objects=[],
         )
 
-    with tag2:
+
+    # =====================================================
+    # 맞춤 여행 코스
+    # =====================================================
+
+    with course_col:
 
         st.markdown(
-            f"🎂 **선호 나이대**  \n{age}"
+            """
+            <div class="course-box">
+            """,
+            unsafe_allow_html=True,
         )
 
-    tag3, tag4 = st.columns(2)
+        st.subheader(
+            "🧭 맞춤 여행 코스 만들기"
+        )
 
-    with tag3:
+        st.caption(
+            f"{row['지역']} · 선택한 여행 조건을 기준으로 구성된 추천 코스"
+        )
+
+        tag1, tag2 = st.columns(2)
+
+        with tag1:
+
+            st.markdown(
+                f"""
+                <div class="score-box">
+                    <div class="score-number">
+                        {row['추천점수']}
+                    </div>
+                    <div class="score-label">
+                        로컬 추천점수
+                    </div>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+
+        with tag2:
+
+            st.markdown(
+                f"""
+                <div class="score-box">
+                    <div class="score-number">
+                        {days}일
+                    </div>
+                    <div class="score-label">
+                        추천 여행기간
+                    </div>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+
+        st.write("")
 
         st.markdown(
-            f"📅 **여행 기간**  \n{selected_duration}"
+            make_tags(row),
+            unsafe_allow_html=True,
         )
 
-    with tag4:
+        st.divider()
+
+        # -------------------------------------------------
+        # 여행자 맞춤 포인트
+        # -------------------------------------------------
 
         st.markdown(
-            f"🎯 **여행 테마**  \n{theme}"
+            "**👥 여행자 맞춤 포인트**"
         )
 
-    st.divider()
+        st.info(age_tip)
 
-    st.markdown("**👥 여행자 맞춤 포인트**")
+        st.markdown(
+            "**🧩 코스 구성 방식**"
+        )
 
-    st.info(age_tip)
+        st.info(group_tip)
 
-    st.markdown("**🧩 코스 구성 방식**")
+        st.markdown(
+            "### 📅 추천 일정"
+        )
 
-    st.info(group_tip)
+        # -------------------------------------------------
+        # ★ 일정 가독성 개선
+        # -------------------------------------------------
 
-    st.markdown("### 📅 추천 일정")
+        for plan in daily_plan:
 
-    for plan in daily_plan:
-
-        with st.container(border=True):
-
-            st.markdown(
-                f"#### 📅 {plan['day']}일 차"
+            morning_time, morning_text = split_schedule_item(
+                plan["morning"]
             )
 
-            st.markdown(
-                f"🌅 **오전**  \n"
-                f"{html.escape(plan['morning'].split('·', 1)[-1].strip())}"
+            lunch_time, lunch_text = split_schedule_item(
+                plan["lunch"]
             )
 
-            st.markdown(
-                f"🍴 **점심**  \n"
-                f"{html.escape(plan['lunch'].split('·', 1)[-1].strip())}"
+            afternoon_time, afternoon_text = split_schedule_item(
+                plan["afternoon"]
             )
 
-            st.markdown(
-                f"🏞️ **오후**  \n"
-                f"{html.escape(plan['afternoon'].split('·', 1)[-1].strip())}"
+            evening_time, evening_text = split_schedule_item(
+                plan["evening"]
             )
 
-            st.markdown(
-                f"🌙 **저녁**  \n"
-                f"{html.escape(plan['evening'].split('·', 1)[-1].strip())}"
-            )
+            if plan["day"] == 1:
 
-    st.caption(
-        "※ 예시 데이터 기반 추천 코스입니다. "
-        "실제 이동시간·영업시간·날씨·행사 일정은 방문 전에 확인하세요."
-    )
+                summary = (
+                    "대표 관광지 · 로컬 맛집"
+                )
+
+            elif plan["day"] == days:
+
+                summary = (
+                    "특산품 · 여행 마무리"
+                )
+
+            else:
+
+                summary = (
+                    "자유 산책 · 지역 체험"
+                )
+
+            # 1일차는 펼쳐놓고
+            # 2일차부터는 접어놓음
+            expanded = plan["day"] == 1
+
+            with st.expander(
+                f"📅 {plan['day']}일 차  ·  {summary}",
+                expanded=expanded,
+            ):
+
+                schedule_col1, schedule_col2 = st.columns(2)
+
+                with schedule_col1:
+
+                    st.markdown(
+                        f"""
+                        **🌅 오전**
+
+                        <span class="schedule-time">
+                        {html.escape(morning_time)}
+                        </span>
+
+                        <div class="schedule-text">
+                        {html.escape(morning_text)}
+                        </div>
+                        """,
+                        unsafe_allow_html=True,
+                    )
+
+                    st.write("")
+
+                    st.markdown(
+                        f"""
+                        **🍴 점심**
+
+                        <span class="schedule-time">
+                        {html.escape(lunch_time)}
+                        </span>
+
+                        <div class="schedule-text">
+                        {html.escape(lunch_text)}
+                        </div>
+                        """,
+                        unsafe_allow_html=True,
+                    )
+
+                with schedule_col2:
+
+                    st.markdown(
+                        f"""
+                        **🏞️ 오후**
+
+                        <span class="schedule-time">
+                        {html.escape(afternoon_time)}
+                        </span>
+
+                        <div class="schedule-text">
+                        {html.escape(afternoon_text)}
+                        </div>
+                        """,
+                        unsafe_allow_html=True,
+                    )
+
+                    st.write("")
+
+                    st.markdown(
+                        f"""
+                        **🌙 저녁**
+
+                        <span class="schedule-time">
+                        {html.escape(evening_time)}
+                        </span>
+
+                        <div class="schedule-text">
+                        {html.escape(evening_text)}
+                        </div>
+                        """,
+                        unsafe_allow_html=True,
+                    )
+
+        st.caption(
+            "※ 현재 코스는 플랫폼의 예시 데이터 기반 추천 일정입니다. "
+            "실제 운영시간 및 행사 일정은 방문 전 확인해주세요."
+        )
+
+        st.markdown(
+            "</div>",
+            unsafe_allow_html=True,
+        )
 
 
 # =========================================================
 # 길찾기
 # =========================================================
-query = urllib.parse.quote(
-    f"{row['지역']} {row['관광지']}"
-)
 
-st.markdown("### 🚗 길찾기")
+if row is not None:
 
-nav1, nav2 = st.columns(2)
+    st.markdown("### 🚗 여행지 길찾기")
 
-with nav1:
-
-    st.link_button(
-        "🗺️ 네이버 지도에서 길찾기",
-        f"https://map.naver.com/p/search/{query}",
-        use_container_width=True,
+    query = urllib.parse.quote(
+        f"{row['지역']} {row['관광지']}"
     )
 
-with nav2:
+    nav1, nav2 = st.columns(2)
 
-    st.link_button(
-        "📍 카카오맵에서 검색",
-        f"https://map.kakao.com/?q={query}",
-        use_container_width=True,
-    )
+    with nav1:
+
+        st.link_button(
+            "🗺️ 네이버 지도에서 길찾기",
+            f"https://map.naver.com/p/search/{query}",
+            use_container_width=True,
+        )
+
+    with nav2:
+
+        st.link_button(
+            "📍 카카오맵에서 검색",
+            f"https://map.kakao.com/?q={query}",
+            use_container_width=True,
+        )
 
 
 # =========================================================
 # 추천 지역
 # =========================================================
-st.subheader("📍 추천 지역")
 
-st.caption(
-    "현재 맞춤 여행 코스로 선택한 지역입니다."
-)
-
-with st.container(border=True):
+if len(preference_df) > 0:
 
     st.markdown(
-        f"## 📍 {row['지역']}"
+        "### 📍 지금 취향에 맞는 추천 지역"
     )
 
-    st.markdown("---")
+    st.caption(
+        "사이드바에서 선택한 여행 취향을 기준으로 일치하는 지역입니다."
+    )
 
-    info_col1, info_col2 = st.columns(2)
+    recommend_cols = st.columns(3)
 
-    with info_col1:
+    for i, (_, r) in enumerate(
+        preference_df.sort_values(
+            "추천점수",
+            ascending=False,
+        ).head(6).iterrows()
+    ):
+
+        with recommend_cols[i % 3]:
+
+            st.markdown(
+                f"""
+                <div class="section-card">
+
+                    <div style="
+                        font-size:17px;
+                        font-weight:900;
+                        color:#edf7f0;
+                    ">
+                        📍 {html.escape(r["지역"])}
+                    </div>
+
+                    <div style="
+                        color:#9fe0b6;
+                        font-size:23px;
+                        font-weight:900;
+                        margin-top:8px;
+                    ">
+                        {r["추천점수"]}점
+                    </div>
+
+                    <div style="
+                        color:#a5baad;
+                        font-size:13px;
+                        line-height:1.6;
+                        margin-top:7px;
+                    ">
+                        🍴 {html.escape(r["대표음식"])}<br>
+                        🏞️ {html.escape(r["관광지"])}<br>
+                        🎁 {html.escape(r["특산품"])}
+                    </div>
+
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+
+
+# =========================================================
+# 선택 지역 사진
+# =========================================================
+
+if row is not None:
+
+    st.markdown(
+        f"### 📸 {row['지역']} 사진 미리보기"
+    )
+
+    images = IMAGE_DATA.get(
+        row["지역"],
+        {},
+    )
+
+    photo1, photo2, photo3 = st.columns(3)
+
+    with photo1:
+
+        render_image_card(
+            "🏞️ 여행지",
+            images.get("여행지", ""),
+            row["관광지"],
+        )
+
+    with photo2:
+
+        render_image_card(
+            "🍴 먹거리",
+            images.get("먹거리", ""),
+            f"{row['대표음식']} · {row['음식점']}",
+        )
+
+    with photo3:
+
+        render_image_card(
+            "👀 구경거리",
+            images.get("구경거리", ""),
+            row["지역행사"],
+        )
+
+
+# =========================================================
+# 상세 정보
+# =========================================================
+
+if row is not None:
+
+    st.markdown(
+        f"### 📋 {row['지역']} 상세 정보"
+    )
+
+    tab1, tab2, tab3, tab4 = st.tabs(
+        [
+            "🏞️ 관광지",
+            "🍴 먹거리",
+            "🎉 지역 행사",
+            "🎁 특산품",
+        ]
+    )
+
+    with tab1:
 
         st.markdown(
             f"""
-            **🍚 대표 음식**  
-            {row['대표음식']}
+            <div class="section-card">
 
-            **🎁 지역 특산품**  
-            {row['특산품']}
+                <h3>
+                    🏞️ 주요 관광지
+                </h3>
 
-            **🎉 지역 행사**  
-            {row['지역행사']}
-            """
+                <p style="
+                    font-size:16px;
+                    line-height:1.7;
+                    color:#dcebe1;
+                ">
+                    {html.escape(row["관광지"])}
+                </p>
+
+                <div>
+                    {make_tags(row)}
+                </div>
+
+            </div>
+            """,
+            unsafe_allow_html=True,
         )
 
-    with info_col2:
+    with tab2:
 
         st.markdown(
             f"""
-            **📸 주요 관광지**  
-            {row['관광지']}
+            <div class="section-card">
 
-            **🌿 관광 유형**  
-            {row['관광유형']}
+                <h3>
+                    🍴 로컬 먹거리
+                </h3>
 
-            **📅 추천 기간**  
-            {row['추천기간']}
-            """
+                <p style="
+                    font-size:16px;
+                    color:#dcebe1;
+                ">
+                    대표 음식 : <b>{html.escape(row["대표음식"])}</b>
+                </p>
+
+                <p style="
+                    font-size:14px;
+                    color:#b2c8ba;
+                ">
+                    추천 음식점 : {html.escape(row["음식점"])}
+                </p>
+
+                <div class="score-box">
+                    <div class="score-number">
+                        {row["음식점수"]}
+                    </div>
+                    <div class="score-label">
+                        지역 음식 점수
+                    </div>
+                </div>
+
+            </div>
+            """,
+            unsafe_allow_html=True,
         )
 
-    st.markdown("---")
+    with tab3:
 
-    st.markdown("### 💡 지역 소개")
+        st.markdown(
+            f"""
+            <div class="section-card">
 
-    st.write(
+                <h3>
+                    🎉 지역 행사
+                </h3>
+
+                <p style="
+                    font-size:17px;
+                    color:#dcebe1;
+                ">
+                    {html.escape(row["지역행사"])}
+                </p>
+
+                <p style="
+                    color:#a9c0b2;
+                    line-height:1.6;
+                ">
+                    지역의 고유한 문화와 관광 콘텐츠를
+                    경험할 수 있는 대표 행사입니다.
+                </p>
+
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
+    with tab4:
+
+        st.markdown(
+            f"""
+            <div class="section-card">
+
+                <h3>
+                    🎁 지역 특산품
+                </h3>
+
+                <p style="
+                    font-size:18px;
+                    color:#dcebe1;
+                    font-weight:800;
+                ">
+                    {html.escape(row["특산품"])}
+                </p>
+
+                <p style="
+                    color:#a9c0b2;
+                    line-height:1.6;
+                ">
+                    지역의 특색을 담은 로컬 상품으로
+                    여행 기념품이나 지역 먹거리로 활용할 수 있습니다.
+                </p>
+
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
+
+# =========================================================
+# 소개
+# =========================================================
+
+if row is not None:
+
+    st.markdown("### 💬 지역 소개")
+
+    st.info(
         row["소개"]
     )
 
-    st.markdown("### 🧭 맞춤 여행 조건")
-
-    condition_col1, condition_col2, condition_col3, condition_col4 = st.columns(4)
-
-    with condition_col1:
-
-        st.info(
-            f"👤 **여행 인원**\n\n{group}"
-        )
-
-    with condition_col2:
-
-        st.info(
-            f"🎂 **선호 나이대**\n\n{age}"
-        )
-
-    with condition_col3:
-
-        st.info(
-            f"📅 **여행 기간**\n\n{selected_duration}"
-        )
-
-    with condition_col4:
-
-        st.info(
-            f"🎯 **여행 테마**\n\n{theme}"
-        )
-
 
 # =========================================================
-# 맞춤 추천
+# 푸터
 # =========================================================
-st.markdown("### 🎯 맞춤 추천")
 
-recommendation_parts = []
-
-
-if st.session_state.age_group != "전체":
-
-    age_key = st.session_state.age_group
-
-    recommendation_parts.append(
-        f"**나이대 추천:** "
-        f"{row['나이대별_추천'].get(
-            age_key,
-            '체험·관광 중심의 기본 추천'
-        )}"
-    )
-
-
-if st.session_state.group_size != "전체":
-
-    group_key = st.session_state.group_size
-
-    group_text = row["인원수별_추천"].get(
-        group_key,
-        "기본 추천 코스",
-    )
-
-    recommendation_parts.append(
-        f"**인원별 추천:** {group_text}"
-    )
-
-
-if st.session_state.travel_duration != "전체":
-
-    recommendation_parts.append(
-        f"**여행 기간:** "
-        f"{st.session_state.travel_duration}에 적합한 지역"
-    )
-
-
-if st.session_state.travel_theme != "전체":
-
-    recommendation_parts.append(
-        f"**여행 테마:** "
-        f"{st.session_state.travel_theme} 중심 추천"
-    )
-
-
-if recommendation_parts:
-
-    for item in recommendation_parts:
-
-        st.markdown(
-            f"- {item}"
-        )
-
-else:
-
-    st.info(
-        "사이드바에서 나이대, 인원, 기간, 테마를 선택하면 "
-        "맞춤 추천이 표시됩니다."
-    )
-
-
-# =========================================================
-# 지역 사진
-# =========================================================
-st.markdown("## 📸 지역 사진 미리보기")
-
-region_images = IMAGE_DATA.get(
-    row["지역"],
-    {},
-)
-
-photo1, photo2, photo3 = st.columns(3)
-
-
-with photo1:
-
-    render_image_card(
-        "🏞️ 여행지",
-        region_images.get("여행지", ""),
-        row["관광지"],
-    )
-
-
-with photo2:
-
-    render_image_card(
-        "👀 구경거리",
-        region_images.get("구경거리", ""),
-        row["지역행사"],
-    )
-
-
-with photo3:
-
-    render_image_card(
-        "🍴 먹거리",
-        region_images.get("먹거리", ""),
-        f"{row['대표음식']} · {row['음식점']}",
-    )
-
-
-# =========================================================
-# 상세 탭
-# =========================================================
-tab1, tab2, tab3, tab4, tab5 = st.tabs(
-    [
-        "🍴 음식",
-        "🏞️ 관광지",
-        "🎉 지역 행사",
-        "🎁 특산품",
-        "💬 로컬 리뷰",
-    ]
-)
-
-
-with tab1:
-
-    st.markdown("### 대표 음식")
-
-    st.write(
-        row["대표음식"]
-    )
-
-    st.markdown(
-        f"**추천 음식점:** {row['음식점']}"
-    )
-
-    st.caption(
-        "방문 전 영업시간과 실제 운영 여부를 확인하세요."
-    )
-
-
-with tab2:
-
-    st.markdown("### 추천 관광지")
-
-    st.write(
-        row["관광지"]
-    )
-
-    st.markdown("**관광 유형**")
-
-    st.markdown(
-        make_tags(row["관광유형"]),
-        unsafe_allow_html=True,
-    )
-
-    st.markdown("**랜드마크 유형**")
-
-    st.markdown(
-        make_tags(row["랜드마크유형"]),
-        unsafe_allow_html=True,
-    )
-
-
-with tab3:
-
-    st.markdown("### 지역 행사")
-
-    st.write(
-        row["지역행사"]
-    )
-
-    st.caption(
-        "축제 일정은 개최 기관의 공식 공지를 확인하세요."
-    )
-
-
-with tab4:
-
-    st.markdown("### 지역 특산품")
-
-    st.write(
-        row["특산품"]
-    )
-
-
-with tab5:
-
-    st.markdown("### 로컬 리뷰 예시")
-
-    reviews = [
-        f"{row['지역']}의 자연 풍경이 인상적이었어요.",
-        f"{row['대표음식']}을 먹어 보니 지역 특색이 잘 느껴졌습니다.",
-        "유명 관광지보다 여유롭게 여행하기 좋았습니다.",
-    ]
-
-    for review in reviews:
-
-        st.markdown(
-            f"- 💬 {review}"
-        )
-
-
-# =========================================================
-# 하단 안내
-# =========================================================
-st.markdown("---")
+st.divider()
 
 st.caption(
-    "※ 본 서비스는 SGIS 기반 지역 탐색을 보여주기 위한 "
-    "예시 데이터 기반 프로토타입입니다."
+    "🚗 로컬 쉼표 · SGIS 기반 숨은 지역 발견 플랫폼"
+)
+
+st.caption(
+    "※ 본 서비스의 지역·관광·음식 데이터는 플랫폼 시연을 위한 예시 데이터이며, "
+    "실제 방문 전 운영시간·행사 일정·교통정보를 확인해주세요."
 )
