@@ -2945,7 +2945,12 @@ category = st.radio(
 # 지역별 데이터 구성
 # ---------------------------------------------------------
 
-detail_df = df.copy()
+# 위에서 추천된 지역만 상세 정보에 표시
+recommended_region_name = str(recommended_region["지역"])
+
+detail_df = df[
+    df["지역"].astype(str) == recommended_region_name
+].copy()
 
 detail_items = []
 
@@ -3063,7 +3068,7 @@ elif category == "🎁 특산품":
         })
 
 # ---------------------------------------------------------
-# 카드 표시
+# 카드 표시 - 통일된 배열
 # ---------------------------------------------------------
 
 if not detail_items:
@@ -3072,6 +3077,7 @@ if not detail_items:
 
 else:
 
+    # 모든 카드를 3열로 통일
     for start in range(0, len(detail_items), 3):
 
         card_items = detail_items[start:start + 3]
@@ -3083,7 +3089,8 @@ else:
 
                 with st.container(border=True):
 
-                    image_url = item["이미지"]
+                    # 사진
+                    image_url = item.get("이미지")
 
                     if image_url:
                         st.image(
@@ -3093,18 +3100,22 @@ else:
                     else:
                         st.info("📷 사진 준비 중")
 
+                    # 이름
                     st.markdown(
                         f"### {item['이름']}"
                     )
 
+                    # 지역명
                     st.caption(
                         f"📍 {item['지역']}"
                     )
 
+                    # 간단한 설명
                     st.write(
                         item["설명"]
                     )
 
+                    # 네이버 지도 검색 버튼
                     search_url = (
                         "https://map.naver.com/p/search/"
                         + urllib.parse.quote(item["검색어"])
