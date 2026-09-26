@@ -32,6 +32,7 @@ defaults = {
     "sort_type": "점수순",
     "keyword": "",
     "selected_region": "강원특별자치도 정선군",
+    "selected_day": 1,
 }
 
 for key, value in defaults.items():
@@ -55,10 +56,6 @@ st.markdown(
         background: #101916;
         color: #f1f5f3;
     }
-
-    /* =========================================================
-       상단 로컬 쉼표 작은 제목
-       ========================================================= */
 
     .top-logo {
         font-size: 22px;
@@ -173,7 +170,6 @@ st.markdown(
         border: 1px solid #527b62;
     }
 
-    [data-testid="stSidebar"] .stSlider,
     [data-testid="stSidebar"] .stSelectbox,
     [data-testid="stSidebar"] .stTextInput {
         background: #20352a;
@@ -222,7 +218,7 @@ st.markdown(
     }
 
     /* =========================================================
-       지도 + 코스 영역
+       지도 + 코스
        ========================================================= */
 
     .map-course-title {
@@ -259,48 +255,80 @@ st.markdown(
         font-size: 13px;
     }
 
-    .course-day {
-        background: #20352a;
-        border: 1px solid #3a5949;
-        border-radius: 14px;
-        padding: 14px;
+    /* =========================================================
+       DAY 탭
+       ========================================================= */
+
+    .day-guide {
+        color: #9eb6a7;
+        font-size: 12px;
+        margin-top: -5px;
         margin-bottom: 10px;
     }
 
-    .course-day-title {
-        color: #9fe0b6;
-        font-weight: 800;
-        font-size: 15px;
-        margin-bottom: 8px;
+    .schedule-card {
+        background: #20352a;
+        border: 1px solid #3a5949;
+        border-radius: 14px;
+        padding: 13px 14px;
+        margin-bottom: 9px;
     }
 
-    .course-line {
-        color: #d8e8de;
-        font-size: 13px;
-        line-height: 1.65;
-        margin: 3px 0;
-    }
-
-    .course-info {
-        color: #a9c0b2;
-        font-size: 12px;
-        line-height: 1.6;
-        margin-top: 10px;
-    }
-
-    .course-mini-tag {
-        display: inline-block;
-        background: #294c3b;
-        border: 1px solid #47745b;
-        color: #d5eddf;
-        border-radius: 999px;
-        padding: 4px 8px;
-        margin: 2px;
+    .schedule-time {
+        color: #8bd3a8;
         font-size: 11px;
+        font-weight: 800;
+        margin-bottom: 3px;
+    }
+
+    .schedule-title {
+        color: #ffffff;
+        font-size: 14px;
+        font-weight: 800;
+        line-height: 1.4;
+    }
+
+    .schedule-desc {
+        color: #a9c0b2;
+        font-size: 11px;
+        margin-top: 4px;
+        line-height: 1.45;
+    }
+
+    .course-tip {
+        background: #1b2b24;
+        border: 1px solid #355143;
+        border-radius: 12px;
+        padding: 10px 12px;
+        color: #c5d9cd;
+        font-size: 12px;
+        line-height: 1.5;
+        margin-bottom: 8px;
     }
 
     .nav-button {
         margin-top: 10px;
+    }
+
+    /* Streamlit 탭 디자인 */
+    .stTabs [data-baseweb="tab-list"] {
+        gap: 6px;
+        background: transparent;
+    }
+
+    .stTabs [data-baseweb="tab"] {
+        background: #20352a;
+        border: 1px solid #3a5949;
+        border-radius: 10px;
+        padding: 7px 13px;
+        color: #a9c0b2;
+        font-weight: 700;
+    }
+
+    .stTabs [aria-selected="true"] {
+        background: #315d46 !important;
+        color: #ffffff !important;
+        border-color: #527b62 !important;
     }
     </style>
     """,
@@ -753,15 +781,10 @@ df["숨은지역점수"] = df.apply(calculate_hidden_score, axis=1)
 # =========================================================
 with st.sidebar:
 
-    # =====================================================
-    # 나만의 로컬 여행 찾기
-    # =====================================================
-
     st.markdown(
         '<div class="filter-heading">🧭 나만의 로컬 여행 찾기</div>',
         unsafe_allow_html=True
     )
-
 
     # =====================================================
     # 로컬 행사 광고
@@ -941,7 +964,6 @@ with st.sidebar:
 
             <div class="ad-container">
 
-                <!-- 행사 1 -->
                 <div class="ad-slide active">
 
                     <div class="ad-card">
@@ -971,7 +993,6 @@ with st.sidebar:
                 </div>
 
 
-                <!-- 행사 2 -->
                 <div class="ad-slide">
 
                     <div class="ad-card">
@@ -1001,7 +1022,6 @@ with st.sidebar:
                 </div>
 
 
-                <!-- 행사 3 -->
                 <div class="ad-slide">
 
                     <div class="ad-card">
@@ -1031,7 +1051,6 @@ with st.sidebar:
                 </div>
 
 
-                <!-- 행사 4 -->
                 <div class="ad-slide">
 
                     <div class="ad-card">
@@ -1061,7 +1080,6 @@ with st.sidebar:
                 </div>
 
 
-                <!-- 하단 광고 위치 표시 -->
                 <div class="ad-dots">
 
                     <span class="dot active"></span>
@@ -1107,9 +1125,6 @@ with st.sidebar:
                 }
 
 
-                /*
-                 * 3초마다 다음 행사로 변경
-                 */
                 setInterval(
                     showNextSlide,
                     3000
@@ -1125,17 +1140,13 @@ with st.sidebar:
     )
 
 
-    # =====================================================
-    # 설명
-    # =====================================================
-
     st.caption(
         "여행 취향을 선택하면 추천 지역과 코스가 달라집니다."
     )
 
 
     # =====================================================
-    # 기존 필터
+    # 필터
     # =====================================================
 
     st.selectbox(
@@ -1529,10 +1540,16 @@ days = duration_days.get(
     1,
 )
 
-
 theme = st.session_state.travel_theme
 group = st.session_state.group_size
 age = st.session_state.age_group
+
+
+# =========================================================
+# DAY 선택값 보정
+# =========================================================
+if st.session_state.selected_day > days:
+    st.session_state.selected_day = 1
 
 
 # =========================================================
@@ -1642,20 +1659,21 @@ for day in range(1, days + 1):
         daily_plan.append(
             {
                 "day": day,
-                "morning": (
-                    f"09:30 · {first_activity}"
-                ),
-                "lunch": (
-                    f"12:30 · {row['음식점']} / "
-                    f"{row['대표음식']}"
-                ),
-                "afternoon": (
-                    f"14:00 · {second_activity}"
-                ),
-                "evening": (
-                    f"17:30 · {row['지역']} "
-                    f"로컬 거리 또는 시장 산책"
-                ),
+                "morning_time": "09:30",
+                "morning_title": first_activity,
+                "morning_desc": "여행지의 대표적인 로컬 명소부터 가볍게 시작",
+
+                "lunch_time": "12:30",
+                "lunch_title": f"{row['음식점']} / {row['대표음식']}",
+                "lunch_desc": "지역 대표 먹거리로 점심 식사",
+
+                "afternoon_time": "14:00",
+                "afternoon_title": second_activity,
+                "afternoon_desc": "지역의 자연·문화·볼거리 탐방",
+
+                "evening_time": "17:30",
+                "evening_title": f"{row['지역']} 로컬 거리 또는 시장 산책",
+                "evening_desc": "여유롭게 주변을 둘러보며 하루 마무리",
             }
         )
 
@@ -1664,21 +1682,21 @@ for day in range(1, days + 1):
         daily_plan.append(
             {
                 "day": day,
-                "morning": (
-                    f"09:30 · {row['특산품']} "
-                    f"알아보기 및 기념품 구입"
-                ),
-                "lunch": (
-                    f"12:00 · {row['대표음식']} "
-                    f"중심의 지역 식사"
-                ),
-                "afternoon": (
-                    f"14:00 · {row['관광지']} 중 "
-                    f"방문하지 못한 장소 탐방"
-                ),
-                "evening": (
-                    "16:30 · 여행 정리 및 귀가"
-                ),
+                "morning_time": "09:30",
+                "morning_title": f"{row['특산품']} 알아보기 및 기념품 구입",
+                "morning_desc": "지역 특산품을 둘러보며 마지막 여행 준비",
+
+                "lunch_time": "12:00",
+                "lunch_title": f"{row['대표음식']} 중심의 지역 식사",
+                "lunch_desc": "여행 마지막 로컬 음식 즐기기",
+
+                "afternoon_time": "14:00",
+                "afternoon_title": f"{row['관광지']} 중 남은 장소 탐방",
+                "afternoon_desc": "시간에 맞춰 원하는 장소를 선택해 방문",
+
+                "evening_time": "16:30",
+                "evening_title": "여행 정리 및 귀가",
+                "evening_desc": "여행 기록을 남기고 귀가",
             }
         )
 
@@ -1687,22 +1705,21 @@ for day in range(1, days + 1):
         daily_plan.append(
             {
                 "day": day,
-                "morning": (
-                    f"09:30 · {row['관광지']} "
-                    f"주변 산책 및 자유 일정"
-                ),
-                "lunch": (
-                    f"12:30 · {row['음식점']} "
-                    f"또는 인근 로컬 식당"
-                ),
-                "afternoon": (
-                    f"14:00 · {row['지역행사']} "
-                    f"또는 지역 특색 체험"
-                ),
-                "evening": (
-                    f"17:30 · {row['특산품']} "
-                    f"쇼핑 및 휴식"
-                ),
+                "morning_time": "09:30",
+                "morning_title": f"{row['관광지']} 주변 산책 및 자유 일정",
+                "morning_desc": "관광지 주변을 여유롭게 둘러보기",
+
+                "lunch_time": "12:30",
+                "lunch_title": f"{row['음식점']} 또는 인근 로컬 식당",
+                "lunch_desc": "지역 음식으로 든든하게 식사",
+
+                "afternoon_time": "14:00",
+                "afternoon_title": f"{row['지역행사']} 또는 지역 특색 체험",
+                "afternoon_desc": "지역만의 분위기를 경험하는 시간",
+
+                "evening_time": "17:30",
+                "evening_title": f"{row['특산품']} 쇼핑 및 휴식",
+                "evening_desc": "지역 특산품을 둘러보고 휴식",
             }
         )
 
@@ -1888,42 +1905,120 @@ with course_col:
 
     st.divider()
 
+    # =====================================================
+    # 맞춤 포인트
+    # =====================================================
+
     st.markdown("**👥 여행자 맞춤 포인트**")
 
-    st.info(age_tip)
+    st.markdown(
+        f"""
+        <div class="course-tip">
+            🎂 <b>나이대</b> · {html.escape(age_tip)}
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
 
-    st.markdown("**🧩 코스 구성 방식**")
-
-    st.info(group_tip)
+    st.markdown(
+        f"""
+        <div class="course-tip">
+            👥 <b>여행 인원</b> · {html.escape(group_tip)}
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
 
     st.markdown("### 📅 추천 일정")
 
-    for plan in daily_plan:
+    st.markdown(
+        '<div class="day-guide">DAY를 선택하면 해당 날짜의 일정만 표시됩니다.</div>',
+        unsafe_allow_html=True,
+    )
 
-        with st.container(border=True):
+    # =====================================================
+    # DAY 탭 생성
+    # =====================================================
+
+    day_labels = [
+        f"DAY {i}"
+        for i in range(1, days + 1)
+    ]
+
+    day_tabs = st.tabs(day_labels)
+
+    for index, day_tab in enumerate(day_tabs):
+
+        with day_tab:
+
+            plan = daily_plan[index]
 
             st.markdown(
-                f"#### 📅 {plan['day']}일 차"
+                f"""
+                <div class="schedule-card">
+                    <div class="schedule-time">
+                        🌅 {plan['morning_time']} · 오전
+                    </div>
+                    <div class="schedule-title">
+                        {html.escape(plan['morning_title'])}
+                    </div>
+                    <div class="schedule-desc">
+                        {html.escape(plan['morning_desc'])}
+                    </div>
+                </div>
+                """,
+                unsafe_allow_html=True,
             )
 
             st.markdown(
-                f"🌅 **오전**  \n"
-                f"{html.escape(plan['morning'].split('·', 1)[-1].strip())}"
+                f"""
+                <div class="schedule-card">
+                    <div class="schedule-time">
+                        🍴 {plan['lunch_time']} · 점심
+                    </div>
+                    <div class="schedule-title">
+                        {html.escape(plan['lunch_title'])}
+                    </div>
+                    <div class="schedule-desc">
+                        {html.escape(plan['lunch_desc'])}
+                    </div>
+                </div>
+                """,
+                unsafe_allow_html=True,
             )
 
             st.markdown(
-                f"🍴 **점심**  \n"
-                f"{html.escape(plan['lunch'].split('·', 1)[-1].strip())}"
+                f"""
+                <div class="schedule-card">
+                    <div class="schedule-time">
+                        🏞️ {plan['afternoon_time']} · 오후
+                    </div>
+                    <div class="schedule-title">
+                        {html.escape(plan['afternoon_title'])}
+                    </div>
+                    <div class="schedule-desc">
+                        {html.escape(plan['afternoon_desc'])}
+                    </div>
+                </div>
+                """,
+                unsafe_allow_html=True,
             )
 
             st.markdown(
-                f"🏞️ **오후**  \n"
-                f"{html.escape(plan['afternoon'].split('·', 1)[-1].strip())}"
-            )
-
-            st.markdown(
-                f"🌙 **저녁**  \n"
-                f"{html.escape(plan['evening'].split('·', 1)[-1].strip())}"
+                f"""
+                <div class="schedule-card">
+                    <div class="schedule-time">
+                        🌙 {plan['evening_time']} · 저녁
+                    </div>
+                    <div class="schedule-title">
+                        {html.escape(plan['evening_title'])}
+                    </div>
+                    <div class="schedule-desc">
+                        {html.escape(plan['evening_desc'])}
+                    </div>
+                </div>
+                """,
+                unsafe_allow_html=True,
             )
 
     st.caption(
