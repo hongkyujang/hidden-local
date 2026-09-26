@@ -2774,7 +2774,7 @@ if recommended_region is not None:
     # -----------------------------------------------------
     # 먹거리 상세 정보
     # -----------------------------------------------------
-
+    st.write("")
     with st.expander("🍴 대표 먹거리 자세히 보기", expanded=False):
 
         food_col, food_info_col = st.columns(
