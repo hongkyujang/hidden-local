@@ -1966,32 +1966,91 @@ if row is not None:
 
         st.divider()
 
+# =====================================================
+# 교통수단 & 예상 소요시간
+# =====================================================
 
-        # -------------------------------------------------
-        # 여행자 맞춤 포인트
-        # -------------------------------------------------
+st.markdown("#### 🚗 교통수단 & 예상 소요시간")
 
-        st.markdown(
-            "**👥 여행자 맞춤 포인트**"
-        )
+transport_col1, transport_col2 = st.columns(2)
 
-        st.info(
-            age_tip
-        )
+with transport_col1:
+    st.markdown(
+        f"""
+        <div class="section-card">
+            <div style="font-size:22px; margin-bottom:8px;">🚗</div>
+            <div style="font-size:17px; font-weight:700;">
+                자가용
+            </div>
+            <div style="font-size:14px; opacity:0.75; margin-top:5px;">
+                주요 관광지까지 약 10~30분
+            </div>
+            <div style="font-size:13px; opacity:0.6; margin-top:4px;">
+                지역 내 이동이 편리해요
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
 
+with transport_col2:
+    st.markdown(
+        f"""
+        <div class="section-card">
+            <div style="font-size:22px; margin-bottom:8px;">🚌</div>
+            <div style="font-size:17px; font-weight:700;">
+                대중교통
+            </div>
+            <div style="font-size:14px; opacity:0.75; margin-top:5px;">
+                주요 관광지까지 약 20~60분
+            </div>
+            <div style="font-size:13px; opacity:0.6; margin-top:4px;">
+                버스 중심으로 이동할 수 있어요
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
 
-        # -------------------------------------------------
-        # 코스 구성 방식
-        # -------------------------------------------------
+transport_col3, transport_col4 = st.columns(2)
 
-        st.markdown(
-            "**🧩 코스 구성 방식**"
-        )
+with transport_col3:
+    st.markdown(
+        f"""
+        <div class="section-card">
+            <div style="font-size:22px; margin-bottom:8px;">🚕</div>
+            <div style="font-size:17px; font-weight:700;">
+                택시
+            </div>
+            <div style="font-size:14px; opacity:0.75; margin-top:5px;">
+                관광지 간 약 10~25분
+            </div>
+            <div style="font-size:13px; opacity:0.6; margin-top:4px;">
+                짧은 거리 이동에 적합해요
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
 
-        st.info(
-            group_tip
-        )
-
+with transport_col4:
+    st.markdown(
+        f"""
+        <div class="section-card">
+            <div style="font-size:22px; margin-bottom:8px;">🚶</div>
+            <div style="font-size:17px; font-weight:700;">
+                도보
+            </div>
+            <div style="font-size:14px; opacity:0.75; margin-top:5px;">
+                관광지 주변 약 5~20분
+            </div>
+            <div style="font-size:13px; opacity:0.6; margin-top:4px;">
+                가까운 명소를 천천히 둘러봐요
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
 
         # -------------------------------------------------
         # 추천 일정
