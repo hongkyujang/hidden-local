@@ -1511,41 +1511,49 @@ with nav2:
 
 
 # =========================================================
+# =========================================================
 # 추천 지역
 # =========================================================
-st.markdown("---")
 
-st.markdown("## 🔎 추천 지역")
-
-st.markdown(
-    f"""
-    <div class="section-card">
-
-        <div class="small-muted">
-            선택한 지역
-        </div>
-
-        <h2>
-            {html.escape(row['지역'])}
-        </h2>
-
-        <div class="score">
-            {row['숨은지역점수']}점
-        </div>
-
-        <p>
-            {html.escape(row['소개'])}
-        </p>
-
-        {make_tags(row['여행테마'])}
-
-        {make_tags(row['추천기간'])}
-
-    </div>
-    """,
-    unsafe_allow_html=True,
+st.subheader("📍 추천 지역")
+st.caption(
+    "SGIS 기반 추천 점수와 여행 조건을 바탕으로 선정된 로컬 여행지를 확인해보세요."
 )
 
+recommend_cols = st.columns(3)
+
+for i, (_, rec) in enumerate(filtered_df.head(6).iterrows()):
+    score = calculate_hidden_score(rec)
+
+    with recommend_cols[i % 3]:
+        with st.container(border=True):
+            st.markdown(f"### 📍 {rec['지역']}")
+            st.markdown(
+                f"**추천 점수 {score}점**"
+            )
+
+            st.caption(
+                f"🍚 대표 음식 · {rec['대표음식']}"
+            )
+
+            st.caption(
+                f"📸 관광지 · {rec['관광지']}"
+            )
+
+            st.caption(
+                f"🎉 지역 행사 · {rec['지역행사']}"
+            )
+
+            st.caption(
+                f"🎁 특산품 · {rec['특산품']}"
+            )
+
+            if st.button(
+                "이 지역 자세히 보기",
+                key=f"recommend_{i}_{rec['지역']}"
+            ):
+                st.session_state["selected_region"] = rec["지역"]
+                st.rerun()
 
 # =========================================================
 # 상세 지표
