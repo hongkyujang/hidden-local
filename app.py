@@ -2717,10 +2717,6 @@ if recommended_region is not None:
     # 추천 지역 사진
     # -----------------------------------------------------
 
-    st.markdown(
-        "### 📸 추천 지역 미리보기"
-    )
-
     region_images = IMAGE_DATA.get(
         region_name,
         {}
