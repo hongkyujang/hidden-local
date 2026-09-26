@@ -439,9 +439,26 @@ def photo_card(title, image_query, description):
 
 
 # =========================================================
+# 점수 계산
+# =========================================================
+def calculate_hidden_score(row):
+    hidden_score = 100 - row["관광인지도"]
+    population_score = min(abs(row["인구변화율"]) * 5, 20)
+    return round(
+        hidden_score * 0.4
+        + population_score * 0.1
+        + row["음식점수"] * 0.25
+        + row["지역특색"] * 0.25,
+        1,
+    )
+
+
 def make_tags(items):
     return " ".join(f'<span class="tag">{html.escape(str(item))}</span>' for item in items)
 
+
+df = pd.DataFrame(load_data())
+df["숨은지역점수"] = df.apply(calculate_hidden_score, axis=1)
 
 # 지역별 사진 URL
 # 실제 서비스에서는 저작권을 확인한 뒤 공식 관광 사이트 또는 직접 보유한 사진을 사용하는 것을 권장합니다.
@@ -516,29 +533,148 @@ def render_image_card(title, image_url, description):
 
 
 # =========================================================
-# 기본 여행 설정 (필터 UI는 제거하고 기본값으로 코스 생성)
-st.session_state.setdefault("age_group", "전체")
-st.session_state.setdefault("group_size", "전체")
-st.session_state.setdefault("travel_duration", "전체")
-st.session_state.setdefault("travel_theme", "전체")
-st.session_state.setdefault("selected_region", "강원특별자치도 정선군")
+# 세션 상태 / 초기화
+# =========================================================
+defaults = {
+    "age_group": "전체",
+    "group_size": "전체",
+    "travel_duration": "전체",
+    "travel_theme": "전체",
+    "min_score": 60,
+    "food_type": "전체",
+    "sort_type": "점수순",
+    "keyword": "",
+    "selected_region": "정선군",
+}
+for key, value in defaults.items():
+    if key not in st.session_state:
+        st.session_state[key] = value
 
-# 지도 표시 옵션
-show_regions = True
-show_food = True
-show_tour = True
-show_events = True
-show_specialties = True
+
+# =========================================================
+# 사이드바
+# =========================================================
 with st.sidebar:
-    st.markdown('<div class="filter-heading">🗺️ 지도 표시 항목</div>', unsafe_allow_html=True)
-    show_regions = st.checkbox("추천 지역", value=True)
-    show_food = st.checkbox("음식점", value=True)
-    show_tour = st.checkbox("관광지", value=True)
-    show_events = st.checkbox("지역 행사", value=True)
-    show_specialties = st.checkbox("특산품", value=True)
+    st.markdown('<div class="filter-heading">🧭 나만의 로컬 여행 찾기</div>', unsafe_allow_html=True)
+    st.caption("여행 취향을 선택하면 추천 지역과 코스가 달라집니다.")
 
-filtered_df = df.copy()
+    st.slider(
+        "최소 추천 점수",
+        min_value=0,
+        max_value=100,
+        value=st.session_state.min_score,
+        key="min_score",
+    )
 
+    st.selectbox(
+        "선호 나이대",
+        ["전체", "10대", "20대", "30~40대", "50대 이상"],
+        key="age_group",
+    )
+
+    st.selectbox(
+        "여행 인원",
+        ["전체", "1인 (혼행)", "2인 (커플/친구)", "3인", "4인 이상 (가족)"],
+        key="group_size",
+    )
+
+    st.selectbox(
+        "여행 기간",
+        ["전체", "당일치기", "1박 2일", "2박 3일", "3박 이상"],
+        key="travel_duration",
+    )
+
+    st.selectbox(
+        "여행 테마",
+        ["전체", "자연·힐링", "액티비티", "역사·문화", "맛집·미식", "축제·행사", "사진 명소", "가족 여행"],
+        key="travel_theme",
+    )
+
+    st.selectbox(
+        "선호 음식",
+        ["전체", "한식", "해산물", "산채음식", "향토음식", "간식·디저트"],
+        key="food_type",
+    )
+
+    st.selectbox(
+        "정렬 기준",
+        ["점수순", "인구 적은 순", "음식 점수순", "지역 특색순"],
+        key="sort_type",
+    )
+
+    st.text_input("지역·음식·관광지 검색", key="keyword")
+
+    st.markdown("### 지도 표시 항목")
+    show_regions = st.checkbox("추천 지역", True)
+    show_food = st.checkbox("음식점", True)
+    show_tour = st.checkbox("관광지", True)
+    show_events = st.checkbox("지역 행사", True)
+    show_specialties = st.checkbox("특산품", True)
+
+    if st.button("🔄 필터 초기화", use_container_width=True):
+        for key, value in defaults.items():
+            st.session_state[key] = value
+        st.rerun()
+
+
+# =========================================================
+# 필터 적용
+# =========================================================
+filtered_df = df[df["숨은지역점수"] >= st.session_state.min_score].copy()
+
+if st.session_state.keyword.strip():
+    keyword = st.session_state.keyword.strip().lower()
+    filtered_df = filtered_df[
+        filtered_df.apply(
+            lambda row: keyword in " ".join(
+                [
+                    str(row["지역"]),
+                    str(row["대표음식"]),
+                    str(row["음식점"]),
+                    str(row["관광지"]),
+                    str(row["지역행사"]),
+                    str(row["특산품"]),
+                    str(row["소개"]),
+                ]
+            ).lower(),
+            axis=1,
+        )
+    ]
+
+if st.session_state.food_type != "전체":
+    food_keywords = {
+        "한식": ["밥", "국", "정식", "비빔", "떡", "백숙"],
+        "해산물": ["해산물", "오징어", "꽃게", "장어", "홍합", "재첩"],
+        "산채음식": ["산채", "곤드레", "산나물"],
+        "향토음식": ["향토", "마늘", "고추", "사과"],
+        "간식·디저트": ["떡", "유자", "사과"],
+    }
+    keys = food_keywords[st.session_state.food_type]
+    filtered_df = filtered_df[
+        filtered_df["대표음식"].apply(lambda x: any(k in str(x) for k in keys))
+    ]
+
+if st.session_state.travel_duration != "전체":
+    filtered_df = filtered_df[
+        filtered_df["추천기간"].apply(lambda x: st.session_state.travel_duration in x)
+    ]
+
+if st.session_state.travel_theme != "전체":
+    filtered_df = filtered_df[
+        filtered_df["여행테마"].apply(lambda x: st.session_state.travel_theme in x)
+    ]
+
+if st.session_state.sort_type == "점수순":
+    filtered_df = filtered_df.sort_values("숨은지역점수", ascending=False)
+elif st.session_state.sort_type == "인구 적은 순":
+    filtered_df = filtered_df.sort_values("인구", ascending=True)
+elif st.session_state.sort_type == "음식 점수순":
+    filtered_df = filtered_df.sort_values("음식점수", ascending=False)
+else:
+    filtered_df = filtered_df.sort_values("지역특색", ascending=False)
+
+
+# =========================================================
 # 상단 제목
 # =========================================================
 st.markdown(
@@ -552,32 +688,31 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-metric_cols = st.columns(3)
-metric_cols[0].metric("소개 지역", f"{len(filtered_df)}곳")
-metric_cols[1].metric("여행 테마", "자연 · 미식 · 문화")
-metric_cols[2].metric("여행 범위", "전국 로컬")
+m1, m2, m3, m4 = st.columns(4)
+with m1:
+    st.markdown(
+        f'<div class="metric-card"><div class="metric-label">검색 지역 수</div><div class="metric-value">{len(filtered_df)}곳</div></div>',
+        unsafe_allow_html=True,
+    )
+with m2:
+    avg_score = round(filtered_df["숨은지역점수"].mean(), 1) if len(filtered_df) else 0
+    st.markdown(
+        f'<div class="metric-card"><div class="metric-label">평균 추천 점수</div><div class="metric-value">{avg_score}점</div></div>',
+        unsafe_allow_html=True,
+    )
+with m3:
+    st.markdown(
+        f'<div class="metric-card"><div class="metric-label">선택 여행 기간</div><div class="metric-value">{html.escape(st.session_state.travel_duration)}</div></div>',
+        unsafe_allow_html=True,
+    )
+with m4:
+    st.markdown(
+        f'<div class="metric-card"><div class="metric-label">선택 여행 테마</div><div class="metric-value">{html.escape(st.session_state.travel_theme)}</div></div>',
+        unsafe_allow_html=True,
+    )
 
-st.markdown("## 🎉 지역 축제 · 행사 소식")
-festival_rows = [
-    {"지역": r["지역"], "행사": r["지역행사"], "기간": r.get("행사기간", "공식 일정 확인 필요")}
-    for _, r in filtered_df.iterrows() if r.get("지역행사")
-]
-festival_cols = st.columns(3)
-for i, item in enumerate(festival_rows[:3]):
-    with festival_cols[i]:
-        st.markdown(
-            f"""
-            <div class="section-card" style="border-color:#527b62;background:linear-gradient(135deg,#20392c,#17251f);">
-                <div class="tag">🎊 축제 소식</div>
-                <h3 style="margin:12px 0 6px;color:#ffffff;">{html.escape(item["행사"])}</h3>
-                <div style="color:#b8d8c3;font-weight:700;">{html.escape(item["기간"])}</div>
-                <p style="margin:8px 0 0;color:#c7d8cc;">📍 {html.escape(item["지역"])}</p>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
-st.caption("※ 원본 데이터에 축제 개최일이 없어 날짜는 ‘공식 일정 확인 필요’로 표시했습니다. 운영 전 행사기간을 데이터에 입력해 주세요.")
 
+# =========================================================
 # 지도
 # =========================================================
 st.markdown("## 🗺️ 숨은 지역 지도")
@@ -607,6 +742,7 @@ for _, row in filtered_df.iterrows():
     popup_html = f"""
     <div style="width:240px">
         <h4>{html.escape(row['지역'])}</h4>
+        <b>추천 점수: {row['숨은지역점수']}점</b><br>
         대표 음식: {html.escape(row['대표음식'])}<br>
         관광지: {html.escape(row['관광지'])}
     </div>
@@ -614,6 +750,7 @@ for _, row in filtered_df.iterrows():
     if show_regions:
         folium.Marker(
             [row["위도"], row["경도"]],
+            tooltip=f"{row['지역']} · {row['숨은지역점수']}점",
             popup=folium.Popup(popup_html, max_width=300),
             icon=folium.Icon(color="green", icon="map-marker"),
         ).add_to(m)
@@ -651,7 +788,7 @@ for _, row in filtered_df.iterrows():
         ).add_to(m)
 
 folium.LayerControl().add_to(m)
-st_folium(m, use_container_width=True, height=350, returned_objects=[])
+st_folium(m, use_container_width=True, height=520, returned_objects=[])
 
 
 # =========================================================
@@ -715,6 +852,7 @@ st.markdown(
     <div class="section-card">
         <div class="small-muted">선택한 지역</div>
         <h2>{html.escape(row['지역'])}</h2>
+        <div class="score">{row['숨은지역점수']}점</div>
         <p>{html.escape(row['소개'])}</p>
         {make_tags(row['여행테마'])}
         {make_tags(row['추천기간'])}
@@ -723,10 +861,11 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-c1, c2, c3 = st.columns(3)
+c1, c2, c3, c4 = st.columns(4)
 c1.metric("음식 점수", f"{row['음식점수']}점")
 c2.metric("지역 특색", f"{row['지역특색']}점")
-c3.metric("인구", f"{row['인구']:,}명")
+c3.metric("관광 인지도", f"{row['관광인지도']}점")
+c4.metric("인구", f"{row['인구']:,}명")
 
 st.markdown("### 🎯 맞춤 추천")
 
