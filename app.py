@@ -1512,48 +1512,90 @@ with nav2:
 
 # =========================================================
 # =========================================================
+# =========================================================
 # 추천 지역
 # =========================================================
 
 st.subheader("📍 추천 지역")
-st.caption(
-    "SGIS 기반 추천 점수와 여행 조건을 바탕으로 선정된 로컬 여행지를 확인해보세요."
-)
+st.caption("현재 맞춤 여행 코스로 선택한 지역입니다.")
 
-recommend_cols = st.columns(3)
+recommend_score = calculate_hidden_score(row)
 
-for i, (_, rec) in enumerate(filtered_df.head(6).iterrows()):
-    score = calculate_hidden_score(rec)
+with st.container(border=True):
+    st.markdown(f"## 📍 {row['지역']}")
+    
+    score_col, food_col, tour_col = st.columns(3)
 
-    with recommend_cols[i % 3]:
-        with st.container(border=True):
-            st.markdown(f"### 📍 {rec['지역']}")
-            st.markdown(
-                f"**추천 점수 {score}점**"
-            )
+    with score_col:
+        st.metric(
+            "추천 점수",
+            f"{recommend_score}점"
+        )
 
-            st.caption(
-                f"🍚 대표 음식 · {rec['대표음식']}"
-            )
+    with food_col:
+        st.metric(
+            "음식 점수",
+            f"{row['음식점수']}점"
+        )
 
-            st.caption(
-                f"📸 관광지 · {rec['관광지']}"
-            )
+    with tour_col:
+        st.metric(
+            "관광 인지도",
+            f"{row['관광인지도']}점"
+        )
 
-            st.caption(
-                f"🎉 지역 행사 · {rec['지역행사']}"
-            )
+    st.markdown("---")
 
-            st.caption(
-                f"🎁 특산품 · {rec['특산품']}"
-            )
+    info_col1, info_col2 = st.columns(2)
 
-            if st.button(
-                "이 지역 자세히 보기",
-                key=f"recommend_{i}_{rec['지역']}"
-            ):
-                st.session_state["selected_region"] = rec["지역"]
-                st.rerun()
+    with info_col1:
+        st.markdown(
+            f"""
+            **🍚 대표 음식**  
+            {row['대표음식']}
+
+            **🎁 지역 특산품**  
+            {row['특산품']}
+
+            **🎉 지역 행사**  
+            {row['지역행사']}
+            """
+        )
+
+    with info_col2:
+        st.markdown(
+            f"""
+            **📸 주요 관광지**  
+            {row['관광지']}
+
+            **🌿 관광 유형**  
+            {row['관광유형']}
+
+            **📅 추천 기간**  
+            {row['추천기간']}
+            """
+        )
+
+    st.markdown("---")
+
+    st.markdown("### 💡 지역 소개")
+    st.write(row["소개"])
+
+    st.markdown("### 🧭 현재 맞춤 여행 조건")
+
+    condition_col1, condition_col2, condition_col3, condition_col4 = st.columns(4)
+
+    with condition_col1:
+        st.info(f"👤 **여행 인원**\n\n{group}")
+
+    with condition_col2:
+        st.info(f"🎂 **선호 나이대**\n\n{age}")
+
+    with condition_col3:
+        st.info(f"📅 **여행 기간**\n\n{selected_duration}")
+
+    with condition_col4:
+        st.info(f"🎯 **여행 테마**\n\n{theme}")
 
 # =========================================================
 # 상세 지표
