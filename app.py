@@ -2027,150 +2027,135 @@ else:
         )
 
 # =========================================================
-# 상세 정보
+# 상세 지역 정보
 # =========================================================
 
-if row is not None:
+st.markdown("## 📚 상세 지역 정보")
+st.caption("추천 지역의 여행 정보를 한눈에 확인해 보세요.")
 
-    st.markdown(
-        f"### 📋 {row['지역']} 상세 정보"
-    )
+tab1, tab2, tab3, tab4 = st.tabs(
+    [
+        "🏞️ 관광지",
+        "🍴 먹거리",
+        "🎉 지역 행사",
+        "🎁 특산품",
+    ]
+)
 
-    tab1, tab2, tab3, tab4 = st.tabs(
-        [
-            "🏞️ 관광지",
-            "🍴 먹거리",
-            "🎉 지역 행사",
-            "🎁 특산품",
-        ]
-    )
+# ---------------------------------------------------------
+# 관광지
+# ---------------------------------------------------------
 
-    with tab1:
+with tab1:
 
-        st.markdown(
-            f"""
-            <div class="section-card">
+    with st.container(border=True):
 
-                <h3>
-                    🏞️ 주요 관광지
-                </h3>
-
-                <p style="
-                    font-size:16px;
-                    line-height:1.7;
-                    color:#dcebe1;
-                ">
-                    {html.escape(row["관광지"])}
-                </p>
-
-                <div>
-                    {make_tags(row)}
-                </div>
-
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
-
-    with tab2:
+        st.markdown("### 🏞️ 추천 관광지")
 
         st.markdown(
-            f"""
-            <div class="section-card">
-
-                <h3>
-                    🍴 로컬 먹거리
-                </h3>
-
-                <p style="
-                    font-size:16px;
-                    color:#dcebe1;
-                ">
-                    대표 음식 : <b>{html.escape(row["대표음식"])}</b>
-                </p>
-
-                <p style="
-                    font-size:14px;
-                    color:#b2c8ba;
-                ">
-                    추천 음식점 : {html.escape(row["음식점"])}
-                </p>
-
-                <div class="score-box">
-                    <div class="score-number">
-                        {row["음식점수"]}
-                    </div>
-                    <div class="score-label">
-                        지역 음식 점수
-                    </div>
-                </div>
-
-            </div>
-            """,
-            unsafe_allow_html=True,
+            f"**{str(row['관광지'])}**"
         )
 
-    with tab3:
+        st.divider()
+
+        st.markdown("**📍 관광 유형**")
+        st.write(
+            str(row["관광유형"])
+        )
+
+        st.markdown("**🗺️ 랜드마크 유형**")
+        st.write(
+            str(row["랜드마크유형"])
+        )
+
+        st.info(
+            "지역의 대표적인 관광 명소를 중심으로 "
+            "여행 코스를 구성할 수 있습니다."
+        )
+
+
+# ---------------------------------------------------------
+# 먹거리
+# ---------------------------------------------------------
+
+with tab2:
+
+    with st.container(border=True):
+
+        st.markdown("### 🍴 지역 대표 먹거리")
 
         st.markdown(
-            f"""
-            <div class="section-card">
-
-                <h3>
-                    🎉 지역 행사
-                </h3>
-
-                <p style="
-                    font-size:17px;
-                    color:#dcebe1;
-                ">
-                    {html.escape(row["지역행사"])}
-                </p>
-
-                <p style="
-                    color:#a9c0b2;
-                    line-height:1.6;
-                ">
-                    지역의 고유한 문화와 관광 콘텐츠를
-                    경험할 수 있는 대표 행사입니다.
-                </p>
-
-            </div>
-            """,
-            unsafe_allow_html=True,
+            f"**{str(row['대표음식'])}**"
         )
 
-    with tab4:
+        st.divider()
+
+        st.markdown("**🍽️ 추천 음식점**")
+
+        st.write(
+            str(row["음식점"])
+        )
+
+        st.info(
+            "해당 지역의 대표 음식을 중심으로 "
+            "로컬 맛집을 탐색해 보세요."
+        )
+
+
+# ---------------------------------------------------------
+# 지역 행사
+# ---------------------------------------------------------
+
+with tab3:
+
+    with st.container(border=True):
+
+        st.markdown("### 🎉 지역 행사")
 
         st.markdown(
-            f"""
-            <div class="section-card">
-
-                <h3>
-                    🎁 지역 특산품
-                </h3>
-
-                <p style="
-                    font-size:18px;
-                    color:#dcebe1;
-                    font-weight:800;
-                ">
-                    {html.escape(row["특산품"])}
-                </p>
-
-                <p style="
-                    color:#a9c0b2;
-                    line-height:1.6;
-                ">
-                    지역의 특색을 담은 로컬 상품으로
-                    여행 기념품이나 지역 먹거리로 활용할 수 있습니다.
-                </p>
-
-            </div>
-            """,
-            unsafe_allow_html=True,
+            f"**{str(row['지역행사'])}**"
         )
 
+        st.divider()
+
+        st.markdown("**📅 추천 여행 기간**")
+
+        st.write(
+            str(row["추천기간"])
+        )
+
+        st.info(
+            "지역 행사와 주변 관광지를 함께 둘러보면 "
+            "더 풍성한 여행 코스를 만들 수 있습니다."
+        )
+
+
+# ---------------------------------------------------------
+# 특산품
+# ---------------------------------------------------------
+
+with tab4:
+
+    with st.container(border=True):
+
+        st.markdown("### 🎁 지역 특산품")
+
+        st.markdown(
+            f"**{str(row['특산품'])}**"
+        )
+
+        st.divider()
+
+        st.markdown("**📍 지역 특색**")
+
+        st.write(
+            str(row["지역특색"])
+        )
+
+        st.info(
+            "지역의 특산품과 먹거리를 통해 "
+            "해당 지역만의 로컬 문화를 경험해 보세요."
+        )
 
 # =========================================================
 # 소개
