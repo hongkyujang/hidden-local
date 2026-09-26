@@ -18,16 +18,6 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-# =========================================================
-# 스타일
-# =========================================================
-st.markdown(
-    """
-    
-    """,
-    unsafe_allow_html=True,
-)
-
 
 # =========================================================
 # 데이터
@@ -259,7 +249,7 @@ def load_data():
 
 
 # =========================================================
-# 점수 계산 및 유틸 함수
+# 점수 계산 함수
 # =========================================================
 def calculate_hidden_score(row):
     hidden_score = 100 - row["관광인지도"]
@@ -273,10 +263,6 @@ def calculate_hidden_score(row):
     )
 
 
-def make_tags(items):
-    return " ".join(f"{html.escape(str(item))}" for item in items)
-
-
 df = pd.DataFrame(load_data())
 df["숨은지역점수"] = df.apply(calculate_hidden_score, axis=1)
 
@@ -284,59 +270,82 @@ df["숨은지역점수"] = df.apply(calculate_hidden_score, axis=1)
 IMAGE_DATA = {
     "강원특별자치도 정선군": {
         "여행지": "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=1200",
-        "먹거리": "https://images.unsplash.com/photo-1547592180-85f173990554?w=1200",
-        "구경거리": "https://images.unsplash.com/photo-1500534623283-312aade485b7?w=1200",
     },
     "전라남도 구례군": {
         "여행지": "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1200",
-        "먹거리": "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=1200",
-        "구경거리": "https://images.unsplash.com/photo-1500534623283-312aade485b7?w=1200",
     },
     "경상남도 의령군": {
         "여행지": "https://images.unsplash.com/photo-1470770841072-f978cf4d019e?w=1200",
-        "먹거리": "https://images.unsplash.com/photo-1498837167922-ddd27525d352?w=1200",
-        "구경거리": "https://images.unsplash.com/photo-1519681393784-d120267933ba?w=1200",
     },
     "전북특별자치도 무주군": {
         "여행지": "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=1200",
-        "먹거리": "https://images.unsplash.com/photo-1547592180-85f173990554?w=1200",
-        "구경거리": "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1200",
     },
     "충청북도 단양군": {
         "여행지": "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=1200",
-        "먹거리": "https://images.unsplash.com/photo-1498837167922-ddd27525d352?w=1200",
-        "구경거리": "https://images.unsplash.com/photo-1519681393784-d120267933ba?w=1200",
     },
     "경상북도 영양군": {
         "여행지": "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=1200",
-        "먹거리": "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=1200",
-        "구경거리": "https://images.unsplash.com/photo-1470770841072-f978cf4d019e?w=1200",
     },
     "경상북도 청송군": {
         "여행지": "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1200",
-        "먹거리": "https://images.unsplash.com/photo-1498837167922-ddd27525d352?w=1200",
-        "구경거리": "https://images.unsplash.com/photo-1500534623283-312aade485b7?w=1200",
     },
     "충청남도 태안군": {
         "여행지": "https://images.unsplash.com/photo-1507524275556-7e4f7b3f0f7f?w=1200",
-        "먹거리": "https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?w=1200",
-        "구경거리": "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=1200",
     },
     "전라남도 고흥군": {
         "여행지": "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=1200",
-        "먹거리": "https://images.unsplash.com/photo-1547592180-85f173990554?w=1200",
-        "구경거리": "https://images.unsplash.com/photo-1470770841072-f978cf4d019e?w=1200",
     },
     "경상북도 울릉군": {
         "여행지": "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1200",
-        "먹거리": "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=1200",
-        "구경거리": "https://images.unsplash.com/photo-1507524275556-7e4f7b3f0f7f?w=1200",
     },
 }
 
 
+# Streamlit 순수 함수로 카드 렌더링 대체 (f-string/HTML 미사용)
 def render_image_card(title, image_url, description):
-    st.markdown(
-       """,
-    unsafe_allow_html=True,
+    with st.container():
+        st.subheader(title)
+        st.image(image_url, use_column_width=True)
+        st.write(description)
+        st.divider()
+
+
+# =========================================================
+# 메인 UI 구성
+# =========================================================
+st.title("🚗 로컬 쉼표")
+st.caption("나만의 숨은 로컬 여행지를 찾고 맞춤형 가이드를 확인해보세요.")
+
+# 사이드바 필터링
+st.sidebar.header("🔍 맞춤 필터 설정")
+
+selected_theme = st.sidebar.selectbox(
+    "여행 테마 선택",
+    ["전체"] + sorted(list({theme for sublist in df["여행테마"] for theme in sublist})),
 )
+
+selected_period = st.sidebar.selectbox(
+    "추천 기간 선택",
+    ["전체"] + sorted(list({period for sublist in df["추천기간"] for period in sublist})),
+)
+
+# 데이터 필터 적용
+filtered_df = df.copy()
+
+if selected_theme != "전체":
+    filtered_df = filtered_df[filtered_df["여행테마"].apply(lambda x: selected_theme in x)]
+
+if selected_period != "전체":
+    filtered_df = filtered_df[filtered_df["추천기간"].apply(lambda x: selected_period in x)]
+
+# 레이아웃 분할: 왼쪽(지도), 오른쪽(상세 카드)
+col1, col2 = st.columns([3, 2])
+
+with col1:
+    st.subheader("🗺️ 숨은 로컬 지도")
+    
+    # 기본 지도 중심 위치 설정
+    m = folium.Map(location=[36.5, 127.8], zoom_start=7)
+    
+    for _, row in filtered_df.iterrows():
+        popup_html = f"**{row['지역']}**
