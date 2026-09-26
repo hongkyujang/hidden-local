@@ -1173,7 +1173,10 @@ if len(filtered_df) > 0:
     if st.session_state.selected_region not in region_names:
         st.session_state.selected_region = region_names[0]
 
- 
+selected_region = st.session_state.get(
+    "selected_region",
+    filtered_df["지역"].iloc[0] if len(filtered_df) > 0 else ""
+)
 
     st.session_state.selected_region = selected_region
 
