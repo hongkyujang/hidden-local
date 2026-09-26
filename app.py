@@ -2927,246 +2927,194 @@ else:
         st.caption(
             "사이드바의 검색어나 여행 조건을 변경해 주세요."
         )
-
 # =========================================================
-# 상세 지역 정보
-# =========================================================
-
-if row is not None:
-
-    st.markdown(
-        "## 📚 상세 지역 정보"
-    )
-
-    st.caption(
-        "추천 지역의 여행 정보를 한눈에 확인해 보세요."
-    )
-
-
-    tab1, tab2, tab3, tab4 = st.tabs(
-        [
-            "🏞️ 관광지",
-            "🍴 먹거리",
-            "🎉 지역 행사",
-            "🎁 특산품",
-        ]
-    )
-
-
-    # -----------------------------------------------------
-    # 관광지
-    # -----------------------------------------------------
-
-    with tab1:
-
-        with st.container(border=True):
-
-            st.markdown(
-                "### 🏞️ 추천 관광지"
-            )
-
-            st.markdown(
-                f"## {str(row['관광지'])}"
-            )
-
-            st.divider()
-
-
-            info_col1, info_col2 = st.columns(2)
-
-
-            with info_col1:
-
-                st.markdown(
-                    "#### 📍 관광 유형"
-                )
-
-                st.write(
-                    str(row["관광유형"])
-                )
-
-
-            with info_col2:
-
-                st.markdown(
-                    "#### 🗺️ 랜드마크 유형"
-                )
-
-                st.write(
-                    str(row["랜드마크유형"])
-                )
-
-
-            st.info(
-                "지역의 대표적인 관광 명소를 중심으로 "
-                "여행 코스를 구성할 수 있습니다."
-            )
-
-
-            # 관광지 이미지
-
-            image_url = IMAGE_DATA.get(
-                row["지역"],
-                {}
-            ).get(
-                "여행지"
-            )
-
-            if image_url:
-
-                st.image(
-                    image_url,
-                    use_container_width=True,
-                )
-
-
-    # -----------------------------------------------------
-    # 먹거리
-    # -----------------------------------------------------
-
-    with tab2:
-
-        with st.container(border=True):
-
-            st.markdown(
-                "### 🍴 지역 대표 먹거리"
-            )
-
-            st.markdown(
-                f"## {str(row['대표음식'])}"
-            )
-
-            st.divider()
-
-
-            st.markdown(
-                "#### 🍽️ 추천 음식점"
-            )
-
-            st.write(
-                str(row["음식점"])
-            )
-
-
-            image_url = IMAGE_DATA.get(
-                row["지역"],
-                {}
-            ).get(
-                "먹거리"
-            )
-
-            if image_url:
-
-                st.image(
-                    image_url,
-                    use_container_width=True,
-                )
-
-
-            st.info(
-                "해당 지역의 대표 음식을 중심으로 "
-                "로컬 맛집을 탐색해 보세요."
-            )
-
-
-    # -----------------------------------------------------
-    # 지역 행사
-    # -----------------------------------------------------
-
-    with tab3:
-
-        with st.container(border=True):
-
-            st.markdown(
-                "### 🎉 지역 행사"
-            )
-
-            st.markdown(
-                f"## {str(row['지역행사'])}"
-            )
-
-            st.divider()
-
-
-            st.markdown(
-                "#### 📅 추천 여행 기간"
-            )
-
-            st.write(
-                str(row["추천기간"])
-            )
-
-
-            st.info(
-                "지역 행사와 주변 관광지를 함께 둘러보면 "
-                "더 풍성한 여행을 즐길 수 있습니다."
-            )
-
-
-    # -----------------------------------------------------
-    # 특산품
-    # -----------------------------------------------------
-
-    with tab4:
-
-        with st.container(border=True):
-
-            st.markdown(
-                "### 🎁 지역 특산품"
-            )
-
-            st.markdown(
-                f"## {str(row['특산품'])}"
-            )
-
-            st.divider()
-
-
-            st.markdown(
-                "#### 📍 지역 특색"
-            )
-
-            st.write(
-                str(row["소개"])
-            )
-
-
-            image_url = IMAGE_DATA.get(
-                row["지역"],
-                {}
-            ).get(
-                "구경거리"
-            )
-
-            if image_url:
-
-                st.image(
-                    image_url,
-                    use_container_width=True,
-                )
-
-
-            st.info(
-                "지역의 특산품과 먹거리를 통해 "
-                "해당 지역만의 로컬 문화를 경험해 보세요."
-            )
-
-
-# =========================================================
-# 지역 소개
+# 상세 지역 정보 - 카테고리별 목록
 # =========================================================
 
-if row is not None:
+st.markdown("## 📚 상세 지역 정보")
 
-    st.markdown(
-        "### 💬 지역 소개"
-    )
+category = st.radio(
+    "상세 정보 카테고리",
+    ["🏞️ 관광지", "🍴 먹거리", "🎉 지역 행사", "🎁 특산품"],
+    horizontal=True,
+    label_visibility="collapsed",
+    key="detail_category",
+)
 
-    st.info(
-        row["소개"]
-    )
+# ---------------------------------------------------------
+# 지역별 데이터 구성
+# ---------------------------------------------------------
 
+detail_df = df.copy()
 
+detail_items = []
+
+# ---------------------------------------------------------
+# 관광지 목록
+# ---------------------------------------------------------
+
+if category == "🏞️ 관광지":
+
+    st.markdown("### 🏞️ 추천 관광지")
+    st.caption("지역별 주요 관광지를 확인하고 길찾기를 이용해 보세요.")
+
+    for _, item in detail_df.iterrows():
+
+        region_name = str(item["지역"])
+        tourist_list = str(item["관광지"]).split("·")
+
+        for tourist in tourist_list:
+
+            tourist = tourist.strip()
+
+            if not tourist:
+                continue
+
+            detail_items.append({
+                "지역": region_name,
+                "이름": tourist,
+                "설명": (
+                    f"{region_name}에서 둘러볼 수 있는 "
+                    f"주요 관광지입니다."
+                ),
+                "이미지": IMAGE_DATA.get(
+                    region_name, {}
+                ).get("구경거리"),
+                "검색어": tourist,
+            })
+
+# ---------------------------------------------------------
+# 먹거리 목록
+# ---------------------------------------------------------
+
+elif category == "🍴 먹거리":
+
+    st.markdown("### 🍴 지역별 대표 먹거리")
+    st.caption("각 지역의 대표 음식과 추천 음식점을 확인해 보세요.")
+
+    for _, item in detail_df.iterrows():
+
+        region_name = str(item["지역"])
+        food = str(item["대표음식"])
+        restaurant = str(item["음식점"])
+
+        detail_items.append({
+            "지역": region_name,
+            "이름": food,
+            "설명": f"추천 음식점 · {restaurant}",
+            "이미지": IMAGE_DATA.get(
+                region_name, {}
+            ).get("먹거리"),
+            "검색어": restaurant,
+        })
+
+# ---------------------------------------------------------
+# 지역 행사 목록
+# ---------------------------------------------------------
+
+elif category == "🎉 지역 행사":
+
+    st.markdown("### 🎉 지역별 행사")
+    st.caption("지역에서 열리는 대표 행사와 축제를 확인해 보세요.")
+
+    for _, item in detail_df.iterrows():
+
+        region_name = str(item["지역"])
+        event = str(item["행사"])
+
+        detail_items.append({
+            "지역": region_name,
+            "이름": event,
+            "설명": (
+                f"{region_name}의 지역 행사입니다. "
+                "방문 전 개최 일정과 운영 여부를 확인해 주세요."
+            ),
+            "이미지": IMAGE_DATA.get(
+                region_name, {}
+            ).get("여행지"),
+            "검색어": region_name + " " + event,
+        })
+
+# ---------------------------------------------------------
+# 특산품 목록
+# ---------------------------------------------------------
+
+elif category == "🎁 특산품":
+
+    st.markdown("### 🎁 지역별 대표 특산품")
+    st.caption("지역의 특색을 담은 대표 특산품을 확인해 보세요.")
+
+    for _, item in detail_df.iterrows():
+
+        region_name = str(item["지역"])
+        specialty = str(item["특산품"])
+
+        detail_items.append({
+            "지역": region_name,
+            "이름": specialty,
+            "설명": (
+                f"{region_name}을(를) 대표하는 "
+                f"지역 특산품입니다."
+            ),
+            "이미지": IMAGE_DATA.get(
+                region_name, {}
+            ).get("여행지"),
+            "검색어": region_name + " " + specialty,
+        })
+
+# ---------------------------------------------------------
+# 카드 표시
+# ---------------------------------------------------------
+
+if not detail_items:
+
+    st.info("표시할 정보가 없습니다.")
+
+else:
+
+    for start in range(0, len(detail_items), 3):
+
+        card_items = detail_items[start:start + 3]
+        card_cols = st.columns(3, gap="medium")
+
+        for col, item in zip(card_cols, card_items):
+
+            with col:
+
+                with st.container(border=True):
+
+                    image_url = item["이미지"]
+
+                    if image_url:
+                        st.image(
+                            image_url,
+                            use_container_width=True
+                        )
+                    else:
+                        st.info("📷 사진 준비 중")
+
+                    st.markdown(
+                        f"### {item['이름']}"
+                    )
+
+                    st.caption(
+                        f"📍 {item['지역']}"
+                    )
+
+                    st.write(
+                        item["설명"]
+                    )
+
+                    search_url = (
+                        "https://map.naver.com/p/search/"
+                        + urllib.parse.quote(item["검색어"])
+                    )
+
+                    st.link_button(
+                        "📍 네이버 지도 길찾기",
+                        search_url,
+                        use_container_width=True
+                    )
 # =========================================================
 # 푸터
 # =========================================================
