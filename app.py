@@ -336,4 +336,4 @@ IMAGE_DATA = {
 
 def render_image_card(title, image_url, description):
     st.markdown(
-        f"""
+        f""")
