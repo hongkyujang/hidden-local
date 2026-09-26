@@ -1951,7 +1951,7 @@ if row is not None:
 st.markdown("### 📍 지금 취향에 맞는 추천 지역")
 
 st.caption(
-    "선택한 여행 취향을 기준으로 가장 잘 맞는 지역 1곳을 추천합니다."
+    "선택한 여행 취향을 분석해 가장 잘 맞는 지역을 한 곳만 추천합니다."
 )
 
 if len(preference_df) > 0:
@@ -1963,51 +1963,257 @@ if len(preference_df) > 0:
         .iloc[0]
     )
 
-    # 추천 지역 정보
     region_name = str(recommended_region["지역"])
     score = recommended_region["추천점수"]
     food = str(recommended_region["대표음식"])
     tourist = str(recommended_region["관광지"])
     specialty = str(recommended_region["특산품"])
 
-    # 추천 지역 표시
-    st.success(
-        f"✨ 지금 선택한 여행 취향에 가장 잘 맞는 지역은 "
-        f"**{region_name}** 입니다."
+    # -----------------------------------------------------
+    # 추천 지역 배너
+    # -----------------------------------------------------
+
+    st.markdown(
+        f"""
+        <div style="
+            background: linear-gradient(
+                135deg,
+                #18352c 0%,
+                #1d4436 55%,
+                #245642 100%
+            );
+            border: 1px solid #356b55;
+            border-radius: 22px;
+            padding: 28px 30px;
+            margin: 18px 0 20px 0;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.22);
+        ">
+
+            <div style="
+                color:#9fe0b6;
+                font-size:14px;
+                font-weight:800;
+                letter-spacing:0.5px;
+                margin-bottom:8px;
+            ">
+                ✨ YOUR LOCAL MATCH
+            </div>
+
+            <div style="
+                color:#ffffff;
+                font-size:30px;
+                font-weight:900;
+                line-height:1.3;
+                margin-bottom:8px;
+            ">
+                📍 {html.escape(region_name)}
+            </div>
+
+            <div style="
+                color:#b8d8c5;
+                font-size:14px;
+                line-height:1.6;
+                margin-bottom:20px;
+            ">
+                지금 선택한 여행 취향과 가장 잘 맞는 지역입니다.
+            </div>
+
+            <div style="
+                display:flex;
+                align-items:center;
+                gap:10px;
+                background:rgba(255,255,255,0.08);
+                border-radius:14px;
+                padding:13px 16px;
+                width:fit-content;
+            ">
+
+                <span style="
+                    color:#9fe0b6;
+                    font-size:13px;
+                    font-weight:700;
+                ">
+                    추천점수
+                </span>
+
+                <span style="
+                    color:#ffffff;
+                    font-size:24px;
+                    font-weight:900;
+                ">
+                    {score}점
+                </span>
+
+            </div>
+
+        </div>
+        """,
+        unsafe_allow_html=True,
     )
 
-    # 추천 점수
-    score_col, food_col, tourist_col, specialty_col = st.columns(4)
+    # -----------------------------------------------------
+    # 추천 지역 상세 정보
+    # -----------------------------------------------------
 
-    with score_col:
-        st.metric(
-            "추천점수",
-            f"{score}점"
+    info1, info2, info3 = st.columns(3, gap="medium")
+
+    with info1:
+
+        st.markdown(
+            f"""
+            <div style="
+                background:#17251f;
+                border:1px solid #294238;
+                border-radius:18px;
+                padding:21px;
+                min-height:125px;
+            ">
+
+                <div style="
+                    color:#78988a;
+                    font-size:13px;
+                    font-weight:700;
+                    margin-bottom:10px;
+                ">
+                    🍴 대표 음식
+                </div>
+
+                <div style="
+                    color:#edf7f0;
+                    font-size:19px;
+                    font-weight:900;
+                ">
+                    {html.escape(food)}
+                </div>
+
+                <div style="
+                    color:#81978d;
+                    font-size:12px;
+                    margin-top:8px;
+                ">
+                    이 지역에서 즐길 수 있는 대표 먹거리
+                </div>
+
+            </div>
+            """,
+            unsafe_allow_html=True,
         )
 
-    with food_col:
-        st.metric(
-            "🍴 대표 음식",
-            food
+    with info2:
+
+        st.markdown(
+            f"""
+            <div style="
+                background:#17251f;
+                border:1px solid #294238;
+                border-radius:18px;
+                padding:21px;
+                min-height:125px;
+            ">
+
+                <div style="
+                    color:#78988a;
+                    font-size:13px;
+                    font-weight:700;
+                    margin-bottom:10px;
+                ">
+                    🏞️ 대표 관광지
+                </div>
+
+                <div style="
+                    color:#edf7f0;
+                    font-size:17px;
+                    font-weight:900;
+                    line-height:1.5;
+                ">
+                    {html.escape(tourist)}
+                </div>
+
+                <div style="
+                    color:#81978d;
+                    font-size:12px;
+                    margin-top:8px;
+                ">
+                    지역에서 추천하는 주요 여행지
+                </div>
+
+            </div>
+            """,
+            unsafe_allow_html=True,
         )
 
-    with tourist_col:
-        st.metric(
-            "🏞️ 대표 관광지",
-            tourist
-        )
+    with info3:
 
-    with specialty_col:
-        st.metric(
-            "🎁 특산품",
-            specialty
+        st.markdown(
+            f"""
+            <div style="
+                background:#17251f;
+                border:1px solid #294238;
+                border-radius:18px;
+                padding:21px;
+                min-height:125px;
+            ">
+
+                <div style="
+                    color:#78988a;
+                    font-size:13px;
+                    font-weight:700;
+                    margin-bottom:10px;
+                ">
+                    🎁 지역 특산품
+                </div>
+
+                <div style="
+                    color:#edf7f0;
+                    font-size:19px;
+                    font-weight:900;
+                ">
+                    {html.escape(specialty)}
+                </div>
+
+                <div style="
+                    color:#81978d;
+                    font-size:12px;
+                    margin-top:8px;
+                ">
+                    지역의 개성을 느낄 수 있는 특산품
+                </div>
+
+            </div>
+            """,
+            unsafe_allow_html=True,
         )
 
 else:
 
-    st.info(
-        "현재 선택한 여행 취향과 일치하는 지역이 없습니다. "
-        "사이드바의 여행 취향을 조금 변경해 보세요."
+    st.markdown(
+        """
+        <div style="
+            background:#17251f;
+            border:1px solid #294238;
+            border-radius:18px;
+            padding:25px;
+            margin-top:15px;
+        ">
+            <div style="
+                font-size:17px;
+                font-weight:800;
+                color:#edf7f0;
+            ">
+                🔎 맞춤 지역을 찾지 못했어요
+            </div>
+
+            <div style="
+                color:#91a89d;
+                font-size:13px;
+                margin-top:8px;
+            ">
+                사이드바의 여행 취향을 조금 변경하면
+                새로운 지역을 추천받을 수 있습니다.
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
     )
 # =========================================================
 # 선택 지역 사진
