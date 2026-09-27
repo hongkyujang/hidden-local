@@ -112,12 +112,12 @@ st.markdown(
 .schedule-time {
     color: #9fe0b6;
     font-weight: 900;
-    font-size: 22px;
+    font-size: 18px;
 }
 
 .schedule-text {
     color: #e4eee8;
-    font-size: 22px;
+    font-size: 18px;
     line-height: 1.6;
     word-break: keep-all;
 }
