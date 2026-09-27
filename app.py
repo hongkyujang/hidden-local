@@ -20,6 +20,21 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
+from pathlib import Path
+
+base_dir = Path(__file__).resolve().parent
+pages_dir = base_dir / "pages"
+recommend_file = pages_dir / "recommend.py"
+
+st.write("실행 중인 app.py:", str(Path(__file__).resolve()))
+st.write("pages 폴더 존재:", pages_dir.exists())
+st.write("recommend.py 존재:", recommend_file.exists())
+
+if pages_dir.exists():
+    st.write(
+        "pages 폴더 파일 목록:",
+        [p.name for p in pages_dir.iterdir()]
+    )
 
 # =========================================================
 # 세션 기본값
