@@ -112,13 +112,13 @@ st.markdown(
 .schedule-time {
     color: #9fe0b6;
     font-weight: 900;
-    font-size: 18px;
+    font-size: 13px;
 }
 
 .schedule-text {
     color: #e4eee8;
-    font-size: 18px;
-    line-height: 1.6;
+    font-size: 13px;
+    line-height: 1.55;
     word-break: keep-all;
 }
 
@@ -850,77 +850,7 @@ with st.sidebar:
 
 
     st.divider()
-
-
     
-# =========================================================
-# 📍 지역 추천 및 등록 기능
-# =========================================================
-
-# 세션 상태 초기화
-if "local_recommendations" not in st.session_state:
-    st.session_state["local_recommendations"] = []
-
-if "show_local_recommend_form" not in st.session_state:
-    st.session_state["show_local_recommend_form"] = False
-
-
-# ---------------------------------------------------------
-# 사이드바 지역 추천 버튼
-# ---------------------------------------------------------
-
-st.sidebar.markdown(
-    """
-    <style>
-    .local-recommend-banner {
-        background: linear-gradient(135deg, #254b3a, #3e7355);
-        border: 1px solid #60866d;
-        border-radius: 14px;
-        padding: 18px 16px;
-        margin-top: 14px;
-        margin-bottom: 10px;
-        color: #ffffff;
-    }
-
-    .local-recommend-banner h3 {
-        font-size: 20px;
-        font-weight: 800;
-        margin: 0 0 9px 0;
-        color: #ffffff;
-    }
-
-    .local-recommend-banner p {
-        font-size: 15px;
-        line-height: 1.7;
-        margin: 0;
-        color: #e5f1e8;
-        word-break: keep-all;
-    }
-    </style>
-
-    <div class="local-recommend-banner">
-        <h3>📍 우리 동네 알리기</h3>
-        <p>
-            아직 많은 사람에게 알려지지 않은<br>
-            숨은 명소와 맛집을 소개해 주세요.<br>
-            여러분의 추천이 새로운 여행지가 됩니다.
-        </p>
-    </div>
-    """,
-    unsafe_allow_html=True,
-)
-
-
-if st.sidebar.button(
-    "🌿 지역 추천하기",
-    key="open_local_recommend",
-    use_container_width=True,
-):
-    st.session_state["show_local_recommend_form"] = (
-        not st.session_state["show_local_recommend_form"]
-    )
-
-
    # =====================================================
     # 출발 위치
     # =====================================================
