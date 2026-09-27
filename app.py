@@ -337,12 +337,12 @@ st.markdown(
 .schedule-time {
     color: #9fe0b6;
     font-weight: 900;
-    font-size: 17px;
+    font-size: 13px;
 }
 
 .schedule-text {
     color: #e4eee8;
-    font-size: 17px;
+    font-size: 13px;
     line-height: 1.55;
     word-break: keep-all;
 }
@@ -2567,168 +2567,65 @@ if row is not None:
                 )
 
                 # -------------------------------------------------
-# 교통수단 버튼
-# -------------------------------------------------
+                # 교통수단 버튼
+                # -------------------------------------------------
 
-st.markdown("##### 이동수단을 선택하세요")
+                st.markdown("##### 이동수단을 선택하세요")
 
-transport_buttons = st.columns(4)
+                transport_buttons = st.columns(4)
 
-with transport_buttons[0]:
+                with transport_buttons[0]:
 
-    if st.button(
-        f"🚗 자가용\n약 {car_minutes}분",
-        key="transport_car",
-        use_container_width=True,
-    ):
+                    if st.button(
+                        f"🚗 자가용\n약 {car_minutes}분",
+                        key="transport_car",
+                        use_container_width=True,
+                    ):
+                        if st.session_state.get("selected_transport") == "car":
+                            st.session_state["selected_transport"] = None
+                        else:
+                            st.session_state["selected_transport"] = "car"
+                        st.rerun()
 
-        if st.session_state.get("selected_transport") == "car":
-            st.session_state["selected_transport"] = None
-        else:
-            st.session_state["selected_transport"] = "car"
+                with transport_buttons[1]:
 
-        st.rerun()
+                    if st.button(
+                        f"🚌 고속버스\n약 {bus_minutes}분",
+                        key="transport_bus",
+                        use_container_width=True,
+                    ):
+                        if st.session_state.get("selected_transport") == "bus":
+                            st.session_state["selected_transport"] = None
+                        else:
+                            st.session_state["selected_transport"] = "bus"
+                        st.rerun()
 
+                with transport_buttons[2]:
 
-with transport_buttons[1]:
+                    if st.button(
+                        f"🚆 기차\n약 {train_minutes}분",
+                        key="transport_train",
+                        use_container_width=True,
+                    ):
+                        if st.session_state.get("selected_transport") == "train":
+                            st.session_state["selected_transport"] = None
+                        else:
+                            st.session_state["selected_transport"] = "train"
+                        st.rerun()
 
-    if st.button(
-        f"🚌 고속버스\n약 {bus_minutes}분",
-        key="transport_bus",
-        use_container_width=True,
-    ):
+                with transport_buttons[3]:
 
-        if st.session_state.get("selected_transport") == "bus":
-            st.session_state["selected_transport"] = None
-        else:
-            st.session_state["selected_transport"] = "bus"
+                    if st.button(
+                        f"✈️ 비행기\n약 {flight_minutes}분+",
+                        key="transport_flight",
+                        use_container_width=True,
+                    ):
+                        if st.session_state.get("selected_transport") == "flight":
+                            st.session_state["selected_transport"] = None
+                        else:
+                            st.session_state["selected_transport"] = "flight"
+                        st.rerun()
 
-        st.rerun()
-
-
-with transport_buttons[2]:
-
-    if st.button(
-        f"🚆 기차\n약 {train_minutes}분",
-        key="transport_train",
-        use_container_width=True,
-    ):
-
-        if st.session_state.get("selected_transport") == "train":
-            st.session_state["selected_transport"] = None
-        else:
-            st.session_state["selected_transport"] = "train"
-
-        st.rerun()
-
-
-with transport_buttons[3]:
-
-    if st.button(
-        f"✈️ 비행기\n약 {flight_minutes}분+",
-        key="transport_flight",
-        use_container_width=True,
-    ):
-
-        if st.session_state.get("selected_transport") == "flight":
-            st.session_state["selected_transport"] = None
-        else:
-            st.session_state["selected_transport"] = "flight"
-
-        st.rerun()
-
-
-# -------------------------------------------------
-# 선택된 교통수단
-# -------------------------------------------------
-
-selected_transport = st.session_state.get(
-    "selected_transport",
-    None
-)
-
-
-# -------------------------------------------------
-# 교통수단 상세정보
-# -------------------------------------------------
-
-if selected_transport == "car":
-
-    st.info(
-        f"""
-🚗 **자가용 예상 경로**
-
-출발지 → {region_name}
-
-- 예상 거리: 약 {road_distance:.0f}km
-- 예상 소요시간: 약 {car_minutes}분
-- 고속도로 및 주요 도로 기준 예상 시간입니다.
-"""
-    )
-
-
-elif selected_transport == "bus":
-
-    route = bus_routes.get(
-        region_name,
-        f"{departure_city} → {region_name} 터미널"
-    )
-
-    st.info(
-        f"""
-🚌 **고속버스 예상 경로**
-
-{route}
-
-- 예상 소요시간: 약 {bus_minutes}분
-- 터미널 이동 및 대기시간은 제외된 예상 시간입니다.
-"""
-    )
-
-
-elif selected_transport == "train":
-
-    route = train_routes.get(
-        region_name,
-        f"{departure_city} → {region_name} 인근 철도역"
-    )
-
-    st.info(
-        f"""
-🚆 **기차 예상 경로**
-
-{route}
-
-- 예상 소요시간: 약 {train_minutes}분
-- 열차 운행 상황에 따라 실제 시간은 달라질 수 있습니다.
-"""
-    )
-
-
-elif selected_transport == "flight":
-
-    route = flight_routes.get(
-        region_name,
-        f"{departure_city} → {region_name} 인근 공항"
-    )
-
-    st.info(
-        f"""
-✈️ **비행기 예상 경로**
-
-{route}
-
-- 예상 소요시간: 약 {flight_minutes}분+
-- 공항 이동 및 탑승 수속 시간은 별도로 고려해야 합니다.
-"""
-    )
-
-
-else:
-
-    st.caption(
-        "교통수단 버튼을 누르면 예상 이동 경로와 소요시간이 표시됩니다."
-    )
                 # -------------------------------------------------
                 # 선택된 교통수단
                 # -------------------------------------------------
@@ -2942,7 +2839,7 @@ else:
                         </span>
 
                         <div class="schedule-text">
-                        {html.escape(evening_time)}
+                        {html.escape(evening_text)}
                         </div>
                         """,
                         unsafe_allow_html=True,
