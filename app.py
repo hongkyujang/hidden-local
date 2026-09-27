@@ -337,12 +337,12 @@ st.markdown(
 .schedule-time {
     color: #9fe0b6;
     font-weight: 900;
-    font-size: 13px;
+    font-size: 17px;
 }
 
 .schedule-text {
     color: #e4eee8;
-    font-size: 13px;
+    font-size: 17px;
     line-height: 1.55;
     word-break: keep-all;
 }
