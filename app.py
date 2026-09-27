@@ -883,13 +883,13 @@ with st.sidebar:
         unsafe_allow_html=True,
     )
 
-   st.page_link(
-    "pages/recommend.py",
-    label="🌿 지역 추천하기",
-    use_container_width=True,
-)
+     st.page_link(
+        "pages/recommend.py",
+         label="🌿 지역 추천하기",
+         use_container_width=True,
+    )  
 
-st.divider()
+    st.divider()
     
    # =====================================================
     # 출발 위치
