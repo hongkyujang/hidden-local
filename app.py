@@ -863,7 +863,7 @@ with st.sidebar:
         height=195,
     )
 
-    # -----------------------------------------------------
+        # -----------------------------------------------------
     # 🌿 지역 추천 페이지 이동
     # -----------------------------------------------------
     st.markdown(
@@ -883,11 +883,11 @@ with st.sidebar:
         unsafe_allow_html=True,
     )
 
-     st.page_link(
+    st.page_link(
         "pages/recommend.py",
-         label="🌿 지역 추천하기",
-         use_container_width=True,
-    )  
+        label="🌿 지역 추천하기",
+        use_container_width=True,
+    )
 
     st.divider()
     
