@@ -850,7 +850,233 @@ with st.sidebar:
 
 
     st.divider()
+
+
     
+# =========================================================
+# 📍 지역 추천 및 등록 기능
+# =========================================================
+
+# 세션 상태 초기화
+if "local_recommendations" not in st.session_state:
+    st.session_state["local_recommendations"] = []
+
+if "show_local_recommend_form" not in st.session_state:
+    st.session_state["show_local_recommend_form"] = False
+
+
+# ---------------------------------------------------------
+# 사이드바 지역 추천 버튼
+# ---------------------------------------------------------
+
+st.sidebar.markdown(
+    """
+    <style>
+    .local-recommend-banner {
+        background: linear-gradient(135deg, #254b3a, #3e7355);
+        border: 1px solid #60866d;
+        border-radius: 14px;
+        padding: 18px 16px;
+        margin-top: 14px;
+        margin-bottom: 10px;
+        color: #ffffff;
+    }
+
+    .local-recommend-banner h3 {
+        font-size: 20px;
+        font-weight: 800;
+        margin: 0 0 9px 0;
+        color: #ffffff;
+    }
+
+    .local-recommend-banner p {
+        font-size: 15px;
+        line-height: 1.7;
+        margin: 0;
+        color: #e5f1e8;
+        word-break: keep-all;
+    }
+    </style>
+
+    <div class="local-recommend-banner">
+        <h3>📍 우리 동네 알리기</h3>
+        <p>
+            아직 많은 사람에게 알려지지 않은<br>
+            숨은 명소와 맛집을 소개해 주세요.<br>
+            여러분의 추천이 새로운 여행지가 됩니다.
+        </p>
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
+
+
+if st.sidebar.button(
+    "🌿 지역 추천하기",
+    key="open_local_recommend",
+    use_container_width=True,
+):
+    st.session_state["show_local_recommend_form"] = (
+        not st.session_state["show_local_recommend_form"]
+    )
+
+
+# ---------------------------------------------------------
+# 지역 추천 입력 폼
+# ---------------------------------------------------------
+
+if st.session_state["show_local_recommend_form"]:
+
+    with st.sidebar.container(border=True):
+
+        st.markdown("### 📝 지역 추천 등록")
+
+        st.caption(
+            "사람들에게 소개하고 싶은 지역의 정보를 작성해 주세요."
+        )
+
+        with st.form("local_recommend_form", clear_on_submit=True):
+
+            # 지역 기본 정보
+            region_name = st.text_input(
+                "📍 지역명",
+                placeholder="예: 전라남도 담양군",
+            )
+
+            recommender = st.text_input(
+                "👤 추천자 또는 단체명",
+                placeholder="예: 담양 주민 / 지역 관광협회",
+            )
+
+            # 사진 업로드
+            region_photo = st.file_uploader(
+                "📷 지역 대표 사진",
+                type=["jpg", "jpeg", "png", "webp"],
+                help="지역 풍경이나 대표 장소의 사진을 올려주세요.",
+            )
+
+            # 먹거리
+            food_name = st.text_input(
+                "🍴 대표 먹거리",
+                placeholder="예: 지역 대표 음식, 맛집 이름",
+            )
+
+            food_description = st.text_area(
+                "먹거리 소개",
+                placeholder="어떤 음식인지, 어디에서 맛볼 수 있는지 소개해 주세요.",
+                height=100,
+            )
+
+            # 구경거리
+            attraction_name = st.text_input(
+                "🏞️ 구경거리",
+                placeholder="예: 숨은 명소, 산책로, 관광지",
+            )
+
+            attraction_description = st.text_area(
+                "구경거리 소개",
+                placeholder="볼거리와 방문하면 좋은 이유를 소개해 주세요.",
+                height=100,
+            )
+
+            # 지역 소개
+            introduction = st.text_area(
+                "✍️ 우리 지역 소개",
+                placeholder="이 지역만의 매력과 사람들에게 알리고 싶은 이야기를 적어주세요.",
+                height=150,
+            )
+
+            submitted = st.form_submit_button(
+                "🌱 지역 추천 등록하기",
+                use_container_width=True,
+            )
+
+            if submitted:
+
+                if not region_name.strip():
+                    st.warning("지역명을 입력해 주세요.")
+
+                elif not introduction.strip():
+                    st.warning("지역 소개글을 입력해 주세요.")
+
+                else:
+
+                    photo_bytes = (
+                        region_photo.getvalue()
+                        if region_photo is not None
+                        else None
+                    )
+
+                    recommendation = {
+                        "지역명": region_name.strip(),
+                        "추천자": recommender.strip(),
+                        "사진": photo_bytes,
+                        "사진형식": (
+                            region_photo.type
+                            if region_photo is not None
+                            else None
+                        ),
+                        "먹거리": food_name.strip(),
+                        "먹거리소개": food_description.strip(),
+                        "구경거리": attraction_name.strip(),
+                        "구경거리소개": attraction_description.strip(),
+                        "지역소개": introduction.strip(),
+                    }
+
+                    st.session_state[
+                        "local_recommendations"
+                    ].append(recommendation)
+
+                    st.session_state[
+                        "show_local_recommend_form"
+                    ] = False
+
+                    st.success("지역 추천이 등록되었습니다!")
+                    st.rerun()
+
+
+# ---------------------------------------------------------
+# 등록된 지역 추천 목록
+# ---------------------------------------------------------
+
+if st.session_state["local_recommendations"]:
+
+    st.sidebar.markdown("---")
+    st.sidebar.markdown("### 🌱 주민 추천 지역")
+
+    for idx, item in enumerate(
+        reversed(st.session_state["local_recommendations"])
+    ):
+
+        with st.sidebar.expander(
+            f"📍 {item['지역명']}",
+            expanded=False,
+        ):
+
+            if item["사진"] is not None:
+
+                st.image(
+                    item["사진"],
+                    width="stretch",
+                )
+
+            if item["추천자"]:
+                st.caption(f"추천자: {item['추천자']}")
+
+            if item["먹거리"]:
+                st.markdown(f"🍴 **{item['먹거리']}**")
+
+            if item["먹거리소개"]:
+                st.write(item["먹거리소개"])
+
+            if item["구경거리"]:
+                st.markdown(f"🏞️ **{item['구경거리']}**")
+
+            if item["구경거리소개"]:
+                st.write(item["구경거리소개"])
+
+            st.markdown("✍️ **지역 소개**")
+            st.write(item["지역소개"])
    # =====================================================
     # 출발 위치
     # =====================================================
