@@ -2566,49 +2566,76 @@ if row is not None:
                     }
                 )
 
-                # -------------------------------------------------
-                # 교통수단 버튼
-                # -------------------------------------------------
+               # -------------------------------------------------
+# 교통수단 버튼
+# -------------------------------------------------
 
-                st.markdown("##### 이동수단을 선택하세요")
+st.markdown("##### 이동수단을 선택하세요")
 
-                transport_buttons = st.columns(4)
+transport_buttons = st.columns(4)
 
-                with transport_buttons[0]:
+with transport_buttons[0]:
 
-                    if st.button(
-                        f"🚗 자가용\n약 {car_minutes}분",
-                        key="transport_car",
-                        use_container_width=True,
-                    ):
-                        st.session_state["selected_transport"] = "car"
+    if st.button(
+        f"🚗 자가용\n약 {car_minutes}분",
+        key="transport_car",
+        use_container_width=True,
+    ):
 
-                with transport_buttons[1]:
+        if st.session_state.get("selected_transport") == "car":
+            st.session_state["selected_transport"] = None
+        else:
+            st.session_state["selected_transport"] = "car"
 
-                    if st.button(
-                        f"🚌 고속버스\n약 {bus_minutes}분",
-                        key="transport_bus",
-                        use_container_width=True,
-                    ):
-                        st.session_state["selected_transport"] = "bus"
+        st.rerun()
 
-                with transport_buttons[2]:
 
-                    if st.button(
-                        f"🚆 기차\n약 {train_minutes}분",
-                        key="transport_train",
-                        use_container_width=True,
-                    ):
-                        st.session_state["selected_transport"] = "train"
+with transport_buttons[1]:
 
-                with transport_buttons[3]:
+    if st.button(
+        f"🚌 고속버스\n약 {bus_minutes}분",
+        key="transport_bus",
+        use_container_width=True,
+    ):
 
-                    if st.button(
-                        f"✈️ 비행기\n약 {flight_minutes}분+",
-                        key="transport_flight",
-                        use_container_width=True,
-                    ):
-                        st.session_state["selected_transport"] = "flight"
+        if st.session_state.get("selected_transport") == "bus":
+            st.session_state["selected_transport"] = None
+        else:
+            st.session_state["selected_transport"] = "bus"
+
+        st.rerun()
+
+
+with transport_buttons[2]:
+
+    if st.button(
+        f"🚆 기차\n약 {train_minutes}분",
+        key="transport_train",
+        use_container_width=True,
+    ):
+
+        if st.session_state.get("selected_transport") == "train":
+            st.session_state["selected_transport"] = None
+        else:
+            st.session_state["selected_transport"] = "train"
+
+        st.rerun()
+
+
+with transport_buttons[3]:
+
+    if st.button(
+        f"✈️ 비행기\n약 {flight_minutes}분+",
+        key="transport_flight",
+        use_container_width=True,
+    ):
+
+        if st.session_state.get("selected_transport") == "flight":
+            st.session_state["selected_transport"] = None
+        else:
+            st.session_state["selected_transport"] = "flight"
+
+        st.rerun()
 
                 # -------------------------------------------------
                 # 선택된 교통수단
