@@ -873,7 +873,7 @@ with st.sidebar:
         key="go_to_local_recommend",
         use_container_width=True,
     ):
-        st.switch_page("pages/1_지역_추천.py")
+        st.switch_page("pages/recommend.py")
 
     st.divider()
     
