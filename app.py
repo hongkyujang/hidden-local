@@ -20,21 +20,6 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-from pathlib import Path
-
-base_dir = Path(__file__).resolve().parent
-pages_dir = base_dir / "pages"
-recommend_file = pages_dir / "recommend.py"
-
-st.write("실행 중인 app.py:", str(Path(__file__).resolve()))
-st.write("pages 폴더 존재:", pages_dir.exists())
-st.write("recommend.py 존재:", recommend_file.exists())
-
-if pages_dir.exists():
-    st.write(
-        "pages 폴더 파일 목록:",
-        [p.name for p in pages_dir.iterdir()]
-    )
 
 # =========================================================
 # 세션 기본값
@@ -863,31 +848,6 @@ with st.sidebar:
         height=195,
     )
 
-        # -----------------------------------------------------
-    # 🌿 지역 추천 페이지 이동
-    # -----------------------------------------------------
-    st.markdown(
-        """
-        <div style="background:linear-gradient(135deg,#254b3a,#3e7355);
-                    border:1px solid #60866d;border-radius:14px;
-                    padding:18px 16px;margin:14px 0 10px;color:white;">
-            <div style="font-size:20px;font-weight:800;margin-bottom:9px;">
-                📍 우리 동네 알리기
-            </div>
-            <div style="font-size:15px;line-height:1.7;color:#e5f1e8;">
-                숨겨진 지역의 매력을 소개해 주세요.<br>
-                여러분의 추천이 새로운 여행지가 됩니다.
-            </div>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-
-    st.page_link(
-        "pages/recommend.py",
-        label="🌿 지역 추천하기",
-        use_container_width=True,
-    )
 
     st.divider()
     
@@ -1051,8 +1011,6 @@ with st.sidebar:
 
 filtered_df = df.copy()
 
-
-keyword = st.session_state.get("keyword", "")
 
 if keyword.strip():
 
