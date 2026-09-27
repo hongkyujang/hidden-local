@@ -850,7 +850,50 @@ with st.sidebar:
 
 
     st.divider()
+
     
+# =========================================================
+# 🌿 지역 추천 페이지 이동 버튼
+# =========================================================
+
+st.sidebar.markdown(
+    """
+    <div style="
+        background: linear-gradient(135deg, #254b3a, #3e7355);
+        border: 1px solid #60866d;
+        border-radius: 14px;
+        padding: 18px 16px;
+        margin-top: 14px;
+        margin-bottom: 10px;
+        color: white;
+    ">
+        <div style="
+            font-size: 20px;
+            font-weight: 800;
+            margin-bottom: 9px;
+        ">
+            📍 우리 동네 알리기
+        </div>
+
+        <div style="
+            font-size: 15px;
+            line-height: 1.7;
+            color: #e5f1e8;
+        ">
+            숨겨진 지역의 매력을 소개해 주세요.<br>
+            여러분의 추천이 새로운 여행지가 됩니다.
+        </div>
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
+
+if st.sidebar.button(
+    "🌿 지역 추천하기",
+    key="go_to_local_recommend",
+    use_container_width=True,
+):
+    st.switch_page("pages/1_지역_추천.py")
    # =====================================================
     # 출발 위치
     # =====================================================
